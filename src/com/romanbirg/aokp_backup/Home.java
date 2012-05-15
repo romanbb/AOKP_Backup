@@ -47,8 +47,12 @@ public class Home extends Activity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
+        	
+        	View v = inflater.inflate(R.layout.main, null);
 
-            return inflater.inflate(R.layout.main, null);
+        	
+        	
+            return v;
         }
 
         @Override
