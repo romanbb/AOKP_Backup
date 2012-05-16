@@ -1,6 +1,8 @@
 
 package com.romanbirg.aokp_backup;
 
+import java.util.ArrayList;
+
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
@@ -10,8 +12,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 
 public class Home extends Activity {
 
@@ -37,30 +42,55 @@ public class Home extends Activity {
     }
 
     public static class BackupFragment extends Fragment {
-        
+
+        String[] cats;
+        ArrayList<CheckBox> checkBoxes = new ArrayList<CheckBox>();
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setHasOptionsMenu(true);
+
         }
-        
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-        	
-        	View v = inflater.inflate(R.layout.main, null);
 
-        	
-        	
+            View v = inflater.inflate(R.layout.main, null);
+            LinearLayout categories = (LinearLayout) v.findViewById(R.id.categories);
+            cats = getActivity().getApplicationContext().getResources()
+                    .getStringArray(R.array.categories);
+            for (int i = 0; i < cats.length; i++) {
+                CheckBox b = new CheckBox(getActivity());
+                b.setTag(cats[i]);
+                categories.addView(b);
+            }
+
             return v;
         }
 
         @Override
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
             inflater.inflate(R.menu.backup, menu);
             super.onCreateOptionsMenu(menu, inflater);
         }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menu_backup:
+                    backup();
+
+            }
+            return super.onOptionsItemSelected(item);
+        }
+
+        public void backup() {
+            
+            Backup b = new Backup(Context, );
+        }
+
     }
 
     public static class RestoreFragment extends Fragment {

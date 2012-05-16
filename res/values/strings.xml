@@ -4,38 +4,51 @@
     <string name="hello">Hello World, Home!</string>
     <string name="app_name">AOKP_Backup</string>
     <string name="backup">Backup</string>
-	<string name="restore">Restore</string>
-	<string name="backup_all">Backup all settings</string>
-	
-	<string-array name="cat_general_ui">
-		<item>disable_boot_animation</item>
-		<item>disable_boot_audio</item>
-		<item>disable_bug_mailer</item>
-		<item>accelerometer_rotation_angles</item>
-		<item>recent_app_switcher</item>
-		<item>lcd_density</item>
-		<item>crt_off_animation</item>
-		<item>ime_switcher</item>
-		<item>enable_volume_options</item>
-		<item>custom_carrier_label</item>
-		<item>kill_app_longpress_back</item>
-		<item>navigation_bar_home_longpress</item>
-		<item>accelerometer_rotation_settle_time</item>
-	</string-array>
-	
-	<string-array name="cat_general_ui_strings">
-		<item>Disable boot animation</item>
-		<item>Disable boot audio</item>
-		<item>Disable bug mailer</item>
-		<item>Allow 180 degree rotation</item>
-		<item>Recents window style</item>
-		<item>LCD density</item>
-		<item>CRT Off animation</item>
-		<item>Show IME switcher</item>
-		<item>Enable volume options</item>
-		<item>Custom carrier label</item>
-		<item>Kill app on longpress back</item>
-		<item>Rotation delay</item>
-	</string-array>
-    
+    <string name="restore">Restore</string>
+    <string name="backup_all">Backup all settings</string>
+
+    <string-array name="categories">
+        <item>General UI</item>
+        <item>Navigation Bar</item>
+        <item>Lockscreen Options</item>
+        <item>Power Menu Options</item>
+        <item>Weather</item>
+        <item>Power Saver</item>
+        <item>LED Options</item>
+        <item>Statusbar General</item>
+        <item>Statusbar Toggles</item>
+        <item>Statusbar Clock</item>
+        <item>Statusbar Battery</item>
+        <item>Statusbar Signal</item>
+    </string-array>
+    <string-array name="cat_general_ui">
+        <item>disable_boot_animation</item>
+        <item>disable_boot_audio</item>
+        <item>disable_bug_mailer</item>
+        <item>accelerometer_rotation_angles</item>
+        <item>recent_app_switcher</item>
+        <item>lcd_density</item>
+        <item>crt_off_animation</item>
+        <item>ime_switcher</item>
+        <item>enable_volume_options</item>
+        <item>custom_carrier_label</item>
+        <item>kill_app_longpress_back</item>
+        <item>navigation_bar_home_longpress</item>
+        <item>accelerometer_rotation_settle_time</item>
+    </string-array>
+    <string-array name="cat_general_ui_strings">
+        <item>Disable boot animation</item>
+        <item>Disable boot audio</item>
+        <item>Disable bug mailer</item>
+        <item>Allow 180 degree rotation</item>
+        <item>Recents window style</item>
+        <item>LCD density</item>
+        <item>CRT Off animation</item>
+        <item>Show IME switcher</item>
+        <item>Enable volume options</item>
+        <item>Custom carrier label</item>
+        <item>Kill app on longpress back</item>
+        <item>Rotation delay</item>
+    </string-array>
+
 </resources>
