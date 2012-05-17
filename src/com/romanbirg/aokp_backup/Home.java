@@ -1,8 +1,6 @@
 
 package com.romanbirg.aokp_backup;
 
-import java.util.ArrayList;
-
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
@@ -43,14 +41,28 @@ public class Home extends Activity {
 
     public static class BackupFragment extends Fragment {
 
+        private static final String KEY_CATS = "categoreis";
+        private static final String KEY_CHECK_ALL = "checkAll";
+
         String[] cats;
-        ArrayList<CheckBox> checkBoxes = new ArrayList<CheckBox>();
+        CheckBox[] checkBoxes;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setHasOptionsMenu(true);
 
+            cats = getActivity().getApplicationContext().getResources()
+                    .getStringArray(R.array.categories);
+            checkBoxes = new CheckBox[cats.length];
+
+        }
+
+        @Override
+        public void onSaveInstanceState(Bundle outState) {
+            outState.putBooleanArray(KEY_CATS, getCheckedBoxes());
+            outState.putBoolean(KEY_CHECK_ALL, getShouldBackupAll());
+            super.onSaveInstanceState(outState);
         }
 
         @Override
@@ -58,9 +70,10 @@ public class Home extends Activity {
                 Bundle savedInstanceState) {
 
             View v = inflater.inflate(R.layout.main, null);
+            CheckBox backupAll = (CheckBox) v.findViewById(R.id.backup_all);
+            backupAll.setOnClickListener(mBackupAllListener);
+
             LinearLayout categories = (LinearLayout) v.findViewById(R.id.categories);
-            cats = getActivity().getApplicationContext().getResources()
-                    .getStringArray(R.array.categories);
             for (int i = 0; i < cats.length; i++) {
                 CheckBox b = new CheckBox(getActivity());
                 b.setTag(cats[i]);
@@ -68,6 +81,32 @@ public class Home extends Activity {
             }
 
             return v;
+        }
+
+        @Override
+        public void onViewCreated(View view, Bundle savedInstanceState) {
+            boolean[] checkStates;
+            boolean allChecked;
+
+            if (savedInstanceState != null) {
+                checkStates = savedInstanceState.getBooleanArray(KEY_CATS);
+                allChecked = savedInstanceState.getBoolean(KEY_CHECK_ALL);
+            } else {
+                allChecked = true;
+                checkStates = new boolean[cats.length];
+                for (int i = 0; i < checkStates.length; i++) {
+                    checkStates[i] = true;
+                }
+            }
+
+            for (int i = 0; i < checkBoxes.length; i++) {
+                checkBoxes[i] = (CheckBox) getView().findViewWithTag(cats[i]);
+                checkBoxes[i].setText(cats[i]);
+                checkBoxes[i].setChecked(checkStates[i]);
+                checkBoxes[i].setEnabled(!allChecked);
+            }
+
+            super.onViewCreated(view, savedInstanceState);
         }
 
         @Override
@@ -81,16 +120,49 @@ public class Home extends Activity {
             switch (item.getItemId()) {
                 case R.id.menu_backup:
                     backup();
+                    break;
 
             }
             return super.onOptionsItemSelected(item);
         }
 
         public void backup() {
-            
-            Backup b = new Backup(Context, );
+            boolean[] checkedCats = getCheckedBoxes();
+            Backup b = new Backup(getActivity(), checkedCats);
+            b.backupSettings("test");
         }
 
+        private boolean getShouldBackupAll() {
+            CheckBox backupAll = (CheckBox) getView().findViewById(R.id.backup_all);
+            if (backupAll != null)
+                return backupAll.isChecked();
+
+            return false;
+        }
+
+        private boolean[] getCheckedBoxes() {
+            boolean[] boxStates = new boolean[cats.length];
+            for (int i = 0; i < cats.length; i++) {
+                CheckBox check = (CheckBox) getView().findViewWithTag(cats[i]);
+                boxStates[i] = check.isChecked();
+            }
+            return boxStates;
+        }
+
+        View.OnClickListener mBackupAllListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateState();
+            }
+        };
+
+        private void updateState() {
+            CheckBox box = (CheckBox) getView().findViewById(R.id.backup_all);
+            boolean newState = !box.isChecked();
+            for (CheckBox b : checkBoxes) {
+                b.setEnabled(newState);
+            }
+        }
     }
 
     public static class RestoreFragment extends Fragment {
@@ -123,6 +195,7 @@ public class Home extends Activity {
         /* The following are each of the ActionBar.TabListener callbacks */
 
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
+            mFragment = mActivity.getFragmentManager().findFragmentByTag(mTag);
             // Check if the fragment is already initialized
             if (mFragment == null) {
                 // If not, instantiate and add it to the activity
