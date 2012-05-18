@@ -49,7 +49,7 @@ public class Backup {
         catsToBackup = categories;
     }
 
-    public void backupSettings(String name) {
+    public boolean backupSettings(String name) {
         this.name = name;
         for (int i = 0; i < catsToBackup.length; i++) {
             backupValues.add(i, new ArrayList<SVal>());
@@ -57,7 +57,7 @@ public class Backup {
                 backupSettings(i);
             }
         }
-        writeBackupSetings();
+        return writeBackupSetings();
     }
 
     private void backupSettings(int category) {
