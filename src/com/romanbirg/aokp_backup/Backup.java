@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
 import android.util.Log;
 
 public class Backup {
@@ -21,18 +20,6 @@ public class Backup {
     public static final String TAG = "Backup";
 
     // categories
-    public static final int CAT_GENERAL_UI = 0;
-    public static final int CAT_NAVIGATION_BAR = 1;
-    public static final int CAT_LOCKSCREEN_OPTS = 2;
-    public static final int CAT_POWER_MENU_OPTS = 3;
-    public static final int CAT_WEATHER = 4;
-    public static final int CAT_POWER_SAVER = 5;
-    public static final int CAT_LED = 6;
-    public static final int CAT_SB_GENERAL = 7;
-    public static final int CAT_SB_TOGGLES = 8;
-    public static final int CAT_SB_CLOCK = 9;
-    public static final int CAT_SB_BATTERY = 10;
-    public static final int CAT_SB_SIGNAL = 11;
 
     private static int NUM_CATS = 12;
 
@@ -66,40 +53,40 @@ public class Backup {
         ArrayList<SVal> vals = currentSVals = new ArrayList<SVal>();
         String[] settings = null;
         switch (category) {
-            case CAT_GENERAL_UI:
+            case Categories.CAT_GENERAL_UI:
                 settings = res.getStringArray(R.array.cat_general_ui);
                 break;
-            case CAT_NAVIGATION_BAR:
+            case Categories.CAT_NAVIGATION_BAR:
                 settings = res.getStringArray(R.array.cat_navigation_bar);
                 break;
-            case CAT_LED:
+            case Categories.CAT_LED:
                 settings = res.getStringArray(R.array.cat_led);
                 break;
-            case CAT_LOCKSCREEN_OPTS:
+            case Categories.CAT_LOCKSCREEN_OPTS:
                 settings = res.getStringArray(R.array.cat_lockscreen);
                 break;
-            case CAT_POWER_MENU_OPTS:
+            case Categories.CAT_POWER_MENU_OPTS:
                 settings = res.getStringArray(R.array.cat_powermenu);
                 break;
-            case CAT_POWER_SAVER:
+            case Categories.CAT_POWER_SAVER:
                 settings = res.getStringArray(R.array.cat_powersaver);
                 break;
-            case CAT_SB_BATTERY:
+            case Categories.CAT_SB_BATTERY:
                 settings = res.getStringArray(R.array.cat_statusbar_battery);
                 break;
-            case CAT_SB_CLOCK:
+            case Categories.CAT_SB_CLOCK:
                 settings = res.getStringArray(R.array.cat_statusbar_clock);
                 break;
-            case CAT_SB_GENERAL:
+            case Categories.CAT_SB_GENERAL:
                 settings = res.getStringArray(R.array.cat_statusbar_general);
                 break;
-            case CAT_SB_SIGNAL:
+            case Categories.CAT_SB_SIGNAL:
                 settings = res.getStringArray(R.array.cat_statusbar_signal);
                 break;
-            case CAT_SB_TOGGLES:
+            case Categories.CAT_SB_TOGGLES:
                 settings = res.getStringArray(R.array.cat_statusbar_toggles);
                 break;
-            case CAT_WEATHER:
+            case Categories.CAT_WEATHER:
                 settings = res.getStringArray(R.array.cat_weather);
                 break;
         }
@@ -135,7 +122,9 @@ public class Backup {
             }
         }
 
-        File dir = new File(mContext.getExternalFilesDir(null), name);
+        File backups = Tools.getBackupDirectory(mContext);
+        backups.mkdir();
+        File dir = new File(backups, name);
         if (dir.exists()) {
             dir.delete();
             dir.mkdir();
@@ -175,14 +164,25 @@ public class Backup {
 
             return true;
         } else if (setting.equals("navigation_bar_icons")) {
-            String outDir = new File(mContext.getExternalFilesDir(null), name).getAbsolutePath();
+            String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
             ContentResolver resolver = mContext.getContentResolver();
             for (int i = 0; i < 5; i++) {
-                String set = "navigation_custom_app_icon_" + i;
-                String val = Settings.System.getString(resolver, set);
-                if (val != null) {
-                    currentSVals.add(new SVal(set, val));
-                    File f = new File(Uri.parse(val).getPath());
+                String iconIntent = "navigation_custom_app_intent_" + i;
+                String iconIntentValue = Settings.System.getString(resolver, iconIntent);
+                if (iconIntentValue != null)
+                    currentSVals.add(new SVal(iconIntent, iconIntentValue));
+
+                String iconLongPressIntent = "navigation_longpress_app_intent_" + i;
+                String iconLongPressIntentValue = Settings.System.getString(resolver,
+                        iconLongPressIntent);
+                if (iconLongPressIntentValue != null)
+                    currentSVals.add(new SVal(iconLongPressIntent, iconLongPressIntentValue));
+
+                String iconSetting = "navigation_custom_app_icon_" + i;
+                String iconValue = Settings.System.getString(resolver, iconSetting);
+                if (iconValue != null && iconValue.length() > 0) {
+                    currentSVals.add(new SVal(iconSetting, iconValue));
+                    File f = new File(Uri.parse(iconValue).getPath());
                     if (f.exists()) {
                         // custom icon
                         new ShellCommand().su
@@ -192,22 +192,24 @@ public class Backup {
                 }
             }
 
-            new ShellCommand().su.run("cp /data/data/com.aokp.romcontrol/files/navbar_icon_* "
-                    + outDir + "/");
-
             return true;
         } else if (setting.equals("lockscreen_wallpaper")) {
-            String outDir = new File(mContext.getExternalFilesDir(null), name).getAbsolutePath();
+            String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
 
             new ShellCommand().su
-                    .run("cp /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg "
+                    .run("cp /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.* "
                             + outDir);
 
             return true;
         } else if (setting.equals("lockscreen_icons")) {
-            String outDir = new File(mContext.getExternalFilesDir(null), name).getAbsolutePath();
+            String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
             ContentResolver resolver = mContext.getContentResolver();
             for (int i = 0; i < 8; i++) {
+                String intentSetting = "lockscreen_custom_app_intent_" + i;
+                String intentValue = Settings.System.getString(resolver, intentSetting);
+                if (intentValue != null)
+                    currentSVals.add(new SVal(intentSetting, intentValue));
+
                 String set = "lockscreen_custom_app_icon_" + i;
                 String val = Settings.System.getString(resolver, set);
                 if (val != null) {
@@ -228,20 +230,6 @@ public class Backup {
         }
 
         return false;
-    }
-
-    public static class SVal {
-        String setting;
-        String val;
-
-        public SVal(String setting, String val) {
-            this.setting = setting;
-            this.val = val;
-        }
-
-        public String toString() {
-            return setting + "=" + val;
-        }
     }
 
 }
