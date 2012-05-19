@@ -48,9 +48,10 @@ public class Restore {
         String strLine;
         while ((strLine = br.readLine()) != null) {
             // System.out.println(strLine);
-            String[] line = strLine.split("=");
-            if (line.length > 1)
-                settingsFromFile.put(line[0], new SVal(line[0], line[1]));
+            int split = strLine.indexOf("=");
+            String setting = strLine.substring(0, split);
+            String value = strLine.substring(split + 1, strLine.length());
+            settingsFromFile.put(setting, new SVal(setting, value));
         }
         in.close();
     }
@@ -104,19 +105,18 @@ public class Restore {
         }
 
         for (String s : settingsArray) {
-            if (!settingsFromFile.containsKey(s))
-                continue;
-
             SVal settingToRestore = settingsFromFile.get(s);
-            if (!shouldHandleSpecialCase(settingToRestore)) {
+            if (!shouldHandleSpecialCase(s) && settingsFromFile.containsKey(s)) {
                 restoreSetting(settingToRestore);
             }
         }
     }
 
-    public boolean shouldHandleSpecialCase(SVal s) {
-        String setting = s.setting;
-        String value = s.val;
+    public boolean shouldHandleSpecialCase(String setting) {
+
+        String value = "";
+        if (settingsFromFile.containsKey(setting))
+            value = settingsFromFile.get(setting).val;
 
         if (setting.equals("disable_boot_animation") && value.equals("1")) {
             if (new File("/system/media/bootanimation.zip").exists()) {
@@ -141,61 +141,61 @@ public class Restore {
         } else if (setting.equals("navigation_bar_icons")) {
             File outDir = Tools.getBackupDirectory(mContext, name);
             for (int i = 0; i < 5; i++) {
-                String iconIntent = "navigation_custom_app_intent_" + i;
-                if (settingsFromFile.containsKey(iconIntent))
-                    restoreSetting(settingsFromFile.get(iconIntent));
-
-                String iconLPIntent = "navigation_longpress_app_intent_" + i;
-                if (settingsFromFile.containsKey(iconLPIntent))
-                    restoreSetting(settingsFromFile.get(iconLPIntent));
+                // String iconIntent = "navigation_custom_app_intent_" + i;
+                // if (settingsFromFile.containsKey(iconIntent))
+                // restoreSetting(settingsFromFile.get(iconIntent));
+                //
+                // String iconLPIntent = "navigation_longpress_app_intent_" + i;
+                // if (settingsFromFile.containsKey(iconLPIntent))
+                // restoreSetting(settingsFromFile.get(iconLPIntent));
 
                 // navigation_custom_app_icon_0
                 String settingName = "navigation_custom_app_icon_" + i;
-
+                String iconName = "navbar_icon_" + i + ".png";
+                Log.i(TAG, iconName);
                 new ShellCommand().su
-                        .run("rm -f /data/data/com.aokp.romcontrol/files/" + settingName + ".*");
-                if (!settingsFromFile.containsKey(settingName)) {
+                        .runWaitFor("rm -f /data/data/com.aokp.romcontrol/files/" + iconName);
+                if (settingsFromFile.containsKey(settingName)) {
+                    String cmd = "cp " + outDir.getAbsolutePath() + "/" + iconName
+                            + " /data/data/com.aokp.romcontrol/files/";
+                    new ShellCommand().su.runWaitFor(cmd);
+                    restoreSetting(settingsFromFile.get(settingName));
+                } else {
                     restoreSetting(settingName, "", false);
-                    continue;
                 }
 
-                new ShellCommand().su
-                        .run("cp " + outDir.getAbsolutePath() + "/" + settingName
-                                + ".* /data/data/com.aokp.romcontrol/files/");
-                restoreSetting(settingsFromFile.get(settingName));
             }
             return true;
         } else if (setting.equals("lockscreen_wallpaper")) {
             String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
 
             new ShellCommand().su
-                    .run("rm -f /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.*");
+                    .run("rm -f /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg");
             new ShellCommand().su
-                    .run("cp " + outDir + "/lockscreen_wallpaper.*"
+                    .run("cp " + outDir + "/lockscreen_wallpaper.jpg"
                             + " /data/data/com.aokp.romcontrol/files/");
 
             return true;
         } else if (setting.equals("lockscreen_icons")) {
             String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
             for (int i = 0; i < 8; i++) {
-                String iconIntent = "lockscreen_custom_app_intent_" + i;
-                if (settingsFromFile.containsKey(iconIntent))
-                    restoreSetting(settingsFromFile.get(iconIntent));
+                // String iconIntent = "lockscreen_custom_app_intent_" + i;
+                // if (settingsFromFile.containsKey(iconIntent))
+                // restoreSetting(settingsFromFile.get(iconIntent));
 
                 String settingName = "lockscreen_custom_app_icon_" + i;
                 File iconToRestore = new File(outDir, settingName);
 
                 new ShellCommand().su
                         .run("rm -f /data/data/com.aokp.romcontrol/files/" + settingName + ".*");
-                if (!settingsFromFile.containsKey(settingName)) {
+                if (settingsFromFile.containsKey(settingName)) {
+                    new ShellCommand().su
+                            .run("cp " + iconToRestore.getAbsolutePath() + ".* "
+                                    + "/data/data/com.aokp.romcontrol/files/");
+                    restoreSetting(settingsFromFile.get(settingName));
+                } else {
                     restoreSetting(settingName, "", false);
-                    continue;
                 }
-
-                new ShellCommand().su
-                        .run("cp " + iconToRestore.getAbsolutePath() + ".* "
-                                + "/data/data/com.aokp.romcontrol/files/");
-                restoreSetting(settingsFromFile.get(settingName));
 
             }
             return true;

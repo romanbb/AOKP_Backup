@@ -58,7 +58,6 @@
         <item>navigation_bar_buttons_qty</item>
         <item>navigation_bar_tint</item>
         <item>navigation_bar_glow_tint</item>
-        <item>navigation_bar_icons</item>
         <item>navigation_bar_button_alpha</item>
         <item>navigation_bar_glow_duration_off</item>
         <item>navigation_bar_glow_duration_on</item>
@@ -74,6 +73,7 @@
         <item>navigation_custom_app_intent_2</item>
         <item>navigation_custom_app_intent_3</item>
         <item>navigation_custom_app_intent_4</item>
+        <item>navigation_bar_icons</item>
     </string-array>
     <string-array name="cat_lockscreen">
         <item>lockscreen_wallpaper</item>
@@ -177,5 +177,8 @@
         <item>statusbar_signal_text_color</item>
         <item>statusbar_wifi_signal_text_color</item>
     </string-array>
+
+    <string name="no_root">No root</string>
+    <string name="not_aokp">You aren\'t running AOKP, silly!</string>
 
 </resources>

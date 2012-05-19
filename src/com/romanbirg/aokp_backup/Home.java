@@ -6,8 +6,9 @@ import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.widget.TextView;
 
 public class Home extends Activity {
 
@@ -33,6 +34,44 @@ public class Home extends Activity {
         if (savedInstanceState != null) {
             getActionBar().setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
         }
+
+        new CheckTask(this).execute();
+
+    }
+
+    class CheckTask extends AsyncTask<Void, Void, Void> {
+
+        Activity activity;
+
+        public CheckTask(Activity a) {
+            activity = a;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (!new ShellCommand().canSU()) {
+                activity.getActionBar().removeAllTabs();
+                activity.getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                activity.getActionBar().setDisplayShowHomeEnabled(true);
+                activity.setContentView(R.layout.error);
+                TextView error = (TextView) activity.findViewById(R.id.error);
+                error.setText(R.string.no_root);
+                return null;
+            }
+
+            if (!Tools.getROMVersion().startsWith("aokp")) {
+                activity.getActionBar().removeAllTabs();
+                activity.getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+                activity.getActionBar().setDisplayShowHomeEnabled(true);
+                activity.setContentView(R.layout.error);
+                TextView error = (TextView) activity.findViewById(R.id.error);
+                error.setText(R.string.not_aokp);
+                return null;
+            }
+
+            return null;
+        }
+
     }
 
     @Override

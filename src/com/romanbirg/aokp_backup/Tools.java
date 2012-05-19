@@ -2,10 +2,14 @@
 package com.romanbirg.aokp_backup;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
 
 import android.content.Context;
 import android.util.Log;
@@ -13,6 +17,24 @@ import android.util.Log;
 public class Tools {
 
     static final String TAG = "Tools";
+
+    private static Tools instance;
+
+    HashMap<String, String> props;
+
+    public static ShellCommand.SH sh = new ShellCommand().sh;
+    public static ShellCommand.SH su = new ShellCommand().su;
+
+    public Tools() {
+        readBuildProp();
+    }
+
+    public static Tools getInstance() {
+        if (instance == null)
+            return new Tools();
+        else
+            return instance;
+    }
 
     public static File getBackupDirectory(Context c) {
         return new File(c.getExternalFilesDir(null), "backups");
@@ -64,5 +86,45 @@ public class Tools {
                     + " " + path).success();
         }
         return false;
+    }
+
+    public static String getROMVersion() {
+        String modVersion = Tools.getInstance().getProp("ro.modversion");
+        String cmVersion = Tools.getInstance().getProp("ro.cm.version");
+        String aokpVersion = Tools.getInstance().getProp("ro.aokp.version");
+        if (modVersion != null)
+            return modVersion;
+        else if (cmVersion != null)
+            return cmVersion;
+        else if (aokpVersion != null)
+            return aokpVersion;
+        else
+            return "<none>";
+    }
+
+    public String getProp(String key) {
+        if (props != null && props.containsKey(key))
+            return props.get(key);
+
+        return null;
+    }
+
+    private void readBuildProp() {
+        props = new HashMap<String, String>();
+        try {
+            FileInputStream fstream = new FileInputStream("/system/build.prop");
+            DataInputStream in = new DataInputStream(fstream);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String strLine;
+            while ((strLine = br.readLine()) != null) {
+                // System.out.println(strLine);
+                String[] line = strLine.split("=");
+                if (line.length > 1)
+                    props.put(line[0], line[1]);
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -37,6 +37,13 @@ public class Backup {
     }
 
     public boolean backupSettings(String name) {
+
+        File dir = Tools.getBackupDirectory(mContext, name);
+        if (dir.exists()) {
+            new ShellCommand().su.runWaitFor("rm -r " + dir.getAbsolutePath());
+        }
+        dir.mkdirs();
+
         this.name = name;
         for (int i = 0; i < catsToBackup.length; i++) {
             backupValues.add(i, new ArrayList<SVal>());
@@ -50,7 +57,7 @@ public class Backup {
     private void backupSettings(int category) {
         Resources res = mContext.getResources();
         ContentResolver resolver = mContext.getContentResolver();
-        ArrayList<SVal> vals = currentSVals = new ArrayList<SVal>();
+        currentSVals = new ArrayList<SVal>();
         String[] settings = null;
         switch (category) {
             case Categories.CAT_GENERAL_UI:
@@ -102,15 +109,15 @@ public class Backup {
                 if (setting.startsWith("secure.")) {
                     String val = Settings.Secure.getString(resolver, setting);
                     if (val != null)
-                        vals.add(new SVal(setting, val));
+                        currentSVals.add(new SVal(setting, val));
                 } else {
                     String val = Settings.System.getString(resolver, setting);
                     if (val != null)
-                        vals.add(new SVal(setting, val));
+                        currentSVals.add(new SVal(setting, val));
                 }
             }
         }
-        backupValues.add(category, vals);
+        backupValues.add(category, currentSVals);
     }
 
     public boolean writeBackupSetings() {
@@ -122,15 +129,7 @@ public class Backup {
             }
         }
 
-        File backups = Tools.getBackupDirectory(mContext);
-        backups.mkdir();
-        File dir = new File(backups, name);
-        if (dir.exists()) {
-            dir.delete();
-            dir.mkdir();
-        } else {
-            dir.mkdir();
-        }
+        File dir = Tools.getBackupDirectory(mContext, name);
         File backup = new File(dir, "settings.cfg");
         Writer outWriter;
         try {
@@ -167,27 +166,31 @@ public class Backup {
             String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
             ContentResolver resolver = mContext.getContentResolver();
             for (int i = 0; i < 5; i++) {
-                String iconIntent = "navigation_custom_app_intent_" + i;
-                String iconIntentValue = Settings.System.getString(resolver, iconIntent);
-                if (iconIntentValue != null)
-                    currentSVals.add(new SVal(iconIntent, iconIntentValue));
-
-                String iconLongPressIntent = "navigation_longpress_app_intent_" + i;
-                String iconLongPressIntentValue = Settings.System.getString(resolver,
-                        iconLongPressIntent);
-                if (iconLongPressIntentValue != null)
-                    currentSVals.add(new SVal(iconLongPressIntent, iconLongPressIntentValue));
+                // String iconIntent = "navigation_custom_app_intent_" + i;
+                // String iconIntentValue = Settings.System.getString(resolver,
+                // iconIntent);
+                // Log.i(TAG, "intent value: " + iconIntentValue);
+                // if (iconIntentValue != null)
+                // currentSVals.add(new SVal(iconIntent, iconIntentValue));
+                //
+                // String iconLongPressIntent =
+                // "navigation_longpress_app_intent_" + i;
+                // String iconLongPressIntentValue =
+                // Settings.System.getString(resolver,
+                // iconLongPressIntent);
+                // if (iconLongPressIntentValue != null)
+                // currentSVals.add(new SVal(iconLongPressIntent,
+                // iconLongPressIntentValue));
 
                 String iconSetting = "navigation_custom_app_icon_" + i;
                 String iconValue = Settings.System.getString(resolver, iconSetting);
-                if (iconValue != null && iconValue.length() > 0) {
-                    currentSVals.add(new SVal(iconSetting, iconValue));
-                    File f = new File(Uri.parse(iconValue).getPath());
-                    if (f.exists()) {
-                        // custom icon
+                if (iconValue != null) {
+                    if (iconValue.length() > 0) {
+                        currentSVals.add(new SVal(iconSetting, iconValue));
+                        String cmd = "cp /data/data/com.aokp.romcontrol/files/navbar_icon_" + i
+                                + ".png " + outDir + "/";
                         new ShellCommand().su
-                                .run("cp /data/data/com.aokp.romcontrol/files/navbar_icon_" + i
-                                        + ".png " + outDir);
+                                .runWaitFor(cmd);
                     }
                 }
             }
@@ -197,7 +200,7 @@ public class Backup {
             String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
 
             new ShellCommand().su
-                    .run("cp /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.* "
+                    .run("cp /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg "
                             + outDir);
 
             return true;
@@ -205,10 +208,11 @@ public class Backup {
             String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
             ContentResolver resolver = mContext.getContentResolver();
             for (int i = 0; i < 8; i++) {
-                String intentSetting = "lockscreen_custom_app_intent_" + i;
-                String intentValue = Settings.System.getString(resolver, intentSetting);
-                if (intentValue != null)
-                    currentSVals.add(new SVal(intentSetting, intentValue));
+                // String intentSetting = "lockscreen_custom_app_intent_" + i;
+                // String intentValue = Settings.System.getString(resolver,
+                // intentSetting);
+                // if (intentValue != null)
+                // currentSVals.add(new SVal(intentSetting, intentValue));
 
                 String set = "lockscreen_custom_app_icon_" + i;
                 String val = Settings.System.getString(resolver, set);
