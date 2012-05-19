@@ -37,19 +37,25 @@ public class BackupFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        setRetainInstance(true);
 
         cats = getActivity().getApplicationContext().getResources()
                 .getStringArray(R.array.categories);
         checkBoxes = new CheckBox[cats.length];
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateState();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putBooleanArray(KEY_CATS, getCheckedBoxes());
-        outState.putBoolean(KEY_CHECK_ALL, getShouldBackupAll());
         super.onSaveInstanceState(outState);
+        if (!isDetached()) {
+            outState.putBooleanArray(KEY_CATS, getCheckedBoxes());
+            outState.putBoolean(KEY_CHECK_ALL, getShouldBackupAll());
+        }
     }
 
     @Override
@@ -66,7 +72,6 @@ public class BackupFragment extends Fragment {
             checkStates = savedInstanceState.getBooleanArray(KEY_CATS);
             allChecked = savedInstanceState.getBoolean(KEY_CHECK_ALL);
         } else {
-            Log.i(TAG, "savedInstanceState == null");
             allChecked = true;
             checkStates = new boolean[cats.length];
             for (int i = 0; i < checkStates.length; i++) {
@@ -74,24 +79,26 @@ public class BackupFragment extends Fragment {
             }
         }
 
+        for (int i = 0; i < checkBoxes.length; i++) {
+            checkBoxes[i] = (CheckBox) getView().findViewWithTag(cats[i]);
+        }
+        updateState(!allChecked);
         backupAll.setChecked(allChecked);
 
-        LinearLayout categories = (LinearLayout) getView().findViewById(R.id.categories);
         for (int i = 0; i < checkBoxes.length; i++) {
-            checkBoxes[i] = (CheckBox) categories.findViewWithTag(cats[i]);
             checkBoxes[i].setText(cats[i]);
             checkBoxes[i].setChecked(checkStates[i]);
-            checkBoxes[i].setEnabled(!allChecked);
         }
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.backup, null);
+        if (container == null)
+            return null;
 
+        View v = inflater.inflate(R.layout.backup, container, false);
         LinearLayout categories = (LinearLayout) v.findViewById(R.id.categories);
         for (int i = 0; i < cats.length; i++) {
             CheckBox b = new CheckBox(getActivity());
@@ -99,13 +106,8 @@ public class BackupFragment extends Fragment {
             categories.addView(b);
         }
 
+        Log.i(TAG, "view created");
         return v;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-
-        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -153,6 +155,12 @@ public class BackupFragment extends Fragment {
             updateState();
         }
     };
+
+    private void updateState(boolean newState) {
+        for (CheckBox b : checkBoxes) {
+            b.setEnabled(newState);
+        }
+    }
 
     private void updateState() {
         CheckBox box = (CheckBox) getView().findViewById(R.id.backup_all);

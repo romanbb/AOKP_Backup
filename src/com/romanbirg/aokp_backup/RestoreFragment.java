@@ -47,20 +47,25 @@ public class RestoreFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        updateState();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putBooleanArray(KEY_CATS, getCheckedBoxes());
-        outState.putBoolean(KEY_CHECK_ALL, getShouldBackupAll());
         super.onSaveInstanceState(outState);
+        if (!isDetached()) {
+            outState.putBooleanArray(KEY_CATS, getCheckedBoxes());
+            outState.putBoolean(KEY_CHECK_ALL, getShouldRestoreAll());
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.restore, null);
-        restoreAll = (CheckBox) v.findViewById(R.id.restore_all);
-        restoreAll.setOnClickListener(mBackupAllListener);
-
+        View v = inflater.inflate(R.layout.restore, container, false);
         LinearLayout categories = (LinearLayout) v.findViewById(R.id.categories);
         for (int i = 0; i < cats.length; i++) {
             CheckBox b = new CheckBox(getActivity());
@@ -73,6 +78,21 @@ public class RestoreFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        restoreAll = (CheckBox) getView().findViewById(R.id.restore_all);
+
+        for (int i = 0; i < checkBoxes.length; i++) {
+            checkBoxes[i] = (CheckBox) getView().findViewWithTag(cats[i]);
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        restoreAll.setOnClickListener(mBackupAllListener);
+
         boolean[] checkStates;
         boolean allChecked;
 
@@ -87,15 +107,13 @@ public class RestoreFragment extends Fragment {
             }
         }
 
+        updateState(!allChecked);
+        restoreAll.setChecked(allChecked);
+
         for (int i = 0; i < checkBoxes.length; i++) {
-            checkBoxes[i] = (CheckBox) getView().findViewWithTag(cats[i]);
             checkBoxes[i].setText(cats[i]);
             checkBoxes[i].setChecked(checkStates[i]);
-            checkBoxes[i].setEnabled(!allChecked);
         }
-
-        updateState();
-        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -121,7 +139,7 @@ public class RestoreFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean getShouldBackupAll() {
+    private boolean getShouldRestoreAll() {
         if (restoreAll != null)
             return restoreAll.isChecked();
 
@@ -142,6 +160,12 @@ public class RestoreFragment extends Fragment {
             updateState();
         }
     };
+
+    private void updateState(boolean newState) {
+        for (CheckBox b : checkBoxes) {
+            b.setEnabled(newState);
+        }
+    }
 
     private void updateState() {
         CheckBox box = (CheckBox) getView().findViewById(R.id.restore_all);
