@@ -16,6 +16,13 @@
             android:checked="true"
             android:text="@string/restore_all" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#AA666666"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp" />
+
         <LinearLayout
             android:id="@+id/categories"
             android:layout_width="match_parent"

@@ -17,8 +17,9 @@ public class Home extends Activity {
 
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(false);
+        actionBar.setTitle(R.string.actionbar_title);
 
         actionBar.addTab(actionBar.newTab()
                 .setText("Backup")
@@ -71,7 +72,7 @@ public class Home extends Activity {
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
             if (mFragment == null) {
                 mFragment = Fragment.instantiate(mActivity, mClass.getName(), mArgs);
-                ft.replace(android.R.id.content, mFragment, mTag);
+                ft.add(android.R.id.content, mFragment, mTag);
             } else {
                 ft.attach(mFragment);
             }

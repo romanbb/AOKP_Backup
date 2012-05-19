@@ -2,7 +2,8 @@
 <resources>
 
     <string name="hello">Hello World, Home!</string>
-    <string name="app_name">AOKP_Backup</string>
+    <string name="app_name">AOKP Backup</string>
+    <string name="actionbar_title">AOKP Backup Manager</string>
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
     <string name="restore_all">Restore all settings</string>

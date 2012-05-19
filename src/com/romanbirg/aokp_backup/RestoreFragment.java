@@ -77,20 +77,10 @@ public class RestoreFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        restoreAll = (CheckBox) getView().findViewById(R.id.restore_all);
-
-        for (int i = 0; i < checkBoxes.length; i++) {
-            checkBoxes[i] = (CheckBox) getView().findViewWithTag(cats[i]);
-        }
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        restoreAll = (CheckBox) getView().findViewById(R.id.restore_all);
         restoreAll.setOnClickListener(mBackupAllListener);
 
         boolean[] checkStates;
@@ -107,6 +97,9 @@ public class RestoreFragment extends Fragment {
             }
         }
 
+        for (int i = 0; i < checkBoxes.length; i++) {
+            checkBoxes[i] = (CheckBox) getView().findViewWithTag(cats[i]);
+        }
         updateState(!allChecked);
         restoreAll.setChecked(allChecked);
 

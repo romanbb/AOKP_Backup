@@ -65,14 +65,19 @@ public class BackupFragment extends Fragment {
         backupAll = (CheckBox) getView().findViewById(R.id.backup_all);
         backupAll.setOnClickListener(mBackupAllListener);
 
-        boolean[] checkStates;
+        boolean[] checkStates = null;
         boolean allChecked;
 
         if (savedInstanceState != null) {
             checkStates = savedInstanceState.getBooleanArray(KEY_CATS);
             allChecked = savedInstanceState.getBoolean(KEY_CHECK_ALL);
+
         } else {
             allChecked = true;
+        }
+
+        // checkStates could have been not commited properly if it was detached
+        if (savedInstanceState == null || checkStates == null) {
             checkStates = new boolean[cats.length];
             for (int i = 0; i < checkStates.length; i++) {
                 checkStates[i] = true;
@@ -95,9 +100,6 @@ public class BackupFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 
-        if (container == null)
-            return null;
-
         View v = inflater.inflate(R.layout.backup, container, false);
         LinearLayout categories = (LinearLayout) v.findViewById(R.id.categories);
         for (int i = 0; i < cats.length; i++) {
@@ -106,7 +108,6 @@ public class BackupFragment extends Fragment {
             categories.addView(b);
         }
 
-        Log.i(TAG, "view created");
         return v;
     }
 
@@ -144,7 +145,6 @@ public class BackupFragment extends Fragment {
         boolean[] boxStates = new boolean[cats.length];
         for (int i = 0; i < cats.length; i++) {
             boxStates[i] = checkBoxes[i].isChecked();
-            Log.i(TAG, i + " " + boxStates[i]);
         }
         return boxStates;
     }
