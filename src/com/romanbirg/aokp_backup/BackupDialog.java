@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.aokp.backup.R;
+
 public class BackupDialog extends DialogFragment {
 
     boolean[] cats;

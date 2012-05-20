@@ -10,6 +10,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.aokp.backup.R;
+
 public class Home extends Activity {
 
     @Override

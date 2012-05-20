@@ -14,6 +14,8 @@ import android.content.res.Resources;
 import android.provider.Settings;
 import android.util.Log;
 
+import com.aokp.backup.R;
+
 public class Restore {
 
     public static final String TAG = "Restore";
@@ -23,19 +25,66 @@ public class Restore {
     HashMap<String, SVal> settingsFromFile;
     String name;
 
+    public static final int ERROR_IOEXCEPTION = 1;
+    public static final int ERROR_RESTORE_UNSUPPORTED = 2;
+    public static final int ERROR_NOT_AOKP = 3;
+
     public Restore(Context c) {
         mContext = c;
     }
 
-    public boolean restoreSettings(String name, boolean[] catsToRestore) throws IOException {
+    public int restoreSettings(String name, boolean[] catsToRestore) {
         this.name = name;
-        readRestore();
+
+        try {
+            if (!okayToRestore())
+                return ERROR_RESTORE_UNSUPPORTED;
+        } catch (NumberFormatException nfe) {
+            return ERROR_NOT_AOKP;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ERROR_IOEXCEPTION;
+        }
+
+        try {
+            readRestore();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ERROR_IOEXCEPTION;
+        }
         for (int i = 0; i < catsToRestore.length; i++) {
             if (catsToRestore[i]) {
                 restoreSettings(i);
             }
         }
-        return true;
+        return 0;
+    }
+
+    public boolean okayToRestore() throws IOException {
+        final int minimumGooVersion = getBackupVersion();
+        final int maximumGooVersion = 14;
+
+        int currentVersion = -1;
+        currentVersion = Integer.parseInt(Tools.getAOKPVersion());
+
+        if (currentVersion <= maximumGooVersion && currentVersion >= minimumGooVersion)
+            return true;
+
+        return false;
+    }
+
+    private int getBackupVersion() throws IOException {
+        String dir = new File(Tools.getBackupDirectory(mContext, name), "aokp.version")
+                .getAbsolutePath();
+        FileInputStream fstream = new FileInputStream(dir);
+        DataInputStream in = new DataInputStream(fstream);
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        String strLine;
+        while ((strLine = br.readLine()) != null) {
+            return Integer.parseInt(strLine);
+        }
+        in.close();
+        return Integer.MAX_VALUE;
     }
 
     private void readRestore() throws IOException {
@@ -52,6 +101,7 @@ public class Restore {
             String setting = strLine.substring(0, split);
             String value = strLine.substring(split + 1, strLine.length());
             settingsFromFile.put(setting, new SVal(setting, value));
+
         }
         in.close();
     }

@@ -3,7 +3,6 @@ package com.romanbirg.aokp_backup;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -24,6 +23,8 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import com.aokp.backup.R;
 
 public class RestoreFragment extends Fragment {
 
@@ -264,7 +265,7 @@ public class RestoreFragment extends Fragment {
 
         }
 
-        public class RestoreTask extends AsyncTask<Void, Void, Boolean> {
+        public class RestoreTask extends AsyncTask<Void, Void, Integer> {
 
             AlertDialog d;
             Activity context;
@@ -288,26 +289,16 @@ public class RestoreFragment extends Fragment {
                 Tools.mountRw();
             }
 
-            protected Boolean doInBackground(Void... v) {
-                boolean result = false;
-                try {
-                    result = r.restoreSettings(name, cats);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    result = false;
-                }
-                return result;
+            protected Integer doInBackground(Void... v) {
+                return r.restoreSettings(name, cats);
             }
 
-            protected void onPostExecute(Boolean result) {
+            protected void onPostExecute(Integer result) {
+                d.dismiss();
                 Tools.mountRo();
-                if (d != null) {
-                    Toast.makeText(context.getApplicationContext(), result ? "Restore successful!"
-                            : "Restore failed!!!!", Toast.LENGTH_SHORT).show();
-                    d.dismiss();
-                }
-                if (result) {
+                if (result == 0) {
                     new AlertDialog.Builder(context)
+                            .setTitle("Restore successful!")
                             .setMessage("You should reboot right now!")
                             .setCancelable(false)
                             .setNeutralButton("I'll reboot later", null)
@@ -318,6 +309,30 @@ public class RestoreFragment extends Fragment {
                                     new ShellCommand().su.run("reboot");
                                 }
                             }).create().show();
+                } else if (result == 1) {
+                    new AlertDialog.Builder(context)
+                            .setTitle("Restore failed!")
+                            .setMessage("Try again or report this error if it keeps happening.")
+                            .setCancelable(false)
+                            .setNeutralButton("Ok", null)
+                            .create().show();
+                } else if (result == 2) {
+                    new AlertDialog.Builder(context)
+                            .setTitle("Restore failed!")
+                            .setMessage("Your AOKP version is not supported yet (or is too old)!!")
+                            .setCancelable(false)
+                            .setNeutralButton("Ok", null)
+                            .create().show();
+                } else if (result == 2) {
+                    new AlertDialog.Builder(context)
+                            .setTitle("Restore failed!")
+                            .setMessage("Are you running AOKP??")
+                            .setCancelable(false)
+                            .setNeutralButton("Ok", null)
+                            .create().show();
+                } else {
+                    Toast.makeText(context.getApplicationContext(), "Restore failed!!!!",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         }

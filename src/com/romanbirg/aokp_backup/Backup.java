@@ -1,11 +1,7 @@
 
 package com.romanbirg.aokp_backup;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 
 import android.content.ContentResolver;
@@ -14,6 +10,8 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
+
+import com.aokp.backup.R;
 
 public class Backup {
 
@@ -122,7 +120,6 @@ public class Backup {
 
     public boolean writeBackupSetings() {
         StringBuilder output = new StringBuilder();
-
         for (ArrayList<SVal> array : backupValues) {
             for (SVal pair : array) {
                 output.append(pair.setting + "=" + pair.val + "\n");
@@ -131,15 +128,11 @@ public class Backup {
 
         File dir = Tools.getBackupDirectory(mContext, name);
         File backup = new File(dir, "settings.cfg");
-        Writer outWriter;
-        try {
-            outWriter = new BufferedWriter(new FileWriter(backup));
-            outWriter.write(output.toString());
-            outWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
+
+        Tools.writeFile(output.toString(), backup);
+
+        Tools.writeFile(Tools.getAOKPVersion(), new File(Tools.getBackupDirectory(mContext, name),
+                "aokp.version"));
         return true;
     }
 
