@@ -1,5 +1,5 @@
 
-package com.romanbirg.aokp_backup;
+package com.aokp.backup;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

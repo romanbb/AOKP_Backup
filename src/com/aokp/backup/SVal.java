@@ -1,4 +1,4 @@
-package com.romanbirg.aokp_backup;
+package com.aokp.backup;
 
 public class SVal {
     String setting;

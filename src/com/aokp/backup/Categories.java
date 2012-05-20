@@ -1,5 +1,5 @@
 
-package com.romanbirg.aokp_backup;
+package com.aokp.backup;
 
 public class Categories {
     public static final int CAT_GENERAL_UI = 0;
