@@ -1,52 +1,81 @@
 
 package com.aokp.backup;
 
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
+import java.util.HashMap;
+
 import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.TabHost;
 import android.widget.TextView;
 
-public class Home extends Activity {
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.ActionBar.TabListener;
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
+public class Home extends SherlockFragmentActivity {
 
     TextView mErrorMessage = null;
     boolean skipWarningDialog = false;
 
+    TabHost mTabHost;
+    TabManager mTabManager;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.Theme_Sherlock);
         super.onCreate(savedInstanceState);
 
-        addTabs();
+        setContentView(R.layout.fragment_tabs);
+        mTabHost = (TabHost) findViewById(android.R.id.tabhost);
+        mTabHost.setup();
+        mTabManager = new TabManager(this, mTabHost, R.id.realtabcontent);
+
+        mTabManager.addTab(mTabHost.newTabSpec("backup").setIndicator("Backup"),
+                BackupFragment.class, savedInstanceState);
+        mTabManager.addTab(mTabHost.newTabSpec("restore").setIndicator("Restore"),
+                RestoreFragment.class, savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
+        }
+
+        // getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        //
+        // ActionBar.Tab backup = getSupportActionBar().newTab();
+        // backup.setText("Backup");
+        // backup.setTabListener(new MyTabListener(this, "backup",
+        // BackupFragment.class));
+        // getSupportActionBar().addTab(backup);
+        //
+        // ActionBar.Tab restore = getSupportActionBar().newTab();
+        // restore.setText("Restore");
+        // restore.setTabListener(new MyTabListener(this, "restore",
+        // RestoreFragment.class));
+        // getSupportActionBar().addTab(restore);
 
         if (savedInstanceState == null) {
             check();
         }
     }
 
-    public void addTabs() {
-        ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(false);
-        actionBar.setTitle(R.string.actionbar_title);
-
-        actionBar.addTab(actionBar.newTab()
-                .setText("Backup")
-                .setTabListener(new TabListener<BackupFragment>(
-                        this, "backup", BackupFragment.class)));
-        actionBar.addTab(actionBar.newTab()
-                .setText("Restore")
-                .setTabListener(new TabListener<RestoreFragment>(
-                        this, "restore", RestoreFragment.class)));
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("tab", mTabHost.getCurrentTabTag());
     }
 
     public void check() {
@@ -54,9 +83,9 @@ public class Home extends Activity {
     }
 
     public void noRoot() {
-        getActionBar().removeAllTabs();
-        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        getActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().removeAllTabs();
+        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.error);
         mErrorMessage = (TextView) findViewById(R.id.error);
         mErrorMessage.setText(R.string.no_root);
@@ -64,13 +93,13 @@ public class Home extends Activity {
 
     public void notAOKP() {
         WarningDialog warning = new WarningDialog();
-        warning.show(getFragmentManager(), "warning");
+        warning.show(getSupportFragmentManager(), "warning");
     }
 
     public void addNotAokpMessage() {
-        getActionBar().removeAllTabs();
-        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        getActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().removeAllTabs();
+        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.error);
         mErrorMessage = (TextView) findViewById(R.id.error);
         mErrorMessage.setText(R.string.not_aokp);
@@ -159,7 +188,7 @@ public class Home extends Activity {
         @Override
         protected Integer doInBackground(Void... params) {
             if (!new ShellCommand().canSU()) {
-                return RESULT_NO_ROOT;
+                // return RESULT_NO_ROOT;
             }
 
             if (Prefs.getShowNotAokpWarning(activity)) {
@@ -190,56 +219,93 @@ public class Home extends Activity {
 
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("tab", getActionBar().getSelectedNavigationIndex());
-    }
+    public static class TabManager implements TabHost.OnTabChangeListener {
+        private final FragmentActivity mActivity;
+        private final TabHost mTabHost;
+        private final int mContainerId;
+        private final HashMap<String, TabInfo> mTabs = new HashMap<String, TabInfo>();
+        TabInfo mLastTab;
 
-    public static class TabListener<T extends Fragment> implements ActionBar.TabListener {
-        private final Activity mActivity;
-        private final String mTag;
-        private final Class<T> mClass;
-        private final Bundle mArgs;
-        private Fragment mFragment;
+        static final class TabInfo {
+            private final String tag;
+            private final Class<?> clss;
+            private final Bundle args;
+            private Fragment fragment;
 
-        public TabListener(Activity activity, String tag, Class<T> clz) {
-            this(activity, tag, clz, null);
+            TabInfo(String _tag, Class<?> _class, Bundle _args) {
+                tag = _tag;
+                clss = _class;
+                args = _args;
+            }
         }
 
-        public TabListener(Activity activity, String tag, Class<T> clz, Bundle args) {
+        static class DummyTabFactory implements TabHost.TabContentFactory {
+            private final Context mContext;
+
+            public DummyTabFactory(Context context) {
+                mContext = context;
+            }
+
+            @Override
+            public View createTabContent(String tag) {
+                View v = new View(mContext);
+                v.setMinimumWidth(0);
+                v.setMinimumHeight(0);
+                return v;
+            }
+        }
+
+        public TabManager(FragmentActivity activity, TabHost tabHost, int containerId) {
             mActivity = activity;
-            mTag = tag;
-            mClass = clz;
-            mArgs = args;
+            mTabHost = tabHost;
+            mContainerId = containerId;
+            mTabHost.setOnTabChangedListener(this);
+        }
+
+        public void addTab(TabHost.TabSpec tabSpec, Class<?> clss, Bundle args) {
+            tabSpec.setContent(new DummyTabFactory(mActivity));
+            String tag = tabSpec.getTag();
+
+            TabInfo info = new TabInfo(tag, clss, args);
 
             // Check to see if we already have a fragment for this tab, probably
             // from a previously saved state. If so, deactivate it, because our
             // initial state is that a tab isn't shown.
-            mFragment = mActivity.getFragmentManager().findFragmentByTag(mTag);
-            if (mFragment != null && !mFragment.isDetached()) {
-                FragmentTransaction ft = mActivity.getFragmentManager().beginTransaction();
-                ft.detach(mFragment);
+            info.fragment = mActivity.getSupportFragmentManager().findFragmentByTag(tag);
+            if (info.fragment != null && !info.fragment.isDetached()) {
+                FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction();
+                ft.detach(info.fragment);
                 ft.commit();
             }
+
+            mTabs.put(tag, info);
+            mTabHost.addTab(tabSpec);
         }
 
-        public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            if (mFragment == null) {
-                mFragment = Fragment.instantiate(mActivity, mClass.getName(), mArgs);
-                ft.add(android.R.id.content, mFragment, mTag);
-            } else {
-                ft.attach(mFragment);
+        @Override
+        public void onTabChanged(String tabId) {
+            TabInfo newTab = mTabs.get(tabId);
+            if (mLastTab != newTab) {
+                FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction();
+                if (mLastTab != null) {
+                    if (mLastTab.fragment != null) {
+                        ft.detach(mLastTab.fragment);
+                    }
+                }
+                if (newTab != null) {
+                    if (newTab.fragment == null) {
+                        newTab.fragment = Fragment.instantiate(mActivity,
+                                newTab.clss.getName(), newTab.args);
+                        ft.add(mContainerId, newTab.fragment, newTab.tag);
+                    } else {
+                        ft.attach(newTab.fragment);
+                    }
+                }
+
+                mLastTab = newTab;
+                ft.commit();
+                mActivity.getSupportFragmentManager().executePendingTransactions();
             }
-        }
-
-        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-            if (mFragment != null) {
-                ft.detach(mFragment);
-            }
-        }
-
-        public void onTabReselected(Tab tab, FragmentTransaction ft) {
         }
     }
 }
