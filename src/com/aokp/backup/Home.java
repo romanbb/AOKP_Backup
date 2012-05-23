@@ -4,18 +4,35 @@ package com.aokp.backup;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 public class Home extends Activity {
+
+    TextView mErrorMessage = null;
+    boolean skipWarningDialog = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        addTabs();
+
+        if (savedInstanceState == null) {
+            check();
+        }
+    }
+
+    public void addTabs() {
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(true);
@@ -30,13 +47,10 @@ public class Home extends Activity {
                 .setText("Restore")
                 .setTabListener(new TabListener<RestoreFragment>(
                         this, "restore", RestoreFragment.class)));
+    }
 
-        if (savedInstanceState != null) {
-            getActionBar().setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
-        }
-
+    public void check() {
         new CheckTask(this).execute();
-
     }
 
     public void noRoot() {
@@ -44,40 +58,134 @@ public class Home extends Activity {
         getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         getActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.error);
-        TextView error = (TextView) findViewById(R.id.error);
-        error.setText(R.string.no_root);
+        mErrorMessage = (TextView) findViewById(R.id.error);
+        mErrorMessage.setText(R.string.no_root);
     }
 
     public void notAOKP() {
+        WarningDialog warning = new WarningDialog();
+        warning.show(getFragmentManager(), "warning");
+    }
+
+    public void addNotAokpMessage() {
         getActionBar().removeAllTabs();
         getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         getActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.error);
-        TextView error = (TextView) findViewById(R.id.error);
-        error.setText(R.string.not_aokp);
+        mErrorMessage = (TextView) findViewById(R.id.error);
+        mErrorMessage.setText(R.string.not_aokp);
     }
 
-    class CheckTask extends AsyncTask<Void, Void, Void> {
+    public static class WarningDialog extends DialogFragment {
 
-        Activity activity;
+        Home mActivity;
+        CheckBox dontShowAgain;
+        CheckBox textRead;
+        Button set;
 
-        public CheckTask(Activity a) {
-            activity = a;
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            mActivity = (Home) getActivity();
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        public void onActivityCreated(Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+
+            setCancelable(false);
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                Bundle savedInstanceState) {
+
+            getDialog().setTitle("Caution!"); // TODO make it a string
+            getDialog().setCanceledOnTouchOutside(false);
+
+            View v = inflater.inflate(R.layout.dialog_not_aokp_warning, container, false);
+            Button cancel = (Button) v.findViewById(R.id.cancel);
+            set = (Button) v.findViewById(R.id.okay);
+            TextView text = (TextView) v.findViewById(R.id.content);
+            dontShowAgain = (CheckBox) v.findViewById(R.id.dont_show);
+            textRead = (CheckBox) v.findViewById(R.id.read_warning);
+
+            text.setText(R.string.not_aokp_warning);
+
+            textRead.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CheckBox b = (CheckBox) v;
+                    set.setEnabled(b.isChecked());
+                }
+            });
+
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mActivity.addNotAokpMessage();
+                    getDialog().dismiss();
+                }
+            });
+
+            set.setEnabled(false);
+            set.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (textRead.isChecked()) {
+                        if (dontShowAgain.isChecked())
+                            Prefs.setShowNotAokpWarning(mActivity, false);
+
+                        getDialog().dismiss();
+                    }
+                }
+            });
+            return v;
+        }
+    }
+
+    class CheckTask extends AsyncTask<Void, Void, Integer> {
+
+        Home activity;
+
+        final static int RESULT_NO_ROOT = 0;
+        final static int RESULT_NOT_AOKP = 1;
+        final static int RESULT_OK = 2;
+
+        public CheckTask(Activity a) {
+            activity = (Home) a;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
             if (!new ShellCommand().canSU()) {
-                noRoot();
-                return null;
+                return RESULT_NO_ROOT;
             }
 
-            if (!Tools.getROMVersion().startsWith("aokp")) {
-                notAOKP();
-                return null;
+            if (Prefs.getShowNotAokpWarning(activity)) {
+                if (!Tools.getROMVersion().startsWith("aokp")) {
+                    return RESULT_NOT_AOKP;
+                }
             }
 
-            return null;
+            return RESULT_OK;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+            switch (result) {
+                case RESULT_NO_ROOT:
+                    activity.noRoot();
+                    break;
+                case RESULT_NOT_AOKP:
+                    activity.notAOKP();
+                    break;
+                case RESULT_OK:
+                    // tabs added by defualt
+                    break;
+            }
+
         }
 
     }

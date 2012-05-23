@@ -180,5 +180,11 @@
 
     <string name="no_root">No root</string>
     <string name="not_aokp">You aren\'t running AOKP, silly!</string>
+    <string name="not_aokp_warning">"It seems you are not running AOKP. If you are positive you are running AOKP, please click continue, otherwise, think twice.\n\nPlease make a nandroid backup before continuing!"</string>
+    <string name="dialog_continue">Continue</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dont_show_again">Don\'t show this warning message again</string>
+    <string name="read_warning_text">I\'ve read the warning. I have a backup.</string>
+    
 
 </resources>
