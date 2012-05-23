@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +20,6 @@ import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.ActionBar.TabListener;
-import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 public class Home extends SherlockFragmentActivity {
@@ -188,7 +184,7 @@ public class Home extends SherlockFragmentActivity {
         @Override
         protected Integer doInBackground(Void... params) {
             if (!new ShellCommand().canSU()) {
-                // return RESULT_NO_ROOT;
+                return RESULT_NO_ROOT;
             }
 
             if (Prefs.getShowNotAokpWarning(activity)) {
