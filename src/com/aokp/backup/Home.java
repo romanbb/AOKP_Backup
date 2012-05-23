@@ -20,6 +20,8 @@ import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 public class Home extends SherlockFragmentActivity {
@@ -35,33 +37,35 @@ public class Home extends SherlockFragmentActivity {
         setTheme(R.style.Theme_Sherlock);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.fragment_tabs);
-        mTabHost = (TabHost) findViewById(android.R.id.tabhost);
-        mTabHost.setup();
-        mTabManager = new TabManager(this, mTabHost, R.id.realtabcontent);
+        // setContentView(R.layout.fragment_tabs);
+        // mTabHost = (TabHost) findViewById(android.R.id.tabhost);
+        // mTabHost.setup();
+        // mTabManager = new TabManager(this, mTabHost, R.id.realtabcontent);
+        //
+        // mTabManager.addTab(mTabHost.newTabSpec("backup").setIndicator("Backup"),
+        // BackupFragment.class, savedInstanceState);
+        // mTabManager.addTab(mTabHost.newTabSpec("restore").setIndicator("Restore"),
+        // RestoreFragment.class, savedInstanceState);
+        //
+        // if (savedInstanceState != null) {
+        // mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
+        // }
 
-        mTabManager.addTab(mTabHost.newTabSpec("backup").setIndicator("Backup"),
-                BackupFragment.class, savedInstanceState);
-        mTabManager.addTab(mTabHost.newTabSpec("restore").setIndicator("Restore"),
-                RestoreFragment.class, savedInstanceState);
+        final ActionBar bar = getSupportActionBar();
+        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        bar.addTab(bar.newTab()
+                .setText("Backup")
+                .setTabListener(new TabListener<BackupFragment>(
+                        this, "backup", BackupFragment.class, savedInstanceState)));
+        bar.addTab(bar.newTab()
+                .setText("Restore")
+                .setTabListener(new TabListener<RestoreFragment>(
+                        this, "restore", RestoreFragment.class, savedInstanceState)));
 
         if (savedInstanceState != null) {
-            mTabHost.setCurrentTabByTag(savedInstanceState.getString("tab"));
+            bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
         }
-
-        // getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        //
-        // ActionBar.Tab backup = getSupportActionBar().newTab();
-        // backup.setText("Backup");
-        // backup.setTabListener(new MyTabListener(this, "backup",
-        // BackupFragment.class));
-        // getSupportActionBar().addTab(backup);
-        //
-        // ActionBar.Tab restore = getSupportActionBar().newTab();
-        // restore.setText("Restore");
-        // restore.setTabListener(new MyTabListener(this, "restore",
-        // RestoreFragment.class));
-        // getSupportActionBar().addTab(restore);
 
         if (savedInstanceState == null) {
             check();
@@ -70,8 +74,8 @@ public class Home extends SherlockFragmentActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("tab", getSupportActionBar().getSelectedNavigationIndex());
         super.onSaveInstanceState(outState);
-        outState.putString("tab", mTabHost.getCurrentTabTag());
     }
 
     public void check() {
@@ -83,6 +87,7 @@ public class Home extends SherlockFragmentActivity {
         getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.error);
+
         mErrorMessage = (TextView) findViewById(R.id.error);
         mErrorMessage.setText(R.string.no_root);
     }
@@ -211,6 +216,55 @@ public class Home extends SherlockFragmentActivity {
                     break;
             }
 
+        }
+
+    }
+
+    public static class TabListener<T> implements ActionBar.TabListener {
+        private final SherlockFragmentActivity mActivity;
+        private final String mTag;
+        private final Class<T> mClass;
+        private final Bundle mArgs;
+        private android.support.v4.app.Fragment mFragment;
+
+        public TabListener(SherlockFragmentActivity activity, String tag, Class<T> clz) {
+            this(activity, tag, clz, null);
+        }
+
+        public TabListener(SherlockFragmentActivity activity, String tag, Class<T> clz, Bundle args) {
+            mActivity = activity;
+            mTag = tag;
+            mClass = clz;
+            mArgs = args;
+
+            // Check to see if we already have a fragment for this tab, probably
+            // from a previously saved state. If so, deactivate it, because our
+            // initial state is that a tab isn't shown.
+            mFragment = mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
+            if (mFragment != null && !mFragment.isDetached()) {
+                FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction();
+                ft.detach(mFragment);
+                ft.commit();
+            }
+        }
+
+        public void onTabSelected(Tab tab, FragmentTransaction ft) {
+            if (mFragment == null) {
+                mFragment = (SherlockFragment) Fragment.instantiate(mActivity, mClass.getName(),
+                        mArgs);
+                ft.add(android.R.id.content, mFragment, mTag);
+            } else {
+                ft.attach(mFragment);
+            }
+        }
+
+        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+            if (mFragment != null) {
+                ft.detach(mFragment);
+            }
+        }
+
+        public void onTabReselected(Tab tab, FragmentTransaction ft) {
         }
 
     }

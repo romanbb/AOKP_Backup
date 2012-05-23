@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,11 +52,9 @@ public class BackupFragment extends SherlockFragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        outState.putBooleanArray(KEY_CATS, getCheckedBoxes());
+        outState.putBoolean(KEY_CHECK_ALL, getShouldBackupAll());
         super.onSaveInstanceState(outState);
-        if (!isDetached()) {
-            outState.putBooleanArray(KEY_CATS, getCheckedBoxes());
-            outState.putBoolean(KEY_CHECK_ALL, getShouldBackupAll());
-        }
     }
 
     @Override
@@ -65,18 +64,21 @@ public class BackupFragment extends SherlockFragment {
         backupAll = (CheckBox) getView().findViewById(R.id.backup_all);
         backupAll.setOnClickListener(mBackupAllListener);
 
-        boolean[] checkStates = null;
-        boolean allChecked;
+        boolean[] checkStates = new boolean[cats.length];
+        boolean allChecked = true;
+        boolean resetStates = true;
 
         if (savedInstanceState != null) {
-            checkStates = savedInstanceState.getBooleanArray(KEY_CATS);
-            allChecked = savedInstanceState.getBoolean(KEY_CHECK_ALL);
-        } else {
-            allChecked = true;
+            if (savedInstanceState.containsKey(KEY_CATS)) {
+                checkStates = savedInstanceState.getBooleanArray(KEY_CATS);
+                resetStates = false;
+            }
+
+            if (savedInstanceState.containsKey(KEY_CHECK_ALL))
+                allChecked = savedInstanceState.getBoolean(KEY_CHECK_ALL);
         }
 
-        // checkStates could have been not commited properly if it was detached
-        if (savedInstanceState == null || checkStates == null) {
+        if (resetStates) {
             checkStates = new boolean[cats.length];
             for (int i = 0; i < checkStates.length; i++) {
                 checkStates[i] = true;
