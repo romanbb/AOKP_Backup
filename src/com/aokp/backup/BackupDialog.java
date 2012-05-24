@@ -5,6 +5,7 @@ import java.util.Date;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,9 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockDialogFragment;
-
-public class BackupDialog extends SherlockDialogFragment {
+public class BackupDialog extends DialogFragment {
 
     boolean[] cats;
 

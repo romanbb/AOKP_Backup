@@ -60,7 +60,7 @@ public class Restore {
 
     public boolean okayToRestore() throws IOException {
         final int minimumGooVersion = getBackupVersion();
-        final int maximumGooVersion = 14;
+        final int maximumGooVersion = 15;
 
         int currentVersion = -1;
         currentVersion = Integer.parseInt(Tools.getAOKPVersion());
