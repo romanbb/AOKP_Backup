@@ -147,6 +147,7 @@
         <item>status_bar_transparency</item>
         <item>status_bar_layout</item>
         <item>statusbar_font_size</item>
+        <item>status_bar_notif_count</item>
     </string-array>
     <string-array name="cat_statusbar_toggles">
         <item>statusbar_toggles_brightness_loc</item>
