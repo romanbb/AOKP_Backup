@@ -16,6 +16,9 @@
 
 package com.aokp.backup;
 
+import android.content.Context;
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -28,9 +31,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.HashMap;
-
-import android.content.Context;
-import android.util.Log;
 
 public class Tools {
 
@@ -151,6 +151,16 @@ public class Tools {
     }
 
     public static void writeFile(String fileContents, File fileToWrite) {
+
+        if (fileToWrite == null || !fileToWrite.exists()) {
+            fileToWrite.mkdirs();
+            try {
+                fileToWrite.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         Writer outWriter;
         try {
             outWriter = new BufferedWriter(new FileWriter(fileToWrite));
