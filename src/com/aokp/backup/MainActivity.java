@@ -16,8 +16,6 @@
 
 package com.aokp.backup;
 
-import java.util.HashMap;
-
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
@@ -27,6 +25,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +33,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TabHost;
 import android.widget.TextView;
+
+import java.util.HashMap;
 
 public class MainActivity extends Activity {
 
@@ -79,13 +80,7 @@ public class MainActivity extends Activity {
     }
 
     public void noRoot() {
-        getActionBar().removeAllTabs();
-        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        getActionBar().setDisplayShowHomeEnabled(true);
-        setContentView(R.layout.error);
-
-        mErrorMessage = (TextView) findViewById(R.id.error);
-        mErrorMessage.setText(R.string.no_root);
+        showError(R.string.no_root);
     }
 
     public void notAOKP() {
@@ -94,12 +89,16 @@ public class MainActivity extends Activity {
     }
 
     public void addNotAokpMessage() {
+        showError(R.string.not_aokp);
+    }
+
+    public void showError(int errorStringResourceId) {
         getActionBar().removeAllTabs();
         getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         getActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.error);
         mErrorMessage = (TextView) findViewById(R.id.error);
-        mErrorMessage.setText(R.string.not_aokp);
+        mErrorMessage.setText(errorStringResourceId);
     }
 
     public static class WarningDialog extends DialogFragment {
@@ -177,6 +176,7 @@ public class MainActivity extends Activity {
         final static int RESULT_NO_ROOT = 0;
         final static int RESULT_NOT_AOKP = 1;
         final static int RESULT_OK = 2;
+        final static int RESULT_SD_NA = 3;
 
         public CheckTask(Activity a) {
             activity = (MainActivity) a;
@@ -194,6 +194,10 @@ public class MainActivity extends Activity {
                 }
             }
 
+            if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+                return RESULT_SD_NA;
+            }
+
             return RESULT_OK;
         }
 
@@ -206,6 +210,9 @@ public class MainActivity extends Activity {
                     break;
                 case RESULT_NOT_AOKP:
                     activity.notAOKP();
+                    break;
+                case RESULT_SD_NA:
+                    activity.showError(R.string.error_sd_not_mounted);
                     break;
                 case RESULT_OK:
                     // tabs added by defualt
