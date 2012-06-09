@@ -17,6 +17,7 @@
 package com.aokp.backup;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -55,7 +56,11 @@ public class Tools {
     }
 
     public static File getBackupDirectory(Context c) {
-        return new File(c.getExternalFilesDir(null), "backups");
+        if (Prefs.getBackupPermanent(c)) {
+            return new File(Environment.getExternalStorageDirectory(), "AOKP_Backup");
+        } else {
+            return new File(c.getExternalFilesDir(null), "backups");
+        }
     }
 
     public static File getBackupDirectory(Context c, String name) {

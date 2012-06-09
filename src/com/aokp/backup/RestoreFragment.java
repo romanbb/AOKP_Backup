@@ -26,6 +26,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -144,6 +145,10 @@ public class RestoreFragment extends Fragment {
                 }
                 RestoreDialog restore = RestoreDialog.newInstance(getCheckedBoxes());
                 restore.show(getFragmentManager(), "restore");
+                break;
+            case R.id.prefs:
+                Intent p = new Intent(getActivity(), Preferences.class);
+                getActivity().startActivity(p);
                 break;
 
         }

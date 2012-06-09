@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
             check();
         }
     }
-
+    
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt("tab", getActionBar().getSelectedNavigationIndex());

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <CheckBoxPreference
+        android:key="perm_storage"
+        android:summary="@string/summary_perm_storage"
+        android:title="@string/title_perm_storage" />
+
+</PreferenceScreen>

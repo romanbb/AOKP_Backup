@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -142,6 +143,10 @@ public class BackupFragment extends Fragment {
                 }
                 BackupDialog backup = BackupDialog.newInstance(getCheckedBoxes());
                 backup.show(getFragmentManager(), "backup");
+                break;
+            case R.id.prefs:
+                Intent p = new Intent(getActivity(), Preferences.class);
+                getActivity().startActivity(p);
                 break;
 
         }

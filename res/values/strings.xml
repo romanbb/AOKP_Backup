@@ -8,6 +8,11 @@
     <string name="restore">Restore</string>
     <string name="restore_all">Restore all settings</string>
     <string name="backup_all">Backup all settings</string>
+    
+    <!--  prefs -->
+    <string name="settings">Settings</string>
+    <string name="title_perm_storage">Use permanent storage</string>
+    <string name="summary_perm_storage">When enabled, backups are stored in /sdcard/AOKP_Backup. This is useful if you want to keep your backups after uninstalling AOKP Backup (in case you want to reinstall it)</string>
 
     <string-array name="categories">
         <item>General UI</item>
