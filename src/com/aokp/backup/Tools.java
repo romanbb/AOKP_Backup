@@ -158,7 +158,7 @@ public class Tools {
     public static void writeFile(String fileContents, File fileToWrite) {
 
         if (fileToWrite == null || !fileToWrite.exists()) {
-            fileToWrite.mkdirs();
+            fileToWrite.getParentFile().mkdirs();
             try {
                 fileToWrite.createNewFile();
             } catch (IOException e) {

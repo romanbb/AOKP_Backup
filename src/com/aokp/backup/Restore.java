@@ -54,9 +54,6 @@ public class Restore {
                 return ERROR_RESTORE_UNSUPPORTED;
         } catch (NumberFormatException nfe) {
             return ERROR_NOT_AOKP;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ERROR_IOEXCEPTION;
         }
 
         try {
@@ -73,8 +70,14 @@ public class Restore {
         return 0;
     }
 
-    public boolean okayToRestore() throws IOException {
-        final int minimumGooVersion = getBackupVersion();
+    public boolean okayToRestore() {
+        int minimumGooVersion;
+        try {
+            minimumGooVersion = getBackupVersion();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return true; // TODO handle this better!
+        }
         final int maximumGooVersion = 16;
 
         int currentVersion = -1;
