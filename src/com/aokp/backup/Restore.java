@@ -78,7 +78,7 @@ public class Restore {
             e.printStackTrace();
             return true; // TODO handle this better!
         }
-        final int maximumGooVersion = 16;
+        final int maximumGooVersion = 20;
 
         int currentVersion = -1;
         currentVersion = Integer.parseInt(Tools.getAOKPVersion());
