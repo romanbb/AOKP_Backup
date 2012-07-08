@@ -34,6 +34,8 @@ import android.widget.CheckBox;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class MainActivity extends Activity {
@@ -196,6 +198,14 @@ public class MainActivity extends Activity {
 
             if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
                 return RESULT_SD_NA;
+            } else {
+                File sdFolder = new File(Environment.getExternalStorageDirectory(), "AOKP_Backup");
+                if(sdFolder.exists()) {
+                    try {
+                        new File(sdFolder, ".nomedia").createNewFile();
+                    } catch (IOException e) {
+                    }
+                }
             }
 
             return RESULT_OK;

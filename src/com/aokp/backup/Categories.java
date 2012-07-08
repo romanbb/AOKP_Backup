@@ -29,4 +29,5 @@ public class Categories {
     public static final int CAT_SB_CLOCK = 9;
     public static final int CAT_SB_BATTERY = 10;
     public static final int CAT_SB_SIGNAL = 11;
+    public static final int CAT_LIGHT_LEVELS = 12;
 }

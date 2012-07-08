@@ -2,11 +2,15 @@
 package com.aokp.backup;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Preferences extends PreferenceActivity {
 
@@ -29,7 +33,6 @@ public class Preferences extends PreferenceActivity {
                 // move from /sdcard/Android
                 new ShellCommand().su
                         .runWaitFor("mv /sdcard/Android/data/com.aokp.backup/files/backups /sdcard/AOKP_Backup/");
-
             } else {
                 // move to /sdcard/Data
                 new ShellCommand().su

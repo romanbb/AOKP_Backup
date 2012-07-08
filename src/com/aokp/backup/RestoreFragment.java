@@ -16,29 +16,21 @@
 
 package com.aokp.backup;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.Fragment;
+import android.app.*;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
 
 public class RestoreFragment extends Fragment {
 
@@ -78,7 +70,7 @@ public class RestoreFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.restore, container, false);
         LinearLayout categories = (LinearLayout) v.findViewById(R.id.categories);
@@ -207,17 +199,19 @@ public class RestoreFragment extends Fragment {
         String[] fileIds;
         File[] files;
         File backupDir;
-        static int fileIndex = 0;
         ArrayList<String> availableBackups = new ArrayList<String>();
+        static int fileIndex = 0;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setRetainInstance(true);
-            backupDir = Tools.getBackupDirectory(getActivity());
 
-            // The list of files can also be retrieved as File objects
-            files = backupDir.listFiles();
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            backupDir = Tools.getBackupDirectory(getActivity());
 
             // This filter only returns directories
             FileFilter fileFilter = new FileFilter() {
@@ -235,34 +229,36 @@ public class RestoreFragment extends Fragment {
                     fileIds[i] = files[i].getName();
                 }
             }
-        }
 
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
+
             if (files.length > 0)
                 return new AlertDialog.Builder(getActivity())
                         .setSingleChoiceItems(fileIds, 0, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 fileIndex = which;
+
                             }
                         })
                         .setTitle("Restore")
                         .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (fileIndex >= 0)
-                                    deleteBackup(fileIds[fileIndex]);
+                                deleteBackup(fileIds[fileIndex]);
                                 dialog.dismiss();
                                 Toast.makeText(getActivity(),
                                         files[fileIndex].getName() + " deleted!",
                                         Toast.LENGTH_LONG).show();
+
                             }
                         })
                         .setPositiveButton("Restore", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                restore(fileIds[fileIndex]);
+                                ListView lv = ((AlertDialog) dialog).getListView();
+                                Integer fileIndex = (Integer) lv.getTag();
+                                if (fileIndex != null)
+                                    restore(fileIds[fileIndex]);
                             }
                         })
                         .create();

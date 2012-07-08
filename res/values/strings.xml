@@ -8,11 +8,13 @@
     <string name="restore">Restore</string>
     <string name="restore_all">Restore all settings</string>
     <string name="backup_all">Backup all settings</string>
-    
+
     <!--  prefs -->
     <string name="settings">Settings</string>
     <string name="title_perm_storage">Use permanent storage</string>
-    <string name="summary_perm_storage">When enabled, backups are stored in /sdcard/AOKP_Backup. This is useful if you want to keep your backups after uninstalling AOKP Backup (in case you want to reinstall it)</string>
+    <string name="summary_perm_storage">When enabled, backups are stored in /sdcard/AOKP_Backup. This is useful if you
+        want to keep your backups after uninstalling AOKP Backup (in case you want to reinstall it)
+    </string>
 
     <string-array name="categories">
         <item>General UI</item>
@@ -27,6 +29,7 @@
         <item>Statusbar Clock</item>
         <item>Statusbar Battery</item>
         <item>Statusbar Signal</item>
+        <item>Custom backlight Settings</item>
     </string-array>
     <string-array name="cat_general_ui">
         <item>disable_boot_animation</item>
@@ -183,15 +186,31 @@
         <item>statusbar_signal_text_color</item>
         <item>statusbar_wifi_signal_text_color</item>
     </string-array>
+    <string-array name="cat_custom_backlight">
+        <item>light_filter</item>
+        <item>light_filter_reset</item>
+        <item>light_filter_window</item>
+        <item>light_filter_interval</item>
+        <item>light_sensor_custom</item>
+        <item>light_screen_dim</item>
+        <item>light_decrease</item>
+        <item>light_hysteresis</item>
+        <item>light_sensor_levels</item>
+        <item>light_sensor_lcd_values</item>
+        <item>light_sensor_button_values</item>
+        <item>light_sensor_keyboard_values</item>
+    </string-array>
 
     <string name="no_root">No root</string>
     <string name="not_aokp">You aren\'t running AOKP, silly!</string>
-    <string name="not_aokp_warning">"It seems you are not running AOKP. If you are positive you are running AOKP, please click continue, otherwise, think twice.\n\nPlease make a nandroid backup before continuing!"</string>
+    <string name="not_aokp_warning">"It seems you are not running AOKP. If you are positive you are running AOKP, please
+        click continue, otherwise, think twice.\n\nPlease make a nandroid backup before continuing!"
+    </string>
     <string name="error_sd_not_mounted">Cannot access SD card storage. Make sure you have an SD card inserted!</string>
     <string name="dialog_continue">Continue</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="dont_show_again">Don\'t show this warning message again</string>
     <string name="read_warning_text">I\'ve read the warning. I have a backup.</string>
-    
+
 
 </resources>

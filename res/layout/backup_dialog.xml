@@ -31,6 +31,8 @@
             android:isScrollContainer="false" >
 
             <requestFocus />
+
+
         </EditText>
     </RelativeLayout>
 

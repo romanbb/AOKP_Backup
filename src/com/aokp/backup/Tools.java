@@ -126,7 +126,8 @@ public class Tools {
     }
 
     public static String getAOKPVersion() {
-        return Tools.getInstance().getProp("ro.goo.version");
+        String version = Tools.getInstance().getProp("ro.goo.version");
+        return version != null ? version : "999";
     }
 
     public String getProp(String key) {
@@ -155,10 +156,24 @@ public class Tools {
         }
     }
 
-    public static void writeFile(String fileContents, File fileToWrite) {
+    public static void delete(File f) throws IOException {
+        if (f.isDirectory()) {
+            for (File c : f.listFiles())
+                delete(c);
+        }
+        if (!f.delete())
+//            throw new FileNotFoundException("Failed to delete file: " + f);
+            Log.d("AOKP.Backup", "Failed to delete file: " + f);
+    }
 
-        if (fileToWrite == null || !fileToWrite.exists()) {
-            fileToWrite.getParentFile().mkdirs();
+    public static void writeFileToSD(String fileContents, File fileToWrite) {
+        if (fileContents == null)
+            return;
+        if (fileToWrite == null)
+            return;
+
+
+        if (!fileToWrite.exists()) {
             try {
                 fileToWrite.createNewFile();
             } catch (IOException e) {

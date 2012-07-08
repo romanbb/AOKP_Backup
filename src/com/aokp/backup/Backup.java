@@ -17,6 +17,7 @@
 package com.aokp.backup;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import android.content.ContentResolver;
@@ -107,6 +108,9 @@ public class Backup {
             case Categories.CAT_WEATHER:
                 settings = res.getStringArray(R.array.cat_weather);
                 break;
+            case Categories.CAT_LIGHT_LEVELS:
+                settings = res.getStringArray(R.array.cat_custom_backlight);
+                break;
         }
 
         if (settings == null) {
@@ -140,12 +144,23 @@ public class Backup {
         }
 
         File dir = Tools.getBackupDirectory(mContext, name);
+        if (dir.exists()) {
+            try {
+                Tools.delete(dir);
+            } catch (IOException e) {
+                Log.d("AOKP.backup", "error deleting dir", e);
+            }
+        }
+        dir.mkdirs();
         File backup = new File(dir, "settings.cfg");
 
-        Tools.writeFile(output.toString(), backup);
 
-        Tools.writeFile(Tools.getAOKPVersion(), new File(Tools.getBackupDirectory(mContext, name),
+        Tools.writeFileToSD(output.toString(), backup);
+
+
+        Tools.writeFileToSD(Tools.getAOKPVersion(), new File(Tools.getBackupDirectory(mContext, name),
                 "aokp.version"));
+
         return true;
     }
 
