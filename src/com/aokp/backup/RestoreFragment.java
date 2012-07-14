@@ -255,9 +255,7 @@ public class RestoreFragment extends Fragment {
                         .setPositiveButton("Restore", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                ListView lv = ((AlertDialog) dialog).getListView();
-                                Integer fileIndex = (Integer) lv.getTag();
-                                if (fileIndex != null)
+                                if (fileIndex  >= 0)
                                     restore(fileIds[fileIndex]);
                             }
                         })
