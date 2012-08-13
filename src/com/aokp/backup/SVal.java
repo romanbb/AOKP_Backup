@@ -41,6 +41,10 @@ public class SVal {
         else
             return setting;
     }
+    
+    public String getVal() {
+        return val;
+    }
 
     public String toString() {
         return setting + "=" + val;

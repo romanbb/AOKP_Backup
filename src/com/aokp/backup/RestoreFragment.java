@@ -16,17 +16,30 @@
 
 package com.aokp.backup;
 
-import android.app.*;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
+
+import com.aokp.backup.restore.ICSRestore;
+import com.aokp.backup.restore.JBRestore;
+import com.aokp.backup.restore.Restore;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -47,8 +60,14 @@ public class RestoreFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        cats = getActivity().getApplicationContext().getResources()
-                .getStringArray(R.array.categories);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+            cats = getActivity().getApplicationContext().getResources()
+                    .getStringArray(R.array.categories);
+        else if (Build.VERSION.SDK_INT >= 16)
+            // jellybean
+            cats = getActivity().getApplicationContext().getResources()
+                    .getStringArray(R.array.jbcategories);
+
         checkBoxes = new CheckBox[cats.length];
 
     }
@@ -70,7 +89,7 @@ public class RestoreFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.restore, container, false);
         LinearLayout categories = (LinearLayout) v.findViewById(R.id.categories);
@@ -230,7 +249,6 @@ public class RestoreFragment extends Fragment {
                 }
             }
 
-
             if (files.length > 0)
                 return new AlertDialog.Builder(getActivity())
                         .setSingleChoiceItems(fileIds, 0, new DialogInterface.OnClickListener() {
@@ -249,13 +267,13 @@ public class RestoreFragment extends Fragment {
                                 Toast.makeText(getActivity(),
                                         files[fileIndex].getName() + " deleted!",
                                         Toast.LENGTH_LONG).show();
-
+                                fileIndex--;
                             }
                         })
                         .setPositiveButton("Restore", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (fileIndex  >= 0)
+                                if (fileIndex >= 0)
                                     restore(fileIds[fileIndex]);
                             }
                         })
@@ -298,7 +316,10 @@ public class RestoreFragment extends Fragment {
                 this.context = context;
                 this.name = name;
                 this.cats = cats;
-                r = new Restore(context);
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+                    r = new ICSRestore(context);
+                else if (Build.VERSION.SDK_INT >= 16)
+                    r = new JBRestore(context);
             }
 
             @Override

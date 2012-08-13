@@ -16,14 +16,13 @@
 
 package com.aokp.backup;
 
-import java.util.Date;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,6 +35,12 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import com.aokp.backup.backup.Backup;
+import com.aokp.backup.backup.ICSBackup;
+import com.aokp.backup.backup.JBBackup;
+
+import java.util.Date;
 
 public class BackupFragment extends Fragment {
 
@@ -53,8 +58,15 @@ public class BackupFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        cats = getActivity().getApplicationContext().getResources()
-                .getStringArray(R.array.categories);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+            cats = getActivity().getApplicationContext().getResources()
+                    .getStringArray(R.array.categories);
+        else if (Build.VERSION.SDK_INT >= 16) {
+            // jellybean
+            cats = getActivity().getApplicationContext().getResources()
+                    .getStringArray(R.array.jbcategories);
+        }
+
         checkBoxes = new CheckBox[cats.length];
     }
 
@@ -252,7 +264,11 @@ public class BackupFragment extends Fragment {
             public WorkTask(Activity context, boolean[] cats, String name) {
                 this.context = context;
                 this.name = name;
-                b = new Backup(context, cats);
+
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+                    b = new ICSBackup(context, cats);
+                else if (Build.VERSION.SDK_INT >= 16)
+                    b = new JBBackup(context, cats);
 
             }
 

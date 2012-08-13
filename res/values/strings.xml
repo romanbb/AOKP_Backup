@@ -9,12 +9,11 @@
     <string name="restore_all">Restore all settings</string>
     <string name="backup_all">Backup all settings</string>
 
-    <!--  prefs -->
+    <!-- prefs -->
     <string name="settings">Settings</string>
     <string name="title_perm_storage">Use permanent storage</string>
     <string name="summary_perm_storage">When enabled, backups are stored in /sdcard/AOKP_Backup. This is useful if you
-        want to keep your backups after uninstalling AOKP Backup (in case you want to reinstall it)
-    </string>
+        want to keep your backups after uninstalling AOKP Backup (in case you want to reinstall it)</string>
 
     <string-array name="categories">
         <item>General UI</item>
@@ -162,6 +161,7 @@
         <item>statusbar_toggles_style</item>
         <item>statusbar_toggles_use_buttons</item>
         <item>statusbar_toggles</item>
+        <item>statusbar_toggles_number_per_row</item>
     </string-array>
     <string-array name="cat_statusbar_clock">
         <item>statusbar_clock_enabled</item>
@@ -173,6 +173,7 @@
     <string-array name="cat_statusbar_battery">
         <item>statusbar_battery_icon</item>
         <item>statusbar_battery_bar</item>
+        <item>statusbar_brightness_slider</item>
         <item>statusbar_battery_bar_style</item>
         <item>statusbar_battery_bar_animate</item>
         <item>statusbar_battery_bar_thickness</item>
@@ -200,17 +201,150 @@
         <item>light_sensor_button_values</item>
         <item>light_sensor_keyboard_values</item>
     </string-array>
+    <string-array name="jbcategories">
+        <item>General UI</item>
+        <item>Navigation Bar</item>
+        <item>Lockscreen Options</item>
+        <item>Weather</item>
+        <item>LED Options</item>
+        <item>Sound Options</item>
+        <item>Statusbar Toggles</item>
+        <item>Statusbar Clock</item>
+        <item>Statusbar Battery</item>
+    </string-array>
+    <string-array name="jbcat_general_ui">
+
+        <!-- <item>disable_boot_animation</item> -->
+        <!-- <item>disable_boot_audio</item> -->
+        <!-- <item>disable_bug_mailer</item> -->
+        <!-- <item>accelerometer_rotation_angles</item> -->
+        <!-- <item>recent_app_switcher</item> -->
+        <!-- <item>lcd_density</item> -->
+        <!-- <item>crt_off_animation</item> -->
+        <!-- <item>ime_switcher</item> -->
+        <!-- <item>custom_carrier_label</item> -->
+        <!-- <item>kill_app_longpress_back</item> -->
+        <!-- <item>navigation_bar_home_longpress</item> -->
+        <!-- <item>accelerometer_rotation_settle_time</item> -->
+        <item>status_bar_notif_count</item>
+        <item>nfc_polling_mode</item>
+        <item>status_bar_notif_count</item>
+        <item>quiet_hours_enabled</item>
+        <item>quiet_hours_start</item>
+        <item>quiet_hours_end</item>
+        <item>quiet_hours_notifications</item>
+        <item>quiet_hours_ringer</item>
+        <item>quiet_hours_still</item>
+        <item>quiet_hours_dim</item>
+    </string-array>
+    <string-array name="jbcat_navigation_bar">
+        <item>navigation_bar_show</item>
+        <item>navigation_bar_width</item>
+        <item>navigation_bar_height</item>
+        <item>navigation_bar_height_landscape</item>
+        <item>menu_location</item>
+        <item>menu_visibility</item>
+        <item>navigation_bar_buttons_qty</item>
+        <item>navigation_bar_tint</item>
+        <item>navigation_bar_glow_tint</item>
+        <item>navigation_bar_button_alpha</item>
+        <item>navigation_bar_glow_duration_off</item>
+        <item>navigation_bar_glow_duration_on</item>
+        <item>navigation_longpress_app_intent_0</item>
+        <item>navigation_longpress_app_intent_1</item>
+        <item>navigation_longpress_app_intent_2</item>
+        <item>navigation_longpress_app_intent_3</item>
+        <item>navigation_longpress_app_intent_4</item>
+        <item>navigation_custom_app_intent_0</item>
+        <item>navigation_custom_app_intent_1</item>
+        <item>navigation_custom_app_intent_2</item>
+        <item>navigation_custom_app_intent_3</item>
+        <item>navigation_custom_app_intent_4</item>
+        <item>navigation_bar_icons</item>
+    </string-array>
+    <string-array name="jbcat_lockscreen">
+<!--         <item>lockscreen_wallpaper</item> -->
+<!--         <item>lockscreen_enable_menu_key</item> -->
+<!--         <item>secure.lock_screen_lock_suer_override</item> -->
+<!--         <item>lockscreen_layout</item> -->
+        <item>lockscreen_battery</item>
+        <item>lockscreen_weather</item>
+        <item>lockscreen_weather_type</item>
+<!--         <item>show_lock_before_unlock</item> -->
+<!--         <item>volume_wake_screen</item> -->
+<!--         <item>volume_music_controls</item> -->
+<!--         <item>lockscreen_calendar</item> -->
+<!--         <item>lockscreen_calendar_flip</item> -->
+<!--         <item>lockscreen_calendar_hide_ongoing</item> -->
+<!--         <item>lockscreen_calendar_use_colors</item> -->
+<!--         <item>lockscreen_calendar_interval</item> -->
+<!--         <item>lockscreen_calendar_range</item> -->
+<!--         <item>lockscreen_hide_nav</item> -->
+<!--         <item>lockscreen_hide_nav</item> -->
+<!--         <item>lockscreen_text_color</item> -->
+<!--         <item>lockscreen_custom_app_intent_0</item> -->
+<!--         <item>lockscreen_custom_app_intent_1</item> -->
+<!--         <item>lockscreen_custom_app_intent_2</item> -->
+<!--         <item>lockscreen_custom_app_intent_3</item> -->
+<!--         <item>lockscreen_custom_app_intent_4</item> -->
+<!--         <item>lockscreen_custom_app_intent_5</item> -->
+<!--         <item>lockscreen_custom_app_intent_6</item> -->
+<!--         <item>lockscreen_custom_app_intent_7</item> -->
+<!--         <item>lockscreen_icons</item> -->
+<!--         <item>lockscreen_hide_nav</item> -->
+<!--         <item>lockscreen_landscape</item> -->
+        <item>lockscreen_quick_unlock_control</item>
+<!--         <item>enable_fast_torch</item> -->
+    </string-array>
+    <string-array name="jbcat_weather">
+        <item>weather_statusbar_style</item>
+        <item>use_weather</item>
+        <item>weather_show_location</item>
+        <item>private_weather_prefs</item>
+    </string-array>
+    <string-array name="jbcat_led">
+        <item>notification_light_off</item>
+        <item>notification_light_on</item>
+        <item>led_screen_on</item>
+        <item>notification_light_color</item>
+    </string-array>
+    <string-array name="jbcat_sound">
+        <item>enable_volume_options</item>
+    </string-array>
+    <string-array name="jbcat_statusbar_toggles">
+        <item>statusbar_layout</item>
+        <item>statusbar_toggles_brightness_loc</item>
+        <item>statusbar_toggles_style</item>
+        <item>statusbar_toggles_use_buttons</item>
+        <item>statusbar_toggles_number_per_row</item>
+        <item>statusbar_toggles</item>
+    </string-array>
+    <string-array name="jbcat_statusbar_clock">
+        <item>statusbar_clock_enabled</item>
+        <item>statusbar_clock_style</item>
+        <item>statusbar_clock_am_pm_style</item>
+        <item>statusbar_show_alarm</item>
+        <item>statusbar_clock_weekday</item>
+        <item>statusbar_clock_color</item>
+    </string-array>
+    <string-array name="jbcat_statusbar_battery">
+        <item>statusbar_battery_icon</item>
+        <item>notification_battery_display</item>
+        <item>statusbar_battery_bar</item>
+        <item>statusbar_battery_bar_style</item>
+        <item>statusbar_battery_bar_animate</item>
+        <item>statusbar_battery_bar_thickness</item>
+        <item>statusbar_battery_bar_color</item>
+    </string-array>
 
     <string name="no_root">No root</string>
     <string name="not_aokp">You aren\'t running AOKP, silly!</string>
     <string name="not_aokp_warning">"It seems you are not running AOKP. If you are positive you are running AOKP, please
-        click continue, otherwise, think twice.\n\nPlease make a nandroid backup before continuing!"
-    </string>
+        click continue, otherwise, think twice.\n\nPlease make a nandroid backup before continuing!"</string>
     <string name="error_sd_not_mounted">Cannot access SD card storage. Make sure you have an SD card inserted!</string>
     <string name="dialog_continue">Continue</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="dont_show_again">Don\'t show this warning message again</string>
     <string name="read_warning_text">I\'ve read the warning. I have a backup.</string>
-
 
 </resources>
