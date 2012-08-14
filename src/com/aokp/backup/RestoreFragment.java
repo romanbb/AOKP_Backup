@@ -267,7 +267,7 @@ public class RestoreFragment extends Fragment {
                                 Toast.makeText(getActivity(),
                                         files[fileIndex].getName() + " deleted!",
                                         Toast.LENGTH_LONG).show();
-                                fileIndex--;
+                                fileIndex = 0;
                             }
                         })
                         .setPositiveButton("Restore", new DialogInterface.OnClickListener() {
