@@ -16,12 +16,8 @@
 
 package com.aokp.backup;
 
-import android.app.ActionBar;
+import android.app.*;
 import android.app.ActionBar.Tab;
-import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,6 +29,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TabHost;
 import android.widget.TextView;
+import com.parse.Parse;
+import com.parse.ParseObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,7 +68,7 @@ public class MainActivity extends Activity {
             check();
         }
     }
-    
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt("tab", getActionBar().getSelectedNavigationIndex());
@@ -125,7 +123,7 @@ public class MainActivity extends Activity {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
 
             getDialog().setTitle("Caution!"); // TODO make it a string
             getDialog().setCanceledOnTouchOutside(false);
@@ -200,7 +198,7 @@ public class MainActivity extends Activity {
                 return RESULT_SD_NA;
             } else {
                 File sdFolder = new File(Environment.getExternalStorageDirectory(), "AOKP_Backup");
-                if(sdFolder.exists()) {
+                if (sdFolder.exists()) {
                     try {
                         new File(sdFolder, ".nomedia").createNewFile();
                     } catch (IOException e) {

@@ -15,8 +15,8 @@ import java.io.File;
 
 public class ICSBackup extends Backup {
 
-    public ICSBackup(Context c, boolean[] categories) {
-        super(c, categories);
+    public ICSBackup(Context c, boolean[] categories, String name) {
+        super(c, categories, name);
 
     }
 
@@ -46,7 +46,7 @@ public class ICSBackup extends Backup {
 
             return true;
         } else if (setting.equals("navigation_bar_icons")) {
-            String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
+            String outDir = Tools.getBackupDirectory(mContext, mName).getAbsolutePath();
             ContentResolver resolver = mContext.getContentResolver();
             for (int i = 0; i < 5; i++) {
                 // String iconIntent = "navigation_custom_app_intent_" + i;
@@ -80,7 +80,7 @@ public class ICSBackup extends Backup {
 
             return true;
         } else if (setting.equals("lockscreen_wallpaper")) {
-            String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
+            String outDir = Tools.getBackupDirectory(mContext, mName).getAbsolutePath();
 
             new ShellCommand().su
                     .run("cp /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg "
@@ -88,7 +88,7 @@ public class ICSBackup extends Backup {
 
             return true;
         } else if (setting.equals("lockscreen_icons")) {
-            String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
+            String outDir = Tools.getBackupDirectory(mContext, mName).getAbsolutePath();
             ContentResolver resolver = mContext.getContentResolver();
             for (int i = 0; i < 8; i++) {
                 // String intentSetting = "lockscreen_custom_app_intent_" + i;

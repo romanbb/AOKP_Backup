@@ -266,9 +266,9 @@ public class BackupFragment extends Fragment {
                 this.name = name;
 
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
-                    b = new ICSBackup(context, cats);
+                    b = new ICSBackup(context, cats, name);
                 else if (Build.VERSION.SDK_INT >= 16)
-                    b = new JBBackup(context, cats);
+                    b = new JBBackup(context, cats, name);
 
             }
 
@@ -281,7 +281,7 @@ public class BackupFragment extends Fragment {
             }
 
             protected Boolean doInBackground(Void... files) {
-                return b.backupSettings(name);
+                return b.backupSettings();
             }
 
             protected void onPostExecute(Boolean result) {

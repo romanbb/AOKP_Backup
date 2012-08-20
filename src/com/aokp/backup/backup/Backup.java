@@ -46,22 +46,24 @@ public abstract class Backup {
 
     ArrayList<SVal> currentSVals;
 
-    String name = "***TEST***";
+    String mName;
 
-    public Backup(Context c, boolean[] categories) {
+    File mBackupDir;
+
+    public Backup(Context c, boolean[] categories, String name) {
         mContext = c;
+        mName = name;
         catsToBackup = categories;
+        mBackupDir = Tools.getBackupDirectory(mContext, name);
     }
 
-    public boolean backupSettings(String name) {
+    public boolean backupSettings() {
 
-        File dir = Tools.getBackupDirectory(mContext, name);
-        if (dir.exists()) {
-            new ShellCommand().su.runWaitFor("rm -r " + dir.getAbsolutePath());
+        if (mBackupDir.exists()) {
+            new ShellCommand().su.runWaitFor("rm -r " + mBackupDir.getAbsolutePath());
         }
-        dir.mkdirs();
+        mBackupDir.mkdirs();
 
-        this.name = name;
         for (int i = 0; i < catsToBackup.length; i++) {
             backupValues.add(i, new ArrayList<SVal>());
             if (catsToBackup[i]) {
@@ -69,6 +71,15 @@ public abstract class Backup {
             }
         }
         return writeBackupSetings();
+    }
+    
+    public File zipBackup() {
+        
+        return null;
+    }
+    
+    public void restoreBackupFromZip(File zip) {
+        
     }
 
     protected abstract String[] getSettingsCategory(int categoryIndex);
@@ -108,7 +119,7 @@ public abstract class Backup {
             }
         }
 
-        File dir = Tools.getBackupDirectory(mContext, name);
+        File dir = Tools.getBackupDirectory(mContext, mName);
         if (dir.exists()) {
             try {
                 Tools.delete(dir);
@@ -122,7 +133,7 @@ public abstract class Backup {
         Tools.writeFileToSD(output.toString(), backup);
 
         Tools.writeFileToSD(Tools.getAOKPVersion(),
-                new File(Tools.getBackupDirectory(mContext, name),
+                new File(Tools.getBackupDirectory(mContext, mName),
                         "aokp.version"));
 
         return true;
