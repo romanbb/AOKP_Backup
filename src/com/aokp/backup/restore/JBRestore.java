@@ -33,7 +33,7 @@ public class JBRestore extends Restore {
             e.printStackTrace();
             return true; // TODO handle this better!
         }
-        final int maximumGooVersion = 20; // jb nightlies
+        final int maximumGooVersion = 21; // jb-build-1
 
         int currentVersion = -1;
         currentVersion = Integer.parseInt(Tools.getAOKPVersion());
