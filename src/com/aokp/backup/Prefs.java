@@ -42,7 +42,7 @@ public class Prefs {
 
     public static boolean getBackupPermanent(Context c) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
-        return prefs.getBoolean(KEY_PERM_STORAGE, false);
+        return prefs.getBoolean(KEY_PERM_STORAGE, true);
     }
 
     public static boolean setBackupLocation(Context c, String loc) {
