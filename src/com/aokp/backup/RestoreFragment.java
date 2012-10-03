@@ -16,11 +16,11 @@
 
 package com.aokp.backup;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -40,9 +40,12 @@ import android.widget.Toast;
 import com.aokp.backup.restore.ICSRestore;
 import com.aokp.backup.restore.JBRestore;
 import com.aokp.backup.restore.Restore;
+import com.aokp.backup.util.ShellCommand;
+import com.aokp.backup.util.Tools;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class RestoreFragment extends Fragment {
@@ -294,6 +297,12 @@ public class RestoreFragment extends Fragment {
 
         protected void deleteBackup(String string) {
             File deleteMe = new File(backupDir, string);
+            try {
+                String id = Tools.readFileToString(new File(deleteMe, "id"));
+                ParseHelpers.getInstance(getActivity()).removeId(id);
+            } catch (IOException e) {
+                // no id file, let's assume there is/was no online version
+            }
             String command = "rm -r " + deleteMe.getAbsolutePath() + "/";
             Log.w(TAG, command);
             new ShellCommand().su.runWaitFor(command);
@@ -307,12 +316,13 @@ public class RestoreFragment extends Fragment {
         public class RestoreTask extends AsyncTask<Void, Void, Integer> {
 
             AlertDialog d;
-            Activity context;
+            Context context;
             Restore r;
             String name = null;
             boolean[] cats = null;
+            Boolean restore;
 
-            public RestoreTask(Activity context, boolean[] cats, String name) {
+            public RestoreTask(Context context, boolean[] cats, String name) {
                 this.context = context;
                 this.name = name;
                 this.cats = cats;
@@ -324,19 +334,53 @@ public class RestoreFragment extends Fragment {
 
             @Override
             protected void onPreExecute() {
-                d = new AlertDialog.Builder(context)
-                        .setMessage("Restore in progress")
-                        .create();
-                d.show();
-                Tools.mountRw();
+                if (!r.okayToRestore()) {
+                    new AlertDialog.Builder(context)
+                            .setTitle("Restore failed!")
+                            .setMessage("AOKP Not detected. Continue restoring?")
+                            .setCancelable(false)
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    restore = true;
+                                    d = new AlertDialog.Builder(context)
+                                            .setMessage("Restore in progress")
+                                            .create();
+                                    d.show();
+                                }
+                            })
+                            .setNegativeButton("No!", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    restore = false;
+                                }
+                            })
+                            .create().show();
+                } else {
+                    restore = true;
+                    d = new AlertDialog.Builder(context)
+                            .setMessage("Restore in progress")
+                            .create();
+                    d.show();
+                }
+
             }
 
             protected Integer doInBackground(Void... v) {
-                return r.restoreSettings(name, cats);
+                while (restore == null) {
+                }
+                if (restore) {
+                    Tools.mountRw();
+                    return r.restoreSettings(name, cats);
+                } else {
+                    return 3;
+                }
+
             }
 
             protected void onPostExecute(Integer result) {
-                d.dismiss();
+                if (d != null)
+                    d.dismiss();
                 Tools.mountRo();
                 if (result == 0) {
                     new AlertDialog.Builder(context)
@@ -365,7 +409,7 @@ public class RestoreFragment extends Fragment {
                             .setCancelable(false)
                             .setNeutralButton("Ok", null)
                             .create().show();
-                } else if (result == 2) {
+                } else if (result == 3) {
                     new AlertDialog.Builder(context)
                             .setTitle("Restore failed!")
                             .setMessage("Are you running AOKP??")

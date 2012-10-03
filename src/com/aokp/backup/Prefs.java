@@ -20,6 +20,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import java.util.Set;
+
 public class Prefs {
     static final String PREFS_BACKUP = "backup";
     static final String PREFS_APP = "prefs";
@@ -27,7 +29,8 @@ public class Prefs {
     public static final String KEY_DONT_SHOW_AOKP_WARNING = "skip_aokp_warning";
 
     public static final String KEY_PERM_STORAGE = "perm_storage";
-    
+
+    public static final String KEY_REMOTE_BACKUP_IDS = "remote_backups";
 
     public static boolean getShowNotAokpWarning(Context c) {
         SharedPreferences prefs = c.getSharedPreferences(PREFS_BACKUP, Context.MODE_PRIVATE);
@@ -42,7 +45,7 @@ public class Prefs {
 
     public static boolean getBackupPermanent(Context c) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
-        return prefs.getBoolean(KEY_PERM_STORAGE, false);
+        return prefs.getBoolean(KEY_PERM_STORAGE, true);
     }
 
     public static boolean setBackupLocation(Context c, String loc) {

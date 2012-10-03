@@ -4,12 +4,10 @@ package com.aokp.backup.restore;
 import android.content.Context;
 import android.util.Log;
 
-import com.aokp.backup.ShellCommand;
-import com.aokp.backup.Tools;
-import com.aokp.backup.ShellCommand.CommandResult;
+import com.aokp.backup.util.ShellCommand;
+import com.aokp.backup.util.Tools;
 
 import java.io.File;
-import java.io.IOException;
 
 public class JBRestore extends Restore {
 
@@ -19,16 +17,12 @@ public class JBRestore extends Restore {
      */
     private static final int MIN_JB_VERSION = 20;
 
-    String rcUser;
-
     public JBRestore(Context c) {
         super(c);
-        CommandResult cr = new ShellCommand().su
-                .runWaitFor("ls -ld /data/data/com.aokp.romcontrol/ | awk '{print $3}'");
-        rcUser = cr.stdout;
     }
 
     public boolean okayToRestore() {
+        boolean result = false;
         int minimumGooVersion = getAOKPBackupVersionInteger();
         if (minimumGooVersion == -1) {
             return false;
@@ -37,28 +31,18 @@ public class JBRestore extends Restore {
 
         try {
             int currentVersion = Integer.parseInt(Tools.getAOKPVersion());
+            if (currentVersion == -1) {
+                result = false;
+            }
 
             if (currentVersion <= maximumGooVersion && currentVersion >= minimumGooVersion)
-                return true;
+                result = true;
         } catch (Exception e) {
         }
-        return false;
+        return result;
     }
 
     public boolean shouldHandleSpecialCase(String setting) {
-
-        File rcFilesDir = new File("/data/data/com.aokp.romcontrol/files/");
-        if (!rcFilesDir.exists()) {
-            new ShellCommand().su.runWaitFor("mkdir " + rcFilesDir.getAbsolutePath());
-            Tools.chmodAndOwn(rcFilesDir, "0660", rcUser);
-        }
-
-        File rcPrefsDir = new File("/data/data/com.aokp.romcontrol/shared_prefs/");
-        if (!rcPrefsDir.exists()) {
-            new ShellCommand().su.runWaitFor("mkdir " + rcPrefsDir.getAbsolutePath());
-            Tools.chmodAndOwn(rcPrefsDir, "0660", rcUser);
-        }
-
         String value = "";
         if (settingsFromFile.containsKey(setting))
             value = settingsFromFile.get(setting).getVal();

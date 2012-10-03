@@ -2,8 +2,8 @@
 package com.aokp.backup;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.res.AssetManager;
+import android.util.Log;
 
 import com.parse.Parse;
 
@@ -14,31 +14,37 @@ import java.io.InputStream;
 
 public class AOKPBackup extends Application {
 
-    Context mContext;
-    boolean mParseFeaturesEnabled;
+    static final String TAG = "AOKP Backup";
 
-    @Override
-    public void onCreate() {
-        mContext = getApplicationContext();
+    private static boolean mParseFeaturesEnabled = false;
 
-        AssetManager assets = mContext.getResources().getAssets();
+    public void initParse() {
+        if (!mParseFeaturesEnabled)
+            return;
+        AssetManager assets = getApplicationContext().getResources()
+                .getAssets();
         try {
-            InputStream parseApplicationIdFile = assets.open("parse.application.id");
-            String parseApplicationId = IOUtils.toString(parseApplicationIdFile);
+            InputStream parseApplicationIdFile = assets
+                    .open("parse.application.id");
+            String parseApplicationId = IOUtils
+                    .toString(parseApplicationIdFile);
 
-            InputStream parseClientIdFile = assets.open("parse.application.id");
+            InputStream parseClientIdFile = assets.open("parse.client.id");
             String parseClientId = IOUtils.toString(parseClientIdFile);
 
             Parse.initialize(this, parseApplicationId, parseClientId);
             mParseFeaturesEnabled = true;
+
+            Log.i(TAG, "client key: " + parseClientId);
+            Log.i(TAG, "app key: " + parseApplicationId);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.i(TAG, "disabling Parse features");
             mParseFeaturesEnabled = false;
         }
     }
 
-    public boolean isParseEnabled() {
-        return mParseFeaturesEnabled;
+    public static boolean isParseEnabled() {
+        return false;
     }
 
 }

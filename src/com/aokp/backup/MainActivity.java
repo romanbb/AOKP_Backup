@@ -16,8 +16,12 @@
 
 package com.aokp.backup;
 
-import android.app.*;
+import android.app.ActionBar;
 import android.app.ActionBar.Tab;
+import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,8 +33,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TabHost;
 import android.widget.TextView;
-import com.parse.Parse;
-import com.parse.ParseObject;
+
+import com.aokp.backup.util.ShellCommand;
+import com.aokp.backup.util.Tools;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +52,7 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        ((AOKPBackup) getApplication()).initParse();
         final ActionBar bar = getActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
@@ -123,7 +128,7 @@ public class MainActivity extends Activity {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
+                Bundle savedInstanceState) {
 
             getDialog().setTitle("Caution!"); // TODO make it a string
             getDialog().setCanceledOnTouchOutside(false);

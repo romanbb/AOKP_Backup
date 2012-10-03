@@ -16,21 +16,23 @@
 
 package com.aokp.backup.restore;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.aokp.backup.SVal;
-import com.aokp.backup.Tools;
 import com.aokp.backup.categories.ICSCategories;
+import com.aokp.backup.util.SVal;
+import com.aokp.backup.util.ShellCommand;
+import com.aokp.backup.util.Tools;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class Restore {
 
@@ -46,22 +48,44 @@ public abstract class Restore {
     public static final int ERROR_NOT_AOKP = 3;
     public static final int ERROR_XOS = 4;
 
+    String rcUser = null;
+    File rcFilesDir;
+    File rcPrefsDir;
+
+    int restoreResult = 0;
+
     public Restore(Context c) {
         mContext = c;
     }
 
-    public int restoreSettings(String name, boolean[] catsToRestore) {
+    public int restoreSettings(final String name, final boolean[] catsToRestore) {
         this.name = name;
 
-        if (!okayToRestore())
-            return ERROR_NOT_AOKP;
-
-        try {
-            readRestore();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!readRestore()) {
+            Log.e(TAG, "error reading restore cfg!");
             return ERROR_IOEXCEPTION;
         }
+
+        rcUser = getRomControlPid();
+        if(rcUser == null) {
+            return ERROR_IOEXCEPTION;
+        }
+
+        Log.e(TAG, "folders go");
+        rcFilesDir = new File("/data/data/com.aokp.romcontrol/files/");
+        if (!rcFilesDir.exists()) {
+            new ShellCommand().su.runWaitFor("mkdir " + rcFilesDir.getAbsolutePath());
+            Tools.chmodAndOwn(rcFilesDir, "0660", rcUser);
+        }
+        Log.e(TAG, "setup files");
+        rcPrefsDir = new File("/data/data/com.aokp.romcontrol/shared_prefs/");
+        if (!rcPrefsDir.exists()) {
+            new ShellCommand().su.runWaitFor("mkdir " + rcPrefsDir.getAbsolutePath());
+            Tools.chmodAndOwn(rcPrefsDir, "0660", rcUser);
+        }
+
+        Log.e(TAG, "setup folders");
+
         for (int i = 0; i < catsToRestore.length; i++) {
             if (catsToRestore[i]) {
                 restoreSettings(i);
@@ -70,42 +94,54 @@ public abstract class Restore {
         return 0;
     }
 
+    private String getRomControlPid() {
+        ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+        List<RunningAppProcessInfo> service = am.getRunningAppProcesses();
+        for (RunningAppProcessInfo app : service) {
+            for (String pkg : app.pkgList) {
+                if (pkg.equals("com.aokp.romcontrol")) {
+                    return app.pid + "";
+                }
+            }
+        }
+        return null;
+    }
+
     public abstract boolean okayToRestore();
 
     protected int getAOKPBackupVersionInteger() {
         try {
-            String dir = new File(Tools.getBackupDirectory(mContext, name), "aokp.version")
-                    .getAbsolutePath();
-            FileInputStream fstream = new FileInputStream(dir);
-            DataInputStream in = new DataInputStream(fstream);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String strLine;
-            while ((strLine = br.readLine()) != null) {
-                return Integer.parseInt(strLine);
-            }
-            in.close();
-        } catch (IOException e) {
+            String contents = Tools.readFileToString(new File(Tools.getBackupDirectory(mContext,
+                    name), "aokp.version"));
+            return Integer.parseInt(contents);
+        } catch (Exception e) {
+            return -1;
         }
-        return -1;
     }
 
-    protected void readRestore() throws IOException {
-        String dir = new File(Tools.getBackupDirectory(mContext, name), "settings.cfg")
-                .getAbsolutePath();
-        settingsFromFile = new HashMap<String, SVal>();
-        FileInputStream fstream = new FileInputStream(dir);
-        DataInputStream in = new DataInputStream(fstream);
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String strLine;
-        while ((strLine = br.readLine()) != null) {
-            // System.out.println(strLine);
-            int split = strLine.indexOf("=");
-            String setting = strLine.substring(0, split);
-            String value = strLine.substring(split + 1, strLine.length());
-            settingsFromFile.put(setting, new SVal(setting, value));
-
+    protected boolean readRestore() {
+        File f = new File(Tools.getBackupDirectory(mContext, name), "settings.cfg");
+        if (!f.exists()) {
+            Log.e(TAG, "settings.cfg doesn't exist!");
         }
-        in.close();
+        settingsFromFile = new HashMap<String, SVal>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(f));
+            String strLine = null;
+            while ((strLine = br.readLine()) != null) {
+                // System.out.println(strLine);
+                int split = strLine.indexOf("=");
+                String setting = strLine.substring(0, split);
+                String value = strLine.substring(split + 1, strLine.length());
+                settingsFromFile.put(setting, new SVal(setting, value));
+            }
+            br.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "error", e);
+            return false;
+        }
     }
 
     private void restoreSettings(int category) {

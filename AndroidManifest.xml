@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.aokp.backup"
-    android:versionCode="25"
-    android:versionName="1.54" >
+    android:versionCode="29"
+    android:versionName="1.6" >
 
-    <uses-sdk android:targetSdkVersion="16" android:minSdkVersion="15"/>
+    <uses-sdk
+        android:minSdkVersion="15"
+        android:targetSdkVersion="16" />
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name="AOKPBackup"
+        android:name=".AOKPBackup"
+        android:backupAgent=".GoogleBackup"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name" >
+        android:killAfterRestore="true"
+        android:label="@string/app_name"
+        android:restoreAnyVersion="true" >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
@@ -24,7 +30,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="Preferences"></activity>
+        <activity android:name="Preferences" />
+
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAIhTEOjHKTja-0RnQHlZA3nrTlAN6nv-obCzpFPA" />
     </application>
 
 </manifest>

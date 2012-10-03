@@ -7,11 +7,11 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.aokp.backup.SVal;
-import com.aokp.backup.ShellCommand;
-import com.aokp.backup.ShellCommand.CommandResult;
-import com.aokp.backup.Tools;
 import com.aokp.backup.categories.JBCategories;
+import com.aokp.backup.util.SVal;
+import com.aokp.backup.util.ShellCommand;
+import com.aokp.backup.util.ShellCommand.CommandResult;
+import com.aokp.backup.util.Tools;
 
 import java.io.File;
 
@@ -89,7 +89,8 @@ public class JBBackup extends Backup {
                     File f = new File(Uri.parse(val).getPath());
                     if (f.exists()) {
                         new ShellCommand().su
-                                .runWaitFor("cp /data/data/com.aokp.romcontrol/files/lockscreen_icon_" + i
+                                .runWaitFor("cp /data/data/com.aokp.romcontrol/files/lockscreen_icon_"
+                                        + i
                                         + ".png " + outDir);
                     }
                 }
@@ -106,7 +107,7 @@ public class JBBackup extends Backup {
                     String command = "cp " + xml.getAbsolutePath() + " " + outDir + xml.getName();
                     Log.e(TAG, command);
                     CommandResult cr = new ShellCommand().su.runWaitFor(command);
-                    if(cr.success()) {
+                    if (cr.success()) {
                         Log.e(TAG, "run success");
                     } else {
                         Log.e(TAG, "error: " + cr.stderr);

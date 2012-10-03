@@ -39,6 +39,7 @@ import android.widget.Toast;
 import com.aokp.backup.backup.Backup;
 import com.aokp.backup.backup.ICSBackup;
 import com.aokp.backup.backup.JBBackup;
+import com.aokp.backup.util.ShellCommand;
 
 import java.util.Date;
 
@@ -251,17 +252,17 @@ public class BackupFragment extends Fragment {
         }
 
         public void backup(String name) {
-            new WorkTask(getActivity(), cats, name).execute();
+            new BackupTask(getActivity(), cats, name).execute();
         }
 
-        public class WorkTask extends AsyncTask<Void, Boolean, Boolean> {
+        public class BackupTask extends AsyncTask<Void, Boolean, Boolean> {
 
             AlertDialog d;
             Activity context;
             Backup b;
             String name;
 
-            public WorkTask(Activity context, boolean[] cats, String name) {
+            public BackupTask(Activity context, boolean[] cats, String name) {
                 this.context = context;
                 this.name = name;
 
@@ -281,7 +282,10 @@ public class BackupFragment extends Fragment {
             }
 
             protected Boolean doInBackground(Void... files) {
-                return b.backupSettings();
+                boolean result = b.backupSettings();
+                // boolean zipSuccessful = Backup.zipBackup(context, b) != null;
+                boolean zipSuccessful = true;
+                return result && zipSuccessful;
             }
 
             protected void onPostExecute(Boolean result) {
