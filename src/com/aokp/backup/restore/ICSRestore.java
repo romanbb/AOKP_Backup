@@ -17,22 +17,19 @@ public class ICSRestore extends Restore {
     }
 
     public boolean okayToRestore() {
-        int minimumGooVersion;
-        try {
-            minimumGooVersion = getBackupVersion();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return true; // TODO handle this better!
+        int minimumGooVersion = getAOKPBackupVersionInteger();
+        if (minimumGooVersion == -1) {
+            return false;
         }
-        final int maximumGooVersion = 19; // milestone 6
+        final int maximumGooVersion = 19;
 
-        int currentVersion = -1;
-        currentVersion = Integer.parseInt(Tools.getAOKPVersion());
+        try {
+            int currentVersion = Integer.parseInt(Tools.getAOKPVersion());
 
-        // don't let backwards restores, for safety
-        if (currentVersion <= maximumGooVersion && currentVersion >= minimumGooVersion)
-            return true;
-
+            if (currentVersion <= maximumGooVersion && currentVersion >= minimumGooVersion)
+                return true;
+        } catch (Exception e) {
+        }
         return false;
     }
 

@@ -10,16 +10,15 @@ public class JBCategories extends Categories {
     public static final int CAT_GENERAL_UI = 0;
     public static final int CAT_NAVIGATION_BAR = 1;
     public static final int CAT_LOCKSCREEN_OPTS = 2;
-    public static final int CAT_WEATHER = 4;
-    public static final int CAT_LED_OPTIONS = 6;
-    public static final int CAT_SOUND = 7;
-    public static final int CAT_SB_TOGGLES = 8;
-    public static final int CAT_SB_CLOCK = 9;
-    public static final int CAT_SB_BATTERY = 10;
-    // public static final int CAT_POWER_MENU_OPTS = 3;
-    // public static final int CAT_POWER_SAVER = 5;
+    public static final int CAT_WEATHER = 3;
+    public static final int CAT_LED_OPTIONS = 4;
+    public static final int CAT_SOUND = 5;
+    public static final int CAT_SB_TOGGLES = 6;
+    public static final int CAT_SB_CLOCK = 7;
+    public static final int CAT_SB_BATTERY = 8;
+    public static final int CAT_SB_SIGNAL = 9;
 
-    public static final int NUM_CATS = 9;
+    public static final int NUM_CATS = 10;
 
     @Override
     public String[] getSettingsCategory(Context c, int cat) {
@@ -43,6 +42,8 @@ public class JBCategories extends Categories {
                 return res.getStringArray(R.array.jbcat_weather);
             case CAT_SOUND:
                 return res.getStringArray(R.array.jbcat_sound);
+            case CAT_SB_SIGNAL:
+                return res.getStringArray(R.array.jbcat_statusbar_signal);
             default:
                 return null;
         }

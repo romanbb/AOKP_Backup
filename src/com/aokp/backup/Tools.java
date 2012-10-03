@@ -162,7 +162,7 @@ public class Tools {
                 delete(c);
         }
         if (!f.delete())
-//            throw new FileNotFoundException("Failed to delete file: " + f);
+            // throw new FileNotFoundException("Failed to delete file: " + f);
             Log.d("AOKP.Backup", "Failed to delete file: " + f);
     }
 
@@ -171,7 +171,6 @@ public class Tools {
             return;
         if (fileToWrite == null)
             return;
-
 
         if (!fileToWrite.exists()) {
             try {
@@ -189,5 +188,13 @@ public class Tools {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void chmodAndOwn(File f, String chmod, String chownUser) {
+        new ShellCommand().su
+                .runWaitFor("chown " + chownUser + ":" + chownUser
+                        + " " + f.getAbsolutePath());
+        new ShellCommand().su
+                .runWaitFor("chmod" + chmod + " " + f.getAbsolutePath());
     }
 }

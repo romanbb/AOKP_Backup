@@ -5,24 +5,31 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.provider.Settings;
+import android.util.Log;
 
 import com.aokp.backup.SVal;
 import com.aokp.backup.ShellCommand;
+import com.aokp.backup.ShellCommand.CommandResult;
 import com.aokp.backup.Tools;
-import com.aokp.backup.categories.ICSCategories;
+import com.aokp.backup.categories.JBCategories;
 
 import java.io.File;
 
 public class JBBackup extends Backup {
 
+    String outDir;
+
     public JBBackup(Context c, boolean[] categories, String name) {
         super(c, categories, name);
+        outDir = Tools.getBackupDirectory(mContext, mName).getAbsolutePath();
+        if (!outDir.endsWith("/"))
+            outDir += "/";
 
     }
 
     @Override
     protected String[] getSettingsCategory(int categoryIndex) {
-        return new ICSCategories().getSettingsCategory(mContext, categoryIndex);
+        return new JBCategories().getSettingsCategory(mContext, categoryIndex);
     }
 
     @Override
@@ -46,32 +53,15 @@ public class JBBackup extends Backup {
 
             return true;
         } else if (setting.equals("navigation_bar_icons")) {
-            String outDir = Tools.getBackupDirectory(mContext, mName).getAbsolutePath();
             ContentResolver resolver = mContext.getContentResolver();
-            for (int i = 0; i < 5; i++) {
-                // String iconIntent = "navigation_custom_app_intent_" + i;
-                // String iconIntentValue = Settings.System.getString(resolver,
-                // iconIntent);
-                // Log.i(TAG, "intent value: " + iconIntentValue);
-                // if (iconIntentValue != null)
-                // currentSVals.add(new SVal(iconIntent, iconIntentValue));
-                //
-                // String iconLongPressIntent =
-                // "navigation_longpress_app_intent_" + i;
-                // String iconLongPressIntentValue =
-                // Settings.System.getString(resolver,
-                // iconLongPressIntent);
-                // if (iconLongPressIntentValue != null)
-                // currentSVals.add(new SVal(iconLongPressIntent,
-                // iconLongPressIntentValue));
-
+            for (int i = 0; i < 7; i++) {
                 String iconSetting = "navigation_custom_app_icon_" + i;
                 String iconValue = Settings.System.getString(resolver, iconSetting);
                 if (iconValue != null) {
                     if (iconValue.length() > 0) {
                         currentSVals.add(new SVal(iconSetting, iconValue));
                         String cmd = "cp /data/data/com.aokp.romcontrol/files/navbar_icon_" + i
-                                + ".png " + outDir + "/";
+                                + ".png " + outDir;
                         new ShellCommand().su
                                 .runWaitFor(cmd);
                     }
@@ -80,23 +70,18 @@ public class JBBackup extends Backup {
 
             return true;
         } else if (setting.equals("lockscreen_wallpaper")) {
-            String outDir = Tools.getBackupDirectory(mContext, mName).getAbsolutePath();
-
             new ShellCommand().su
-                    .run("cp /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg "
+                    .runWaitFor("cp /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg "
                             + outDir);
-
+            return true;
+        } else if (setting.equals("notification_wallpaper")) {
+            new ShellCommand().su
+                    .runWaitFor("cp /data/data/com.aokp.romcontrol/files/notification_wallpaper.jpg "
+                            + outDir);
             return true;
         } else if (setting.equals("lockscreen_icons")) {
-            String outDir = Tools.getBackupDirectory(mContext, mName).getAbsolutePath();
             ContentResolver resolver = mContext.getContentResolver();
             for (int i = 0; i < 8; i++) {
-                // String intentSetting = "lockscreen_custom_app_intent_" + i;
-                // String intentValue = Settings.System.getString(resolver,
-                // intentSetting);
-                // if (intentValue != null)
-                // currentSVals.add(new SVal(intentSetting, intentValue));
-
                 String set = "lockscreen_custom_app_icon_" + i;
                 String val = Settings.System.getString(resolver, set);
                 if (val != null) {
@@ -104,15 +89,30 @@ public class JBBackup extends Backup {
                     File f = new File(Uri.parse(val).getPath());
                     if (f.exists()) {
                         new ShellCommand().su
-                                .run("cp /data/data/com.aokp.romcontrol/files/lockscreen_icon_" + i
+                                .runWaitFor("cp /data/data/com.aokp.romcontrol/files/lockscreen_icon_" + i
                                         + ".png " + outDir);
                     }
                 }
             }
-
             return true;
-        } else if (setting.equals("private_weather_prefs")) {
-
+        } else if (setting.equals("rc_prefs")) {
+            final String[] xmlFiles = {
+                    "WeatherServicePreferences.xml", "_has_set_default_values.xml",
+                    "aokp_weather.xml", "com.aokp.romcontrol_preferences.xml", "vibrations.xml"
+            };
+            for (String xmlName : xmlFiles) {
+                File xml = new File("/data/data/com.aokp.romcontrol/shared_prefs/" + xmlName);
+                if (xml.exists()) {
+                    String command = "cp " + xml.getAbsolutePath() + " " + outDir + xml.getName();
+                    Log.e(TAG, command);
+                    CommandResult cr = new ShellCommand().su.runWaitFor(command);
+                    if(cr.success()) {
+                        Log.e(TAG, "run success");
+                    } else {
+                        Log.e(TAG, "error: " + cr.stderr);
+                    }
+                }
+            }
             return true;
         }
 

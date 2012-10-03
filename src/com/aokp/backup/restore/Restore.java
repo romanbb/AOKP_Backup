@@ -53,12 +53,8 @@ public abstract class Restore {
     public int restoreSettings(String name, boolean[] catsToRestore) {
         this.name = name;
 
-        try {
-            if (!okayToRestore())
-                return ERROR_RESTORE_UNSUPPORTED;
-        } catch (NumberFormatException nfe) {
+        if (!okayToRestore())
             return ERROR_NOT_AOKP;
-        }
 
         try {
             readRestore();
@@ -73,21 +69,24 @@ public abstract class Restore {
         }
         return 0;
     }
-    
+
     public abstract boolean okayToRestore();
 
-    protected int getBackupVersion() throws IOException {
-        String dir = new File(Tools.getBackupDirectory(mContext, name), "aokp.version")
-                .getAbsolutePath();
-        FileInputStream fstream = new FileInputStream(dir);
-        DataInputStream in = new DataInputStream(fstream);
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String strLine;
-        while ((strLine = br.readLine()) != null) {
-            return Integer.parseInt(strLine);
+    protected int getAOKPBackupVersionInteger() {
+        try {
+            String dir = new File(Tools.getBackupDirectory(mContext, name), "aokp.version")
+                    .getAbsolutePath();
+            FileInputStream fstream = new FileInputStream(dir);
+            DataInputStream in = new DataInputStream(fstream);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String strLine;
+            while ((strLine = br.readLine()) != null) {
+                return Integer.parseInt(strLine);
+            }
+            in.close();
+        } catch (IOException e) {
         }
-        in.close();
-        return Integer.MAX_VALUE;
+        return -1;
     }
 
     protected void readRestore() throws IOException {

@@ -72,14 +72,12 @@ public abstract class Backup {
         }
         return writeBackupSetings();
     }
-    
+
     public File zipBackup() {
-        
         return null;
     }
-    
+
     public void restoreBackupFromZip(File zip) {
-        
     }
 
     protected abstract String[] getSettingsCategory(int categoryIndex);
@@ -119,17 +117,7 @@ public abstract class Backup {
             }
         }
 
-        File dir = Tools.getBackupDirectory(mContext, mName);
-        if (dir.exists()) {
-            try {
-                Tools.delete(dir);
-            } catch (IOException e) {
-                Log.d("AOKP.backup", "error deleting dir", e);
-            }
-        }
-        dir.mkdirs();
-        File backup = new File(dir, "settings.cfg");
-
+        File backup = new File(mBackupDir, "settings.cfg");
         Tools.writeFileToSD(output.toString(), backup);
 
         Tools.writeFileToSD(Tools.getAOKPVersion(),
