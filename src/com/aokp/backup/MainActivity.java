@@ -26,6 +26,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ import android.widget.CheckBox;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import com.aokp.backup.restore.Restore;
 import com.aokp.backup.util.ShellCommand;
 import com.aokp.backup.util.Tools;
 
@@ -52,6 +54,7 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("B", Restore.getRomControlPid());
         ((AOKPBackup) getApplication()).initParse();
         final ActionBar bar = getActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
