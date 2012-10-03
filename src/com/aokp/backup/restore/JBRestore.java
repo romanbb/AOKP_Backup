@@ -4,8 +4,8 @@ package com.aokp.backup.restore;
 import android.content.Context;
 import android.util.Log;
 
-import com.aokp.backup.ShellCommand;
-import com.aokp.backup.Tools;
+import com.aokp.backup.util.ShellCommand;
+import com.aokp.backup.util.Tools;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class JBRestore extends Restore {
             e.printStackTrace();
             return true; // TODO handle this better!
         }
-        final int maximumGooVersion = 21; // jb-build-1
+        final int maximumGooVersion = 26;
 
         int currentVersion = -1;
         currentVersion = Integer.parseInt(Tools.getAOKPVersion());

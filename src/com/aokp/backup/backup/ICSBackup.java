@@ -6,10 +6,10 @@ import android.content.Context;
 import android.net.Uri;
 import android.provider.Settings;
 
-import com.aokp.backup.SVal;
-import com.aokp.backup.ShellCommand;
-import com.aokp.backup.Tools;
 import com.aokp.backup.categories.ICSCategories;
+import com.aokp.backup.util.SVal;
+import com.aokp.backup.util.ShellCommand;
+import com.aokp.backup.util.Tools;
 
 import java.io.File;
 

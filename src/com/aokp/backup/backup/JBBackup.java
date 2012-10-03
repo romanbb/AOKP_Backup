@@ -1,23 +1,27 @@
 
 package com.aokp.backup.backup;
 
+import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.net.Uri;
 import android.provider.Settings;
+import android.util.Log;
 
-import com.aokp.backup.SVal;
-import com.aokp.backup.ShellCommand;
-import com.aokp.backup.Tools;
 import com.aokp.backup.categories.ICSCategories;
+import com.aokp.backup.util.SVal;
+import com.aokp.backup.util.ShellCommand;
+import com.aokp.backup.util.Tools;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 public class JBBackup extends Backup {
 
-    public JBBackup(Context c, boolean[] categories, String name) {
-        super(c, categories, name);
-
+    public JBBackup(Activity context, boolean[] cats, String name) {
+        super(context, cats, name);
     }
 
     @Override

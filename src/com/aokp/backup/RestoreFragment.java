@@ -40,9 +40,12 @@ import android.widget.Toast;
 import com.aokp.backup.restore.ICSRestore;
 import com.aokp.backup.restore.JBRestore;
 import com.aokp.backup.restore.Restore;
+import com.aokp.backup.util.ShellCommand;
+import com.aokp.backup.util.Tools;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class RestoreFragment extends Fragment {
@@ -294,6 +297,12 @@ public class RestoreFragment extends Fragment {
 
         protected void deleteBackup(String string) {
             File deleteMe = new File(backupDir, string);
+            try {
+                String id = Tools.readFileToString(new File(deleteMe, "id"));
+                ParseHelpers.getInstance(getActivity()).removeId(id);
+            } catch (IOException e) {
+                // no id file, let's assume there is/was no online version
+            }
             String command = "rm -r " + deleteMe.getAbsolutePath() + "/";
             Log.w(TAG, command);
             new ShellCommand().su.runWaitFor(command);

@@ -5,6 +5,8 @@
         android:id="@+id/menu_backup"
         android:showAsAction="ifRoom|withText"
         android:title="@string/backup"/>
-    <item android:id="@+id/prefs" android:title="@string/settings"></item>
+    <item
+        android:id="@+id/prefs"
+        android:title="@string/settings"/>
 
 </menu>

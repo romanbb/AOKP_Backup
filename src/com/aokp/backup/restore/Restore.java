@@ -20,9 +20,9 @@ import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.aokp.backup.SVal;
-import com.aokp.backup.Tools;
 import com.aokp.backup.categories.ICSCategories;
+import com.aokp.backup.util.SVal;
+import com.aokp.backup.util.Tools;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;

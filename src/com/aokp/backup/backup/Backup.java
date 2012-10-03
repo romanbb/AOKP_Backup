@@ -16,23 +16,28 @@
 
 package com.aokp.backup.backup;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.res.Resources;
-import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.aokp.backup.R;
-import com.aokp.backup.SVal;
-import com.aokp.backup.ShellCommand;
-import com.aokp.backup.Tools;
-import com.aokp.backup.R.array;
-import com.aokp.backup.categories.Categories;
+import com.aokp.backup.ParseHelpers;
+import com.aokp.backup.util.SVal;
+import com.aokp.backup.util.ShellCommand;
+import com.aokp.backup.util.Tools;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.SaveCallback;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public abstract class Backup {
 
@@ -46,15 +51,28 @@ public abstract class Backup {
 
     ArrayList<SVal> currentSVals;
 
-    String mName;
-
-    File mBackupDir;
+    final String mName;
+    String parseBackupId = null;
+    final File mBackupDir;
+    int gooVersion;
 
     public Backup(Context c, boolean[] categories, String name) {
         mContext = c;
         mName = name;
         catsToBackup = categories;
-        mBackupDir = Tools.getBackupDirectory(mContext, name);
+        mBackupDir = Tools.getBackupDirectory(mContext, mName);
+
+        try {
+            gooVersion = Integer.parseInt(Tools.getAOKPVersion());
+        } catch (NumberFormatException e) {
+            gooVersion = -1;
+        }
+    }
+
+    public Backup(Context c, String name, File fromZip) {
+        // instantiate object expecting to restore it from a zip
+        this(c, new boolean[0], name);
+        restoreBackupFromZip(fromZip, new File(mBackupDir, name));
     }
 
     public boolean backupSettings() {
@@ -72,14 +90,105 @@ public abstract class Backup {
         }
         return writeBackupSetings();
     }
-    
-    public File zipBackup() {
-        
-        return null;
+
+    /**
+     * Extract backup from zip and overwrite this backup's settings
+     * 
+     * @param zip file to restore from
+     * @return whether the operation was successful
+     */
+    public static boolean restoreBackupFromZip(File zip, File destination) {
+        if (!zip.exists()) {
+            Log.d(TAG, "restoreFromBackupZip(zip) zip doesn't exist");
+            return false;
+        }
+
+        if (!destination.exists()) {
+            Log.d(TAG, "restoreFromBackupZip(zip) mBackupDir doesn't exist");
+            return false;
+        } else {
+            try {
+                synchronized (ParseHelpers.sLock) {
+                    FileUtils.deleteDirectory(destination);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        // remove current settings and extract zip
+        try {
+            synchronized (ParseHelpers.sLock) {
+                FileUtils.deleteDirectory(destination);
+            }
+        } catch (IOException e) {
+            Log.d(TAG, "deleting backup directory", e);
+            return false;
+        }
+
+        try {
+            synchronized (ParseHelpers.sLock) {
+                Tools.unzip(zip, destination);
+            }
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
-    
-    public void restoreBackupFromZip(File zip) {
-        
+
+    /**
+     * Convert a current backup object(folder) into a ZIP file
+     * 
+     * @return returns the file where the zip of the backup is located, null if
+     *         the operation failed
+     */
+    public static File zipBackup(final Context c, final Backup backup) {
+
+        File zip = new File(Tools.getBackupDirectory(c), backup.mName + ".zip");
+        // zip up the folder
+        try {
+            synchronized (ParseHelpers.sLock) {
+                Tools.zip(backup.mBackupDir, zip);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        Log.i(TAG, "uploading to Parse");
+        try {
+            ParseFile f = new ParseFile(zip.getName(),
+                    IOUtils.toByteArray(new FileInputStream(zip)));
+            f.saveInBackground();
+
+            final ParseObject b = new ParseObject("Backup");
+            b.put("gooVersion", backup.gooVersion);
+            b.put("zippedBackup", f);
+            b.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    try {
+                        String backupId = b.getObjectId();
+                        ParseHelpers.getInstance(c).addId(backupId);
+                        synchronized (ParseHelpers.sLock) {
+                            Tools.writeFileToSD(backupId, new File(backup.mBackupDir, "id"));
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                        // TODO that sux bro
+                    }
+                }
+            });
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return zip;
     }
 
     protected abstract String[] getSettingsCategory(int categoryIndex);
