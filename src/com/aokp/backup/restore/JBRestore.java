@@ -111,6 +111,9 @@ public class JBRestore extends Restore {
 
             return true;
         } else if (setting.equals("lockscreen_icons")) {
+            // not used anymore
+            if (true)
+                return true;
             String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
             for (int i = 0; i < 8; i++) {
                 String settingName = "lockscreen_custom_app_icon_" + i;

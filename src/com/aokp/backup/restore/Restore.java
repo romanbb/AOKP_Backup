@@ -16,23 +16,16 @@
 
 package com.aokp.backup.restore;
 
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
-
 import com.aokp.backup.categories.ICSCategories;
 import com.aokp.backup.util.SVal;
 import com.aokp.backup.util.ShellCommand;
 import com.aokp.backup.util.Tools;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
-import java.util.List;
 
 public abstract class Restore {
 
@@ -67,7 +60,7 @@ public abstract class Restore {
         }
 
         rcUser = getRomControlPid();
-        if(rcUser == null) {
+        if (rcUser == null) {
             return ERROR_IOEXCEPTION;
         }
 
@@ -94,16 +87,36 @@ public abstract class Restore {
         return 0;
     }
 
-    private String getRomControlPid() {
-        ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
-        List<RunningAppProcessInfo> service = am.getRunningAppProcesses();
-        for (RunningAppProcessInfo app : service) {
-            for (String pkg : app.pkgList) {
-                if (pkg.equals("com.aokp.romcontrol")) {
-                    return app.pid + "";
-                }
+    public static String getRomControlPid() {
+        Process p = new ShellCommand().su
+                .run("ls -ld /data/data/com.aokp.romcontrol/ | awk '{print $3}' | less");
+        Log.i(TAG, "process has run");
+        try {
+            InputStreamReader ir = new InputStreamReader(p.getInputStream());
+            char[] array = new char[10];
+            int read = ir.read(array);
+            ir.close();
+            if (read == -1)
+                read = 10;
+            StringBuffer uid = new StringBuffer();
+            for (int i = 0; i < read; i++) {
+                uid.append(array[i]);
             }
+            return uid.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        // ActivityManager am = (ActivityManager)
+        // mContext.getSystemService(Context.ACTIVITY_SERVICE);
+        // List<RunningAppProcessInfo> service = am.getRunningAppProcesses();
+        // for (RunningAppProcessInfo app : service) {
+        // for (String pkg : app.pkgList) {
+        // if (pkg.equals("com.aokp.romcontrol")) {
+        // Log.i(TAG, "ROMControl uid: " + app.uid);
+        // return "" + app.uid;
+        // }
+        // }
+        // }
         return null;
     }
 

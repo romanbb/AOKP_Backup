@@ -30,7 +30,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TabHost;
 import android.widget.TextView;
+<<<<<<< HEAD
+
 import com.aokp.backup.restore.Restore;
+=======
+>>>>>>> fix some bugs
 import com.aokp.backup.util.ShellCommand;
 import com.aokp.backup.util.Tools;
 
