@@ -27,16 +27,10 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import com.aokp.backup.restore.ICSRestore;
 import com.aokp.backup.restore.JBRestore;
 import com.aokp.backup.restore.Restore;
@@ -45,7 +39,6 @@ import com.aokp.backup.util.Tools;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class RestoreFragment extends Fragment {
@@ -92,7 +85,7 @@ public class RestoreFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.restore, container, false);
         LinearLayout categories = (LinearLayout) v.findViewById(R.id.categories);
@@ -300,7 +293,7 @@ public class RestoreFragment extends Fragment {
             try {
                 String id = Tools.readFileToString(new File(deleteMe, "id"));
                 ParseHelpers.getInstance(getActivity()).removeId(id);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 // no id file, let's assume there is/was no online version
             }
             String command = "rm -r " + deleteMe.getAbsolutePath() + "/";
@@ -334,7 +327,7 @@ public class RestoreFragment extends Fragment {
 
             @Override
             protected void onPreExecute() {
-                if (!r.okayToRestore()) {
+                if (!r.okayToRestore() && !"aokp".equals(Tools.getInstance().getProp("ro.goo.rom"))) {
                     new AlertDialog.Builder(context)
                             .setTitle("Restore failed!")
                             .setMessage("AOKP Not detected. Continue restoring?")

@@ -16,12 +16,8 @@
 
 package com.aokp.backup;
 
-import android.app.ActionBar;
+import android.app.*;
 import android.app.ActionBar.Tab;
-import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,7 +29,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TabHost;
 import android.widget.TextView;
-
 import com.aokp.backup.util.ShellCommand;
 import com.aokp.backup.util.Tools;
 
@@ -128,7 +123,7 @@ public class MainActivity extends Activity {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
 
             getDialog().setTitle("Caution!"); // TODO make it a string
             getDialog().setCanceledOnTouchOutside(false);
@@ -195,7 +190,8 @@ public class MainActivity extends Activity {
 
             if (Prefs.getShowNotAokpWarning(getApplicationContext())) {
                 if (!Tools.getROMVersion().startsWith("aokp")) {
-                    return RESULT_NOT_AOKP;
+                    if (!"aokp".equals(Tools.getInstance().getProp("ro.goo.rom")))
+                        return RESULT_NOT_AOKP;
                 }
             }
 

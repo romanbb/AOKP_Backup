@@ -3,7 +3,6 @@ package com.aokp.backup.restore;
 
 import android.content.Context;
 import android.util.Log;
-
 import com.aokp.backup.util.ShellCommand;
 import com.aokp.backup.util.Tools;
 
@@ -33,6 +32,9 @@ public class JBRestore extends Restore {
             int currentVersion = Integer.parseInt(Tools.getAOKPVersion());
             if (currentVersion == -1) {
                 result = false;
+            }
+            if ("aokp".equals(Tools.getInstance().getProp("ro.goo.rom"))) {
+                result = true;
             }
 
             if (currentVersion <= maximumGooVersion && currentVersion >= minimumGooVersion)

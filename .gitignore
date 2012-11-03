@@ -3,3 +3,5 @@ gen/
 assets/parse.application.id
 
 assets/parse.client.id
+
+.DS_Store

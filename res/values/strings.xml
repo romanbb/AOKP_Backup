@@ -12,7 +12,8 @@
     <string name="settings">Settings</string>
     <string name="title_perm_storage">Use permanent storage</string>
     <string name="summary_perm_storage">When enabled, backups are stored in /sdcard/AOKP_Backup. This is useful if you
-        want to keep your backups after uninstalling AOKP Backup (in case you want to reinstall it)</string>
+        want to keep your backups after uninstalling AOKP Backup (in case you want to reinstall it)
+    </string>
 
     <string-array name="categories">
         <item>General UI</item>
@@ -236,6 +237,11 @@
         <item>nfc_polling_mode</item>
         <item>notification_wallpaper</item>
         <item>rc_prefs</item>
+        <item>force_dualpanel</item>
+        <item>activity_resolver_use_alt</item>
+        <item>ui_force_overflow_button</item>
+        <item>hide_extras_system_bar</item>
+        <item>ram_usage_bar</item>
     </string-array>
     <string-array name="jbcat_navigation_bar">
         <item>navigation_bar_show</item>
@@ -273,14 +279,14 @@
         <item>systemui_navring_5</item>
         <item>systemui_navring_amount</item>
         <item>systemui_navring_override_home</item>
+        <item>navigation_bar_widgets</item>
+        <item>navigation_bar_width_port</item>
+        <item>navigation_bar_width_land</item>
     </string-array>
     <string-array name="jbcat_lockscreen">
         <item>lockscreen_menu_unlock</item>
         <item>lockscreen_stock_music_layout</item>
-        <!-- <item>lockscreen_wallpaper</item> -->
-        <!-- <item>lockscreen_enable_menu_key</item> -->
         <item>lockscreen_custom_text_color</item>
-        <item>secure.lock_screen_lock_suer_override</item>
         <item>lockscreen_battery</item>
         <item>lockscreen_weather</item>
         <item>lockscreen_weather_type</item>
@@ -295,24 +301,18 @@
         <item>lockscreen_hide_nav</item>
         <item>lockscreen_hide_nav</item>
         <item>lockscreen_text_color</item>
-        <!-- <item>lockscreen_custom_app_intent_0</item> -->
-        <!-- <item>lockscreen_custom_app_intent_1</item> -->
-        <!-- <item>lockscreen_custom_app_intent_2</item> -->
-        <!-- <item>lockscreen_custom_app_intent_3</item> -->
-        <!-- <item>lockscreen_custom_app_intent_4</item> -->
-        <!-- <item>lockscreen_custom_app_intent_5</item> -->
-        <!-- <item>lockscreen_custom_app_intent_6</item> -->
-        <!-- <item>lockscreen_custom_app_intent_7</item> -->
-        <!-- <item>lockscreen_icons</item> -->
-        <!-- <item>lockscreen_hide_nav</item> -->
-        <!-- <item>lockscreen_landscape</item> -->
+        <item>lockscreen_targets</item>
+        <item>lockscreen_target_amount</item>
         <item>lockscreen_quick_unlock_control</item>
-        <!-- <item>enable_fast_torch</item> -->
+        <item>use_lockscreen_themes</item>
     </string-array>
     <string-array name="jbcat_weather">
         <item>weather_statusbar_style</item>
         <item>use_weather</item>
         <item>weather_show_location</item>
+        <item>weather_panel_longclick</item>
+        <item>weather_panel_shortclick</item>
+        <item>statusbar_weather_hide</item>
     </string-array>
     <string-array name="jbcat_led">
         <item>notification_light_off</item>
@@ -338,6 +338,7 @@
         <item>statusbar_toggles_text_color</item>
         <item>statusbar_toggles_alpha</item>
         <item>statusbar_toggles_background</item>
+        <item>vibrate_notif_expand</item>
     </string-array>
     <string-array name="jbcat_statusbar_clock">
         <item>statusbar_clock_enabled</item>
@@ -346,6 +347,10 @@
         <item>statusbar_show_alarm</item>
         <item>statusbar_clock_weekday</item>
         <item>statusbar_clock_color</item>
+        <item>notification_date_longclick</item>
+        <item>notification_date_shortclick</item>
+        <item>notification_clock_longclick</item>
+        <item>notification_clock_shortclick</item>
     </string-array>
     <string-array name="jbcat_statusbar_battery">
         <item>statusbar_battery_icon</item>
@@ -368,7 +373,8 @@
     <string name="no_root">No root</string>
     <string name="not_aokp">You aren\'t running AOKP, silly!</string>
     <string name="not_aokp_warning">"It seems you are not running AOKP. If you are positive you are running AOKP, please
-        click continue, otherwise, think twice.\n\nPlease make a nandroid backup before continuing!"</string>
+        click continue, otherwise, think twice.\n\nPlease make a nandroid backup before continuing!"
+    </string>
     <string name="error_sd_not_mounted">Cannot access SD card storage. Make sure you have an SD card inserted!</string>
     <string name="dialog_continue">Continue</string>
     <string name="dialog_cancel">Cancel</string>
