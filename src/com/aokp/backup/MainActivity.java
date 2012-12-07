@@ -22,7 +22,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,9 +29,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TabHost;
 import android.widget.TextView;
-import com.aokp.backup.restore.Restore;
-import com.aokp.backup.util.ShellCommand;
-import com.aokp.backup.util.Tools;
+import eu.chainfire.libsuperuser.Shell;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,12 +42,14 @@ public class MainActivity extends Activity {
 
     TabHost mTabHost;
     TabManager mTabManager;
+    AOKPBackup application;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("B", Restore.getRomControlPid());
-        ((AOKPBackup) getApplication()).initParse();
+//        Log.i("B", Restore.getRomControlPid());
+        application = (AOKPBackup) getApplication();
+        application.initParse();
         final ActionBar bar = getActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
@@ -187,14 +186,13 @@ public class MainActivity extends Activity {
 
         @Override
         protected Integer doInBackground(Void... params) {
-            if (!new ShellCommand().canSU()) {
+            if (!Shell.SU.available()) {
                 return RESULT_NO_ROOT;
             }
 
             if (Prefs.getShowNotAokpWarning(getApplicationContext())) {
-                if (!Tools.getROMVersion().startsWith("aokp")) {
-                    if (!"aokp".equals(Tools.getInstance().getProp("ro.goo.rom")))
-                        return RESULT_NOT_AOKP;
+                if (!application.isAndroidVersionSupported() || !application.isAOKPVersionSupported()) {
+                    return RESULT_NOT_AOKP;
                 }
             }
 
@@ -202,7 +200,7 @@ public class MainActivity extends Activity {
                 return RESULT_SD_NA;
             } else {
                 File sdFolder = new File(Environment.getExternalStorageDirectory(), "AOKP_Backup");
-                if (sdFolder.exists()) {
+                if (sdFolder.exists() && !new File(sdFolder, ".nomedia").exists()) {
                     try {
                         new File(sdFolder, ".nomedia").createNewFile();
                     } catch (IOException e) {

@@ -5,11 +5,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.provider.Settings;
-
 import com.aokp.backup.categories.ICSCategories;
 import com.aokp.backup.util.SVal;
-import com.aokp.backup.util.ShellCommand;
 import com.aokp.backup.util.Tools;
+import eu.chainfire.libsuperuser.Shell;
 
 import java.io.File;
 
@@ -72,8 +71,7 @@ public class ICSBackup extends Backup {
                         currentSVals.add(new SVal(iconSetting, iconValue));
                         String cmd = "cp /data/data/com.aokp.romcontrol/files/navbar_icon_" + i
                                 + ".png " + outDir + "/";
-                        new ShellCommand().su
-                                .runWaitFor(cmd);
+                        Shell.SU.run(cmd);
                     }
                 }
             }
@@ -82,9 +80,8 @@ public class ICSBackup extends Backup {
         } else if (setting.equals("lockscreen_wallpaper")) {
             String outDir = Tools.getBackupDirectory(mContext, mName).getAbsolutePath();
 
-            new ShellCommand().su
-                    .run("cp /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg "
-                            + outDir);
+            Shell.SU.run("cp /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg "
+                    + outDir);
 
             return true;
         } else if (setting.equals("lockscreen_icons")) {
@@ -103,9 +100,8 @@ public class ICSBackup extends Backup {
                     currentSVals.add(new SVal(set, val));
                     File f = new File(Uri.parse(val).getPath());
                     if (f.exists()) {
-                        new ShellCommand().su
-                                .run("cp /data/data/com.aokp.romcontrol/files/lockscreen_icon_" + i
-                                        + ".png " + outDir);
+                        Shell.SU.run("cp /data/data/com.aokp.romcontrol/files/lockscreen_icon_" + i
+                                + ".png " + outDir);
                     }
                 }
             }

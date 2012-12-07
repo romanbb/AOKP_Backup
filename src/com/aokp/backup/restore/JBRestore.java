@@ -3,8 +3,8 @@ package com.aokp.backup.restore;
 
 import android.content.Context;
 import android.util.Log;
-import com.aokp.backup.util.ShellCommand;
 import com.aokp.backup.util.Tools;
+import eu.chainfire.libsuperuser.Shell;
 
 import java.io.File;
 
@@ -29,7 +29,7 @@ public class JBRestore extends Restore {
         final int maximumGooVersion = 26;
 
         try {
-            int currentVersion = Integer.parseInt(Tools.getAOKPVersion());
+            int currentVersion = Tools.getOfficialAOKPVersion();
             if (currentVersion == -1) {
                 result = false;
             }
@@ -51,21 +51,18 @@ public class JBRestore extends Restore {
 
         if (setting.equals("disable_boot_animation") && value.equals("1")) {
             if (new File("/system/media/bootanimation.zip").exists()) {
-                new ShellCommand().su
-                        .runWaitFor("mv /system/media/bootanimation.zip /system/media/bootanimation.unicorn");
+                Shell.SU.run("mv /system/media/bootanimation.zip /system/media/bootanimation.unicorn");
             }
             return true;
         } else if (setting.equals("disable_boot_audio") && value.equals("1")) {
             if (new File("/system/media/boot_audio.mp3").exists()) {
-                new ShellCommand().su
-                        .runWaitFor("mv /system/media/boot_audio.mp3 /system/media/boot_audio.unicorn");
+                Shell.SU.run("mv /system/media/boot_audio.mp3 /system/media/boot_audio.unicorn");
             }
 
             return true;
         } else if (setting.equals("disable_bug_mailer") && value.equals("1")) {
             if (new File("/system/bin/bugmailer.sh").exists()) {
-                new ShellCommand().su
-                        .runWaitFor("mv /system/bin/bugmailer.sh /system/bin/bugmailer.sh.unicorn");
+                Shell.SU.run("mv /system/bin/bugmailer.sh /system/bin/bugmailer.sh.unicorn");
             }
 
             return true;
@@ -78,9 +75,9 @@ public class JBRestore extends Restore {
                 File target = new File(rcFilesDir, iconName);
 
                 // delete the current icon since we're restoring some
-                new ShellCommand().su.runWaitFor("rm " + target.getAbsolutePath());
+               Shell.SU.run("rm " + target.getAbsolutePath());
                 if (settingsFromFile.containsKey(settingName)) {
-                    new ShellCommand().su.runWaitFor("cp " + source.getAbsolutePath() + " "
+                   Shell.SU.run("cp " + source.getAbsolutePath() + " "
                             + target.getAbsolutePath());
                     Tools.chmodAndOwn(target, "0660", rcUser);
                     restoreSetting(settingsFromFile.get(settingName));
@@ -94,8 +91,8 @@ public class JBRestore extends Restore {
             String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
             File source = new File(outDir, "lockscreen_wallpaper.jpg");
             File target = new File(rcFilesDir, "lockscreen_wallpaper.jpg");
-            new ShellCommand().su.runWaitFor("rm " + target.getAbsolutePath());
-            new ShellCommand().su.runWaitFor("cp " + source.getAbsolutePath() + " "
+           Shell.SU.run("rm " + target.getAbsolutePath());
+           Shell.SU.run("cp " + source.getAbsolutePath() + " "
                     + target.getAbsolutePath());
             Tools.chmodAndOwn(target, "0660", rcUser);
 
@@ -104,8 +101,8 @@ public class JBRestore extends Restore {
             String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
             File source = new File(outDir, "notification_wallpaper.jpg");
             File target = new File(rcFilesDir, "notification_wallpaper.jpg");
-            new ShellCommand().su.runWaitFor("rm " + target.getAbsolutePath());
-            new ShellCommand().su.runWaitFor("cp " + source.getAbsolutePath() + " "
+           Shell.SU.run("rm " + target.getAbsolutePath());
+           Shell.SU.run("cp " + source.getAbsolutePath() + " "
                     + target.getAbsolutePath());
             Tools.chmodAndOwn(target, "0660", rcUser);
 
@@ -119,11 +116,9 @@ public class JBRestore extends Restore {
                 String settingName = "lockscreen_custom_app_icon_" + i;
                 File iconToRestore = new File(outDir, settingName);
 
-                new ShellCommand().su
-                        .runWaitFor("rm " + rcFilesDir.getAbsolutePath() + settingName + ".*");
+                Shell.SU.run("rm " + rcFilesDir.getAbsolutePath() + settingName + ".*");
                 if (settingsFromFile.containsKey(settingName)) {
-                    new ShellCommand().su
-                            .runWaitFor("cp " + iconToRestore.getAbsolutePath() + ".* "
+                   Shell.SU.run("cp " + iconToRestore.getAbsolutePath() + ".* "
                                     + rcFilesDir.getAbsolutePath());
                     Tools.chmodAndOwn(iconToRestore, "0660", rcUser);
                     restoreSetting(settingsFromFile.get(settingName));
@@ -144,9 +139,9 @@ public class JBRestore extends Restore {
                     File xml = new File(rcPrefsDir, xmlName);
                     if (xml.exists()) {
                         // remove previous
-                        new ShellCommand().su.runWaitFor("rm " + xml.getAbsolutePath());
+                       Shell.SU.run("rm " + xml.getAbsolutePath());
                         // copy backed up file
-                        new ShellCommand().su.runWaitFor("cp " + outDir + "/" + xml.getName() + " "
+                       Shell.SU.run("cp " + outDir + "/" + xml.getName() + " "
                                 + xml.getAbsolutePath());
                         Tools.chmodAndOwn(xml, "0660", rcUser);
                     }

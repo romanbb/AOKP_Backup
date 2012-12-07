@@ -24,22 +24,11 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.Toast;
-
+import android.view.*;
+import android.widget.*;
 import com.aokp.backup.backup.Backup;
 import com.aokp.backup.backup.ICSBackup;
 import com.aokp.backup.backup.JBBackup;
-import com.aokp.backup.util.ShellCommand;
 
 import java.util.Date;
 
@@ -126,7 +115,7 @@ public class BackupFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.backup, container, false);
         LinearLayout categories = (LinearLayout) v.findViewById(R.id.categories);
@@ -149,11 +138,11 @@ public class BackupFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_backup:
-                if (!new ShellCommand().canSU(true)) {
-                    Toast.makeText(getActivity(), "Couldn't aquire root! Operation Failed",
-                            Toast.LENGTH_LONG);
-                    return true;
-                }
+//                if (!Shell.SU.available()) {
+//                    Toast.makeText(getActivity(), "Couldn't aquire root! Operation Failed",
+//                            Toast.LENGTH_LONG);
+//                    return true;
+//                }
                 BackupDialog backup = BackupDialog.newInstance(getCheckedBoxes());
                 backup.show(getFragmentManager(), "backup");
                 break;
@@ -214,7 +203,7 @@ public class BackupFragment extends Fragment {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
 
             getDialog().setTitle("Name your backup"); // TODO make it a string
             getDialog().setCanceledOnTouchOutside(false);

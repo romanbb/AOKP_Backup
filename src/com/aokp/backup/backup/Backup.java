@@ -20,16 +20,14 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
-
 import com.aokp.backup.ParseHelpers;
 import com.aokp.backup.util.SVal;
-import com.aokp.backup.util.ShellCommand;
 import com.aokp.backup.util.Tools;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
-
+import eu.chainfire.libsuperuser.Shell;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -63,7 +61,7 @@ public abstract class Backup {
         mBackupDir = Tools.getBackupDirectory(mContext, mName);
 
         try {
-            gooVersion = Integer.parseInt(Tools.getAOKPVersion());
+            gooVersion = Tools.getOfficialAOKPVersion();
         } catch (NumberFormatException e) {
             gooVersion = -1;
         }
@@ -78,7 +76,7 @@ public abstract class Backup {
     public boolean backupSettings() {
 
         if (mBackupDir.exists()) {
-            new ShellCommand().su.runWaitFor("rm -r " + mBackupDir.getAbsolutePath());
+            Shell.SU.run("rm -r " + mBackupDir.getAbsolutePath());
         }
         mBackupDir.mkdirs();
 
@@ -93,7 +91,7 @@ public abstract class Backup {
 
     /**
      * Extract backup from zip and overwrite this backup's settings
-     * 
+     *
      * @param zip file to restore from
      * @return whether the operation was successful
      */
@@ -141,7 +139,7 @@ public abstract class Backup {
 
     /**
      * Convert a current backup object(folder) into a ZIP file
-     * 
+     *
      * @return returns the file where the zip of the backup is located, null if
      *         the operation failed
      */
@@ -231,7 +229,7 @@ public abstract class Backup {
         File backup = new File(mBackupDir, "settings.cfg");
         Tools.writeFileToSD(output.toString(), backup);
 
-        Tools.writeFileToSD(Tools.getAOKPVersion(),
+        Tools.writeFileToSD(Tools.getOfficialAOKPVersion().toString(),
                 new File(Tools.getBackupDirectory(mContext, mName),
                         "aokp.version"));
 

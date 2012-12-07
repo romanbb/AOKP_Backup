@@ -6,14 +6,13 @@ import android.content.Context;
 import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
-
 import com.aokp.backup.categories.JBCategories;
 import com.aokp.backup.util.SVal;
-import com.aokp.backup.util.ShellCommand;
-import com.aokp.backup.util.ShellCommand.CommandResult;
 import com.aokp.backup.util.Tools;
+import eu.chainfire.libsuperuser.Shell;
 
 import java.io.File;
+import java.util.List;
 
 public class JBBackup extends Backup {
 
@@ -62,21 +61,21 @@ public class JBBackup extends Backup {
                         currentSVals.add(new SVal(iconSetting, iconValue));
                         String cmd = "cp /data/data/com.aokp.romcontrol/files/navbar_icon_" + i
                                 + ".png " + outDir;
-                        new ShellCommand().su
-                                .runWaitFor(cmd);
+                        Shell.SU.run(
+                                cmd);
                     }
                 }
             }
 
             return true;
         } else if (setting.equals("lockscreen_wallpaper")) {
-            new ShellCommand().su
-                    .runWaitFor("cp /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg "
+            Shell.SU.run(
+                    "cp /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg "
                             + outDir);
             return true;
         } else if (setting.equals("notification_wallpaper")) {
-            new ShellCommand().su
-                    .runWaitFor("cp /data/data/com.aokp.romcontrol/files/notification_wallpaper.jpg "
+            Shell.SU.run(
+                    "cp /data/data/com.aokp.romcontrol/files/notification_wallpaper.jpg "
                             + outDir);
             return true;
         } else if (setting.equals("lockscreen_icons")) {
@@ -88,10 +87,9 @@ public class JBBackup extends Backup {
                     currentSVals.add(new SVal(set, val));
                     File f = new File(Uri.parse(val).getPath());
                     if (f.exists()) {
-                        new ShellCommand().su
-                                .runWaitFor("cp /data/data/com.aokp.romcontrol/files/lockscreen_icon_"
-                                        + i
-                                        + ".png " + outDir);
+                        Shell.SU.run("cp /data/data/com.aokp.romcontrol/files/lockscreen_icon_"
+                                + i
+                                + ".png " + outDir);
                     }
                 }
             }
@@ -104,13 +102,14 @@ public class JBBackup extends Backup {
             for (String xmlName : xmlFiles) {
                 File xml = new File("/data/data/com.aokp.romcontrol/shared_prefs/" + xmlName);
                 if (xml.exists()) {
+
                     String command = "cp " + xml.getAbsolutePath() + " " + outDir + xml.getName();
                     Log.e(TAG, command);
-                    CommandResult cr = new ShellCommand().su.runWaitFor(command);
-                    if (cr.success()) {
+                    List<String> result = Shell.SU.run(command);
+                    if (result != null) {
                         Log.e(TAG, "run success");
                     } else {
-                        Log.e(TAG, "error: " + cr.stderr);
+                        Log.e(TAG, "error");
                     }
                 }
             }

@@ -21,11 +21,15 @@ import android.provider.Settings;
 import android.util.Log;
 import com.aokp.backup.categories.ICSCategories;
 import com.aokp.backup.util.SVal;
-import com.aokp.backup.util.ShellCommand;
 import com.aokp.backup.util.Tools;
+import eu.chainfire.libsuperuser.Shell;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class Restore {
 
@@ -67,13 +71,13 @@ public abstract class Restore {
         Log.e(TAG, "folders go");
         rcFilesDir = new File("/data/data/com.aokp.romcontrol/files/");
         if (!rcFilesDir.exists()) {
-            new ShellCommand().su.runWaitFor("mkdir " + rcFilesDir.getAbsolutePath());
+            Shell.SU.run("mkdir " + rcFilesDir.getAbsolutePath());
             Tools.chmodAndOwn(rcFilesDir, "0660", rcUser);
         }
         Log.e(TAG, "setup files");
         rcPrefsDir = new File("/data/data/com.aokp.romcontrol/shared_prefs/");
         if (!rcPrefsDir.exists()) {
-            new ShellCommand().su.runWaitFor("mkdir " + rcPrefsDir.getAbsolutePath());
+            Shell.SU.run("mkdir " + rcPrefsDir.getAbsolutePath());
             Tools.chmodAndOwn(rcPrefsDir, "0660", rcUser);
         }
 
@@ -88,35 +92,11 @@ public abstract class Restore {
     }
 
     public static String getRomControlPid() {
-        Process p = new ShellCommand().su
-                .run("ls -ld /data/data/com.aokp.romcontrol/ | awk '{print $3}' | less");
-        Log.i(TAG, "process has run");
-        try {
-            InputStreamReader ir = new InputStreamReader(p.getInputStream());
-            char[] array = new char[10];
-            int read = ir.read(array);
-            ir.close();
-            if (read == -1)
-                read = 10;
-            StringBuffer uid = new StringBuffer();
-            for (int i = 0; i < read; i++) {
-                uid.append(array[i]);
-            }
-            return uid.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
+        List<String> result = Shell.SU.run("ls -ld /data/data/com.aokp.romcontrol/ | awk '{print $3}' | less");
+        if (result != null && !result.isEmpty()) {
+            return result.get(0);
         }
-        // ActivityManager am = (ActivityManager)
-        // mContext.getSystemService(Context.ACTIVITY_SERVICE);
-        // List<RunningAppProcessInfo> service = am.getRunningAppProcesses();
-        // for (RunningAppProcessInfo app : service) {
-        // for (String pkg : app.pkgList) {
-        // if (pkg.equals("com.aokp.romcontrol")) {
-        // Log.i(TAG, "ROMControl uid: " + app.uid);
-        // return "" + app.uid;
-        // }
-        // }
-        // }
+
         return null;
     }
 
@@ -177,7 +157,7 @@ public abstract class Restore {
     /**
      * Every setting should be checked through this function. It will check the
      * setting and perform any special actions for this specific setting.
-     * 
+     *
      * @param setting setting name that needs will be checked
      * @return whether a special case was handled
      */

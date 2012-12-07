@@ -3,9 +3,8 @@ package com.aokp.backup.restore;
 
 import android.content.Context;
 import android.util.Log;
-
-import com.aokp.backup.util.ShellCommand;
 import com.aokp.backup.util.Tools;
+import eu.chainfire.libsuperuser.Shell;
 
 import java.io.File;
 
@@ -23,7 +22,7 @@ public class ICSRestore extends Restore {
         final int maximumGooVersion = 19;
 
         try {
-            int currentVersion = Integer.parseInt(Tools.getAOKPVersion());
+            int currentVersion = Tools.getOfficialAOKPVersion();
 
             if (currentVersion <= maximumGooVersion && currentVersion >= minimumGooVersion)
                 return true;
@@ -40,21 +39,18 @@ public class ICSRestore extends Restore {
 
         if (setting.equals("disable_boot_animation") && value.equals("1")) {
             if (new File("/system/media/bootanimation.zip").exists()) {
-                new ShellCommand().su
-                        .run("mv /system/media/bootanimation.zip /system/media/bootanimation.unicorn");
+                Shell.SU.run("mv /system/media/bootanimation.zip /system/media/bootanimation.unicorn");
             }
             return true;
         } else if (setting.equals("disable_boot_audio") && value.equals("1")) {
             if (new File("/system/media/boot_audio.mp3").exists()) {
-                new ShellCommand().su
-                        .run("mv /system/media/boot_audio.mp3 /system/media/boot_audio.unicorn");
+                Shell.SU.run("mv /system/media/boot_audio.mp3 /system/media/boot_audio.unicorn");
             }
 
             return true;
         } else if (setting.equals("disable_bug_mailer") && value.equals("1")) {
             if (new File("/system/bin/bugmailer.sh").exists()) {
-                new ShellCommand().su
-                        .run("mv /system/bin/bugmailer.sh /system/bin/bugmailer.sh.unicorn");
+                Shell.SU.run("mv /system/bin/bugmailer.sh /system/bin/bugmailer.sh.unicorn");
             }
 
             return true;
@@ -73,12 +69,11 @@ public class ICSRestore extends Restore {
                 String settingName = "navigation_custom_app_icon_" + i;
                 String iconName = "navbar_icon_" + i + ".png";
                 Log.i(TAG, iconName);
-                new ShellCommand().su
-                        .runWaitFor("rm -f /data/data/com.aokp.romcontrol/files/" + iconName);
+                Shell.SU.run("rm -f /data/data/com.aokp.romcontrol/files/" + iconName);
                 if (settingsFromFile.containsKey(settingName)) {
                     String cmd = "cp " + outDir.getAbsolutePath() + "/" + iconName
                             + " /data/data/com.aokp.romcontrol/files/";
-                    new ShellCommand().su.runWaitFor(cmd);
+                    Shell.SU.run(cmd);
                     restoreSetting(settingsFromFile.get(settingName));
                 } else {
                     restoreSetting(settingName, "", false);
@@ -89,11 +84,9 @@ public class ICSRestore extends Restore {
         } else if (setting.equals("lockscreen_wallpaper")) {
             String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
 
-            new ShellCommand().su
-                    .run("rm -f /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg");
-            new ShellCommand().su
-                    .run("cp " + outDir + "/lockscreen_wallpaper.jpg"
-                            + " /data/data/com.aokp.romcontrol/files/");
+            Shell.SU.run("rm -f /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg");
+            Shell.SU.run("cp " + outDir + "/lockscreen_wallpaper.jpg"
+                    + " /data/data/com.aokp.romcontrol/files/");
 
             return true;
         } else if (setting.equals("lockscreen_icons")) {
@@ -106,12 +99,10 @@ public class ICSRestore extends Restore {
                 String settingName = "lockscreen_custom_app_icon_" + i;
                 File iconToRestore = new File(outDir, settingName);
 
-                new ShellCommand().su
-                        .run("rm -f /data/data/com.aokp.romcontrol/files/" + settingName + ".*");
+                Shell.SU.run("rm -f /data/data/com.aokp.romcontrol/files/" + settingName + ".*");
                 if (settingsFromFile.containsKey(settingName)) {
-                    new ShellCommand().su
-                            .run("cp " + iconToRestore.getAbsolutePath() + ".* "
-                                    + "/data/data/com.aokp.romcontrol/files/");
+                    Shell.SU.run("cp " + iconToRestore.getAbsolutePath() + ".* "
+                            + "/data/data/com.aokp.romcontrol/files/");
                     restoreSetting(settingsFromFile.get(settingName));
                 } else {
                     restoreSetting(settingName, "", false);

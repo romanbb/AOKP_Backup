@@ -17,18 +17,17 @@
 package com.aokp.backup.util;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import com.aokp.backup.Prefs;
+import eu.chainfire.libsuperuser.Shell;
 
 import java.io.*;
 import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Deque;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -41,9 +40,6 @@ public class Tools {
     private static Tools instance;
 
     HashMap<String, String> props;
-
-    public static ShellCommand.SH sh = new ShellCommand().sh;
-    public static ShellCommand.SH su = new ShellCommand().su;
 
     public Tools() {
         readBuildProp();
@@ -99,9 +95,12 @@ public class Tools {
             final String device = mounts[0];
             final String path = mounts[1];
             final String point = mounts[2];
-            return new ShellCommand().su.runWaitFor("mount -o ro,remount -t " + point
+            List<String> result = Shell.SU.run("mount -o ro,remount -t " + point
                     + " " + device
-                    + " " + path).success();
+                    + " " + path);
+            if (result != null && !result.isEmpty()) {
+                return true;
+            }
         }
         return false;
     }
@@ -112,9 +111,12 @@ public class Tools {
             final String device = mounts[0];
             final String path = mounts[1];
             final String point = mounts[2];
-            return new ShellCommand().su.runWaitFor("mount -o rw,remount -t " + point
+            List<String> result = Shell.SU.run("mount -o rw,remount -t " + point
                     + " " + device
-                    + " " + path).success();
+                    + " " + path);
+            if (result != null && !result.isEmpty()) {
+                return true;
+            }
         }
         return false;
     }
@@ -133,9 +135,17 @@ public class Tools {
             return "<none>";
     }
 
-    public static String getAOKPVersion() {
+    public static Integer getOfficialAOKPVersion() {
         String version = Tools.getInstance().getProp("ro.goo.version");
-        return version != null ? version : "-1";
+        try {
+            return version != null && !version.isEmpty() ? Integer.parseInt(version) : -1;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    public static int getAndroidVersion() {
+        return Build.VERSION.SDK_INT;
     }
 
     public String getProp(String key) {
@@ -227,11 +237,9 @@ public class Tools {
     }
 
     public static void chmodAndOwn(File f, String chmod, String chownUser) {
-        new ShellCommand().su
-                .run("chown " + chownUser + ":" + chownUser
-                        + " " + f.getAbsolutePath());
-        new ShellCommand().su
-                .run("chmod" + chmod + " " + f.getAbsolutePath());
+        Shell.SU.run("chown " + chownUser + ":" + chownUser
+                + " " + f.getAbsolutePath());
+        Shell.SU.run("chmod" + chmod + " " + f.getAbsolutePath());
     }
 
     public static void zip(File directory, File zipfile) throws IOException {

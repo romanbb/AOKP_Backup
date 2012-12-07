@@ -34,8 +34,8 @@ import android.widget.Toast;
 import com.aokp.backup.restore.ICSRestore;
 import com.aokp.backup.restore.JBRestore;
 import com.aokp.backup.restore.Restore;
-import com.aokp.backup.util.ShellCommand;
 import com.aokp.backup.util.Tools;
+import eu.chainfire.libsuperuser.Shell;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -145,7 +145,7 @@ public class RestoreFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_restore:
-                if (!new ShellCommand().canSU(true)) {
+                if (!Shell.SU.available()) {
                     Toast.makeText(getActivity(), "Couldn't aquire root! Operation Failed",
                             Toast.LENGTH_LONG);
                     return true;
@@ -298,7 +298,7 @@ public class RestoreFragment extends Fragment {
             }
             String command = "rm -r " + deleteMe.getAbsolutePath() + "/";
             Log.w(TAG, command);
-            new ShellCommand().su.runWaitFor(command);
+            Shell.SU.run(command);
         }
 
         private void restore(String name) {
@@ -385,7 +385,7 @@ public class RestoreFragment extends Fragment {
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    new ShellCommand().su.run("reboot");
+                                    Shell.SU.run("reboot");
                                 }
                             }).create().show();
                 } else if (result == 1) {
