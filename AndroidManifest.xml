@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.aokp.backup"
-          android:versionCode="32"
-          android:versionName="1.6.3">
+          android:versionCode="33"
+          android:versionName="1.6.5">
 
 
     <uses-sdk
             android:minSdkVersion="15"
-            android:targetSdkVersion="16"/>
+            android:targetSdkVersion="17"/>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
