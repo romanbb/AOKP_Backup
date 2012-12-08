@@ -14,11 +14,11 @@ import eu.chainfire.libsuperuser.Shell;
 import java.io.File;
 import java.util.List;
 
-public class JBBackup extends Backup {
+public class JBMR1Backup extends Backup {
 
     String outDir;
 
-    public JBBackup(Context c, boolean[] categories, String name) {
+    public JBMR1Backup(Context c, boolean[] categories, String name) {
         super(c, categories, name);
         outDir = Tools.getBackupDirectory(mContext, mName).getAbsolutePath();
         if (!outDir.endsWith("/"))
@@ -56,62 +56,60 @@ public class JBBackup extends Backup {
             for (int i = 0; i < 7; i++) {
                 String iconSetting = "navigation_custom_app_icon_" + i;
                 String iconValue = Settings.System.getString(resolver, iconSetting);
-                File iconFile = new File("/data/data/com.aokp.romcontrol/files/navbar_icon_" + i + ".png");
-                if (iconValue != null && iconFile.exists()) {
-                    // add the value to the file so we know to restore the default icon or something
-                    currentSVals.add(new SVal(iconSetting, iconValue));
+                if (iconValue != null) {
                     if (iconValue.length() > 0) {
-                        // copy if there's an actual image there
-                        String cmd = "cp '" + iconFile.getAbsolutePath() + "' '" + outDir + "'";
-                        Shell.SU.run(cmd);
+                        currentSVals.add(new SVal(iconSetting, iconValue));
+                        String cmd = "cp /data/data/com.aokp.romcontrol/files/navbar_icon_" + i
+                                + ".png " + outDir;
+                        Shell.SU.run(
+                                cmd);
                     }
                 }
             }
 
             return true;
         } else if (setting.equals("lockscreen_wallpaper")) {
-            File wallpaper = new File("/data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg");
-            if (wallpaper.exists())
-                Shell.SU.run("cp '" + wallpaper.getAbsolutePath() + "' '"
-                        + outDir + "'");
+            Shell.SU.run(
+                    "cp /data/data/com.aokp.romcontrol/files/lockscreen_wallpaper.jpg "
+                            + outDir);
             return true;
         } else if (setting.equals("notification_wallpaper")) {
-            File wallpaper = new File("/data/data/com.aokp.romcontrol/files/notification_wallpaper.jpg");
-            if (wallpaper.exists())
-                Shell.SU.run("cp '" + wallpaper + "' '"
-                        + outDir + "'");
+            Shell.SU.run(
+                    "cp /data/data/com.aokp.romcontrol/files/notification_wallpaper.jpg "
+                            + outDir);
             return true;
         } else if (setting.equals("lockscreen_icons")) {
             ContentResolver resolver = mContext.getContentResolver();
             for (int i = 0; i < 8; i++) {
                 String set = "lockscreen_custom_app_icon_" + i;
                 String val = Settings.System.getString(resolver, set);
-                File iconFile = new File("/data/data/com.aokp.romcontrol/files/lockscreen_icon_" + i + ".png");
                 if (val != null) {
                     currentSVals.add(new SVal(set, val));
                     File f = new File(Uri.parse(val).getPath());
                     if (f.exists()) {
-                        Shell.SU.run("cp '" + iconFile + "' '" + outDir + "'");
+                        Shell.SU.run("cp /data/data/com.aokp.romcontrol/files/lockscreen_icon_"
+                                + i
+                                + ".png " + outDir);
                     }
                 }
             }
             return true;
         } else if (setting.equals("rc_prefs")) {
             final String[] xmlFiles = {
-                    "WeatherServicePreferences.xml",
-                    "_has_set_default_values.xml",
-                    "aokp_weather.xml",
-                    "com.aokp.romcontrol_preferences.xml",
-                    "vibrations.xml"
+                    "WeatherServicePreferences.xml", "_has_set_default_values.xml",
+                    "aokp_weather.xml", "com.aokp.romcontrol_preferences.xml", "vibrations.xml"
             };
             for (String xmlName : xmlFiles) {
                 File xml = new File("/data/data/com.aokp.romcontrol/shared_prefs/" + xmlName);
                 if (xml.exists()) {
-                    List<String> result = Shell.SU.run("cp '" + xml.getAbsolutePath() + "' '" + outDir + xml.getName() + "'");
+
+                    String command = "cp " + xml.getAbsolutePath() + " " + outDir + xml.getName();
+                    Log.e(TAG, command);
+                    List<String> result = Shell.SU.run(command);
                     if (result != null) {
-//                        Log.e(TAG, "run success");
+                        Log.e(TAG, "run success");
                     } else {
-                        Log.e(TAG, "error backing up: " + xmlName);
+                        Log.e(TAG, "error");
                     }
                 }
             }

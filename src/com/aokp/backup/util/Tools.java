@@ -135,7 +135,7 @@ public class Tools {
             return "<none>";
     }
 
-    public static Integer getOfficialAOKPVersion() {
+    public static Integer getAOKPGooVersion() {
         String version = Tools.getInstance().getProp("ro.goo.version");
         try {
             return version != null && !version.isEmpty() ? Integer.parseInt(version) : -1;
@@ -146,6 +146,15 @@ public class Tools {
 
     public static int getAndroidVersion() {
         return Build.VERSION.SDK_INT;
+    }
+
+    public static String getRomControlPid() {
+        List<String> result = Shell.SU.run("ls -ld /data/data/com.aokp.romcontrol/ | awk '{print $3}' | less");
+        if (result != null && !result.isEmpty()) {
+            return result.get(0);
+        }
+
+        return null;
     }
 
     public String getProp(String key) {
@@ -239,7 +248,7 @@ public class Tools {
     public static void chmodAndOwn(File f, String chmod, String chownUser) {
         Shell.SU.run("chown " + chownUser + ":" + chownUser
                 + " " + f.getAbsolutePath());
-        Shell.SU.run("chmod" + chmod + " " + f.getAbsolutePath());
+        Shell.SU.run("chmod " + chmod + " " + f.getAbsolutePath());
     }
 
     public static void zip(File directory, File zipfile) throws IOException {

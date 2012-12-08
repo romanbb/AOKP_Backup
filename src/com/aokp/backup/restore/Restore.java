@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 
 public abstract class Restore {
 
@@ -63,7 +62,7 @@ public abstract class Restore {
             return ERROR_IOEXCEPTION;
         }
 
-        rcUser = getRomControlPid();
+        rcUser = Tools.getRomControlPid();
         if (rcUser == null) {
             return ERROR_IOEXCEPTION;
         }
@@ -91,18 +90,9 @@ public abstract class Restore {
         return 0;
     }
 
-    public static String getRomControlPid() {
-        List<String> result = Shell.SU.run("ls -ld /data/data/com.aokp.romcontrol/ | awk '{print $3}' | less");
-        if (result != null && !result.isEmpty()) {
-            return result.get(0);
-        }
-
-        return null;
-    }
-
     public abstract boolean okayToRestore();
 
-    protected int getAOKPBackupVersionInteger() {
+    protected int getBackedupGooVersion() {
         try {
             String contents = Tools.readFileToString(new File(Tools.getBackupDirectory(mContext,
                     name), "aokp.version"));

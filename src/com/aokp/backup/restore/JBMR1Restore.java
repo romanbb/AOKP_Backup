@@ -8,7 +8,7 @@ import eu.chainfire.libsuperuser.Shell;
 
 import java.io.File;
 
-public class JBRestore extends Restore {
+public class JBMR1Restore extends Restore {
 
     /**
      * minimum version to accept to restore jellybean settings. we don't want to
@@ -16,7 +16,7 @@ public class JBRestore extends Restore {
      */
     private static final int MIN_JB_VERSION = 20;
 
-    public JBRestore(Context c) {
+    public JBMR1Restore(Context c) {
         super(c);
     }
 
@@ -73,8 +73,6 @@ public class JBRestore extends Restore {
                 String iconName = "navbar_icon_" + i + ".png";
                 File source = new File(outDir, iconName);
                 File target = new File(rcFilesDir, iconName);
-                if (!source.exists())
-                    continue;
 
                 // delete the current icon since we're restoring some
                 if (settingsFromFile.containsKey(settingName)) {
@@ -92,26 +90,20 @@ public class JBRestore extends Restore {
             String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
             File source = new File(outDir, "lockscreen_wallpaper.jpg");
             File target = new File(rcFilesDir, "lockscreen_wallpaper.jpg");
-            if (target.exists())
-                Shell.SU.run("rm " + target.getAbsolutePath());
-            if (source.exists()) {
-                Shell.SU.run("cp " + source.getAbsolutePath() + " "
-                        + target.getAbsolutePath());
-                Tools.chmodAndOwn(target, "0660", rcUser);
-            }
+            Shell.SU.run("rm " + target.getAbsolutePath());
+            Shell.SU.run("cp " + source.getAbsolutePath() + " "
+                    + target.getAbsolutePath());
+            Tools.chmodAndOwn(target, "0660", rcUser);
 
             return true;
-        } else if (setting.equals("notification_wallpaper")) {
+        } else if (setting.equals("lockscreen_wallpaper")) {
             String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
             File source = new File(outDir, "notification_wallpaper.jpg");
             File target = new File(rcFilesDir, "notification_wallpaper.jpg");
-            if (target.exists())
-                Shell.SU.run("rm " + target.getAbsolutePath());
-            if (source.exists()) {
-                Shell.SU.run("cp " + source.getAbsolutePath() + " "
-                        + target.getAbsolutePath());
-                Tools.chmodAndOwn(target, "0660", rcUser);
-            }
+            Shell.SU.run("rm " + target.getAbsolutePath());
+            Shell.SU.run("cp " + source.getAbsolutePath() + " "
+                    + target.getAbsolutePath());
+            Tools.chmodAndOwn(target, "0660", rcUser);
 
             return true;
         } else if (setting.equals("lockscreen_icons")) {

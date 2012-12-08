@@ -15,14 +15,14 @@ public class ICSRestore extends Restore {
     }
 
     public boolean okayToRestore() {
-        int minimumGooVersion = getAOKPBackupVersionInteger();
+        int minimumGooVersion = getBackedupGooVersion();
         if (minimumGooVersion == -1) {
             return false;
         }
         final int maximumGooVersion = 19;
 
         try {
-            int currentVersion = Tools.getOfficialAOKPVersion();
+            int currentVersion = Tools.getAOKPGooVersion();
 
             if (currentVersion <= maximumGooVersion && currentVersion >= minimumGooVersion)
                 return true;

@@ -26,12 +26,12 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.*;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import com.aokp.backup.restore.ICSRestore;
+import com.aokp.backup.restore.JBMR1Restore;
 import com.aokp.backup.restore.JBRestore;
 import com.aokp.backup.restore.Restore;
 import com.aokp.backup.util.Tools;
@@ -145,11 +145,6 @@ public class RestoreFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_restore:
-                if (!Shell.SU.available()) {
-                    Toast.makeText(getActivity(), "Couldn't aquire root! Operation Failed",
-                            Toast.LENGTH_LONG);
-                    return true;
-                }
                 RestoreDialog restore = RestoreDialog.newInstance(getCheckedBoxes());
                 restore.show(getFragmentManager(), "restore");
                 break;
@@ -288,17 +283,22 @@ public class RestoreFragment extends Fragment {
                         .create();
         }
 
-        protected void deleteBackup(String string) {
-            File deleteMe = new File(backupDir, string);
-            try {
-                String id = Tools.readFileToString(new File(deleteMe, "id"));
-                ParseHelpers.getInstance(getActivity()).removeId(id);
-            } catch (Exception e) {
-                // no id file, let's assume there is/was no online version
-            }
-            String command = "rm -r " + deleteMe.getAbsolutePath() + "/";
-            Log.w(TAG, command);
-            Shell.SU.run(command);
+        protected void deleteBackup(final String string) {
+            new AsyncTask<Object, Object, Object>() {
+                @Override
+                protected Object doInBackground(Object... params) {
+                    File deleteMe = new File(backupDir, string);
+                    try {
+                        String id = Tools.readFileToString(new File(deleteMe, "id"));
+                        ParseHelpers.getInstance(getActivity()).removeId(id);
+                    } catch (Exception e) {
+                        // no id file, let's assume there is/was no online version
+                    }
+                    String command = "rm -r " + deleteMe.getAbsolutePath() + "/";
+                    Shell.SU.run(command);
+                    return null;
+                }
+            }.execute((Object) null);
         }
 
         private void restore(String name) {
@@ -321,8 +321,10 @@ public class RestoreFragment extends Fragment {
                 this.cats = cats;
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
                     r = new ICSRestore(context);
-                else if (Build.VERSION.SDK_INT >= 16)
+                else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN)
                     r = new JBRestore(context);
+                else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1)
+                    r = new JBMR1Restore(context);
             }
 
             @Override
@@ -361,20 +363,21 @@ public class RestoreFragment extends Fragment {
 
             protected Integer doInBackground(Void... v) {
                 while (restore == null) {
+                    // wait until user picks an option
                 }
                 if (restore) {
                     Tools.mountRw();
-                    return r.restoreSettings(name, cats);
+                    int result = r.restoreSettings(name, cats);
+                    Tools.mountRo();
+                    return result;
                 } else {
                     return 3;
                 }
-
             }
 
             protected void onPostExecute(Integer result) {
                 if (d != null)
                     d.dismiss();
-                Tools.mountRo();
                 if (result == 0) {
                     new AlertDialog.Builder(context)
                             .setTitle("Restore successful!")
@@ -385,7 +388,7 @@ public class RestoreFragment extends Fragment {
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Shell.SU.run("reboot");
+                                    ShellService.su(context, "reboot");
                                 }
                             }).create().show();
                 } else if (result == 1) {

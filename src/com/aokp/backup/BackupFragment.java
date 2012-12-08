@@ -257,7 +257,7 @@ public class BackupFragment extends Fragment {
 
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
                     b = new ICSBackup(context, cats, name);
-                else if (Build.VERSION.SDK_INT >= 16)
+                else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN)
                     b = new JBBackup(context, cats, name);
 
             }

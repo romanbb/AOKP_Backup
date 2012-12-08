@@ -52,26 +52,19 @@ public abstract class Backup {
     final String mName;
     String parseBackupId = null;
     final File mBackupDir;
-    int gooVersion;
 
     public Backup(Context c, boolean[] categories, String name) {
         mContext = c;
         mName = name;
         catsToBackup = categories;
         mBackupDir = Tools.getBackupDirectory(mContext, mName);
-
-        try {
-            gooVersion = Tools.getOfficialAOKPVersion();
-        } catch (NumberFormatException e) {
-            gooVersion = -1;
-        }
     }
 
-    public Backup(Context c, String name, File fromZip) {
-        // instantiate object expecting to restore it from a zip
-        this(c, new boolean[0], name);
-        restoreBackupFromZip(fromZip, new File(mBackupDir, name));
-    }
+//    public Backup(Context c, String name, File fromZip) {
+//        // instantiate object expecting to restore it from a zip
+//        this(c, new boolean[0], name);
+//        restoreBackupFromZip(fromZip, new File(mBackupDir, name));
+//    }
 
     public boolean backupSettings() {
 
@@ -163,7 +156,7 @@ public abstract class Backup {
             f.saveInBackground();
 
             final ParseObject b = new ParseObject("Backup");
-            b.put("gooVersion", backup.gooVersion);
+            b.put("gooVersion", Tools.getAOKPGooVersion());
             b.put("zippedBackup", f);
             b.saveInBackground(new SaveCallback() {
                 @Override
@@ -229,7 +222,7 @@ public abstract class Backup {
         File backup = new File(mBackupDir, "settings.cfg");
         Tools.writeFileToSD(output.toString(), backup);
 
-        Tools.writeFileToSD(Tools.getOfficialAOKPVersion().toString(),
+        Tools.writeFileToSD(Tools.getAOKPGooVersion().toString(),
                 new File(Tools.getBackupDirectory(mContext, mName),
                         "aokp.version"));
 

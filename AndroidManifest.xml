@@ -36,6 +36,7 @@
         <meta-data
                 android:name="com.google.android.backup.api_key"
                 android:value="AEdPqrEAAAAIhTEOjHKTja-0RnQHlZA3nrTlAN6nv-obCzpFPA"/>
+        <service android:name=".ShellService"/>
     </application>
 
 </manifest>
