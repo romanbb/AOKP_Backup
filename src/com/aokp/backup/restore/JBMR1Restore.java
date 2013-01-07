@@ -14,7 +14,7 @@ public class JBMR1Restore extends Restore {
      * minimum version to accept to restore jellybean settings. we don't want to
      * restore ICS settings on a JB ROM
      */
-    private static final int MIN_JB_VERSION = 20;
+    private static final int MIN_JBMR1_VERSION = 27;
 
     public JBMR1Restore(Context c) {
         super(c);

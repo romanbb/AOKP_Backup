@@ -61,7 +61,7 @@ public class AOKPBackup extends Application {
 
     public boolean isAndroidVersionSupported() {
         switch (Tools.getAndroidVersion()) {
-            case Build.VERSION_CODES.JELLY_BEAN_MR1:
+//            case Build.VERSION_CODES.JELLY_BEAN_MR1:
             case Build.VERSION_CODES.JELLY_BEAN:
             case Build.VERSION_CODES.ICE_CREAM_SANDWICH:
             case Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1:
