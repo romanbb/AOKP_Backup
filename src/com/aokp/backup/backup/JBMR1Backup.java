@@ -6,7 +6,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
-import com.aokp.backup.categories.JBCategories;
+import com.aokp.backup.categories.JBMR1Categories;
 import com.aokp.backup.util.SVal;
 import com.aokp.backup.util.Tools;
 import eu.chainfire.libsuperuser.Shell;
@@ -28,7 +28,7 @@ public class JBMR1Backup extends Backup {
 
     @Override
     protected String[] getSettingsCategory(int categoryIndex) {
-        return new JBCategories().getSettingsCategory(mContext, categoryIndex);
+        return new JBMR1Categories().getSettingsCategory(mContext, categoryIndex);
     }
 
     @Override

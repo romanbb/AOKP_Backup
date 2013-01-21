@@ -400,10 +400,6 @@
         <item>notif_wallpaper_alpha</item>
         <item>show_statusbar_ime_switcher</item>
         <item>kill_app_longpress_back</item>
-        <item>power_dialog_show_navbar_hide</item>
-        <item>power_dialog_show_screenshot</item>
-        <item>power_dialog_show_airplane_toggle</item>
-        <item>power_dialog_show_torch_toggle</item>
         <item>notification_wallpaper</item>
         <item>rc_prefs</item>
         <item>ui_force_overflow_button</item>
@@ -412,6 +408,8 @@
         <item>adb_notify</item>
         <item>mvno_roaming</item>
         <item>noise_suppression</item>
+        <item>manual_safe_media_volume</item>
+        <item>statusbar_brightness_slider</item>
     </string-array>
     <string-array name="jbmr1_cat_navigation_bar">
         <item>navigation_bar_show</item>
@@ -452,6 +450,7 @@
         <item>navigation_bar_width_port</item>
         <item>navigation_bar_width_land</item>
         <item>navigation_bar_menu_arrow_keys</item>
+        <item>navigation_bar_color</item>
     </string-array>
     <string-array name="jbmr1_cat_lockscreen">
         <item>lockscreen_custom_text_color</item>
@@ -463,8 +462,16 @@
         <item>lockscreen_unlimited_widgets</item>
         <item>lockscreen_all_widgets</item>
         <item>lockscreen_auto_rotate</item>
+        <item>lockscreen_longpress_challenge</item>
+        <item>lockscreen_use_widget_container_carousel</item>
+        <item>lockscreen_minimize_lockscreen_challenge</item>
+        <item>lockscreen_hide_initial_page_hints</item>
     </string-array>
-    <string-array name="jbmr1_cat_weather">
+    <string-array name="jbmr1_cat_powermenu">
+        <item>power_dialog_show_navbar_hide</item>
+        <item>power_dialog_show_screenshot</item>
+        <item>power_dialog_show_airplane_toggle</item>
+        <item>power_dialog_show_torch_toggle</item>
     </string-array>
     <string-array name="jbmr1_cat_led">
         <item>notification_light_off</item>
@@ -480,21 +487,13 @@
         <item>manual_safe_media_volume</item>
     </string-array>
     <string-array name="jbmr1_cat_statusbar_toggles">
-        <item>statusbar_layout</item>
-        <item>statusbar_toggles_brightness_loc</item>
-        <item>statusbar_toggles_style</item>
-        <item>statusbar_toggles_use_buttons</item>
-        <item>statusbar_toggles_number_per_row</item>
-        <item>statusbar_toggles</item>
-        <item>statusbar_toggles_enabled_color</item>
-        <item>statusbar_toggles_disabled_color</item>
-        <item>statusbar_toggles_text_color</item>
-        <item>statusbar_toggles_alpha</item>
-        <item>statusbar_toggles_background</item>
+        <item>quick_toggles</item>
+        <item>quick_toggles_per_row</item>
         <item>vibrate_notif_expand</item>
         <item>quick_toggle_fav_contact</item>
         <item>show_statusbar_ime_switcher</item>
-        <item>quick_toggles_per_row</item>
+        <item>fast_toggle</item>
+        <item>choose_fasttoggle_side</item>
     </string-array>
     <string-array name="jbmr1_cat_statusbar_clock">
         <item>statusbar_clock_enabled</item>
@@ -503,14 +502,12 @@
         <item>statusbar_show_alarm</item>
         <item>statusbar_clock_weekday</item>
         <item>statusbar_clock_color</item>
-        <item>notification_date_longclick</item>
-        <item>notification_date_shortclick</item>
-        <item>notification_clock_longclick</item>
-        <item>notification_clock_shortclick</item>
+        <item>notification_clock_0</item>
+        <item>notification_clock_1</item>
+        <item>notification_clock_2</item>
     </string-array>
     <string-array name="jbmr1_cat_statusbar_battery">
         <item>statusbar_battery_icon</item>
-        <item>notification_battery_display</item>
         <item>statusbar_battery_bar</item>
         <item>statusbar_battery_bar_style</item>
         <item>statusbar_battery_bar_animate</item>

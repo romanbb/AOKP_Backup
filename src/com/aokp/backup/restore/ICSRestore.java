@@ -3,6 +3,7 @@ package com.aokp.backup.restore;
 
 import android.content.Context;
 import android.util.Log;
+import com.aokp.backup.categories.ICSCategories;
 import com.aokp.backup.util.Tools;
 import eu.chainfire.libsuperuser.Shell;
 
@@ -12,6 +13,11 @@ public class ICSRestore extends Restore {
 
     public ICSRestore(Context c) {
         super(c);
+    }
+
+    @Override
+    public String[] getSettingsCategory(Context c, int cat) {
+        return new ICSCategories().getSettingsCategory(c, cat);
     }
 
     public boolean okayToRestore() {

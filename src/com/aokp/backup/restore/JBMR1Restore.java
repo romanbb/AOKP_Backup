@@ -3,6 +3,7 @@ package com.aokp.backup.restore;
 
 import android.content.Context;
 import android.util.Log;
+import com.aokp.backup.categories.JBMR1Categories;
 import com.aokp.backup.util.Tools;
 import eu.chainfire.libsuperuser.Shell;
 
@@ -20,20 +21,26 @@ public class JBMR1Restore extends Restore {
         super(c);
     }
 
+    @Override
+    public String[] getSettingsCategory(Context c, int cat) {
+        return new JBMR1Categories().getSettingsCategory(c, cat);
+    }
+
+
     public boolean okayToRestore() {
         boolean result = false;
         int minimumGooVersion = getBackedupGooVersion();
         if (minimumGooVersion == -1) {
             return false;
         }
-        final int maximumGooVersion = 26;
+        final int maximumGooVersion = MIN_JBMR1_VERSION;
 
         try {
             int currentVersion = Tools.getAOKPGooVersion();
             if (currentVersion == -1) {
                 result = false;
             }
-            if ("aokp".equals(Tools.getInstance().getProp("ro.goo.rom"))) {
+            if ("aokp".startsWith(Tools.getInstance().getProp("ro.goo.rom"))) {
                 result = true;
             }
 
@@ -51,18 +58,18 @@ public class JBMR1Restore extends Restore {
 
         if (setting.equals("disable_boot_animation") && value.equals("1")) {
             if (new File("/system/media/bootanimation.zip").exists()) {
-                Shell.SU.run("mv /system/media/bootanimation.zip /system/media/bootanimation.unicorn");
+//                Shell.SU.run("mv /system/media/bootanimation.zip /system/media/bootanimation.unicorn");
             }
             return true;
         } else if (setting.equals("disable_boot_audio") && value.equals("1")) {
             if (new File("/system/media/boot_audio.mp3").exists()) {
-                Shell.SU.run("mv /system/media/boot_audio.mp3 /system/media/boot_audio.unicorn");
+//                Shell.SU.run("mv /system/media/boot_audio.mp3 /system/media/boot_audio.unicorn");
             }
 
             return true;
         } else if (setting.equals("disable_bug_mailer") && value.equals("1")) {
             if (new File("/system/bin/bugmailer.sh").exists()) {
-                Shell.SU.run("mv /system/bin/bugmailer.sh /system/bin/bugmailer.sh.unicorn");
+//                Shell.SU.run("mv /system/bin/bugmailer.sh /system/bin/bugmailer.sh.unicorn");
             }
 
             return true;
@@ -96,7 +103,7 @@ public class JBMR1Restore extends Restore {
             Tools.chmodAndOwn(target, "0660", rcUser);
 
             return true;
-        } else if (setting.equals("lockscreen_wallpaper")) {
+        } else if (setting.equals("notification_wallpaper")) {
             String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
             File source = new File(outDir, "notification_wallpaper.jpg");
             File target = new File(rcFilesDir, "notification_wallpaper.jpg");

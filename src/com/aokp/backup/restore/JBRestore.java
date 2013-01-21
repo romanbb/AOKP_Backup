@@ -3,6 +3,7 @@ package com.aokp.backup.restore;
 
 import android.content.Context;
 import android.util.Log;
+import com.aokp.backup.categories.JBCategories;
 import com.aokp.backup.util.Tools;
 import eu.chainfire.libsuperuser.Shell;
 
@@ -18,6 +19,11 @@ public class JBRestore extends Restore {
 
     public JBRestore(Context c) {
         super(c);
+    }
+
+    @Override
+    public String[] getSettingsCategory(Context c, int cat) {
+        return new JBCategories().getSettingsCategory(c, cat);
     }
 
     public boolean okayToRestore() {

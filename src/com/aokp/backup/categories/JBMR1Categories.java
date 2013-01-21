@@ -16,7 +16,6 @@ public class JBMR1Categories extends Categories {
     public static final int CAT_SB_CLOCK = 7;
     public static final int CAT_SB_BATTERY = 8;
     public static final int CAT_SB_SIGNAL = 9;
-
     public static final int NUM_CATS = 10;
 
     @Override
@@ -24,25 +23,25 @@ public class JBMR1Categories extends Categories {
         Resources res = c.getResources();
         switch (cat) {
             case CAT_GENERAL_UI:
-                return res.getStringArray(R.array.jbcat_general_ui);
+                return res.getStringArray(R.array.jbmr1_cat_general_ui);
             case CAT_NAVIGATION_BAR:
-                return res.getStringArray(R.array.jbcat_navigation_bar);
+                return res.getStringArray(R.array.jbmr1_cat_navigation_bar);
             case CAT_LED_OPTIONS:
-                return res.getStringArray(R.array.jbcat_led);
+                return res.getStringArray(R.array.jbmr1_cat_led);
             case CAT_LOCKSCREEN_OPTS:
-                return res.getStringArray(R.array.jbcat_lockscreen);
+                return res.getStringArray(R.array.jbmr1_cat_lockscreen);
             case CAT_SB_BATTERY:
-                return res.getStringArray(R.array.jbcat_statusbar_battery);
+                return res.getStringArray(R.array.jbmr1_cat_statusbar_battery);
             case CAT_SB_CLOCK:
-                return res.getStringArray(R.array.jbcat_statusbar_clock);
+                return res.getStringArray(R.array.jbmr1_cat_statusbar_clock);
             case CAT_SB_TOGGLES:
-                return res.getStringArray(R.array.jbcat_statusbar_toggles);
+                return res.getStringArray(R.array.jbmr1_cat_statusbar_toggles);
             case CAT_POWERMENU:
-                return res.getStringArray(R.array.jbcat_weather);
+                return res.getStringArray(R.array.jbmr1_cat_powermenu);
             case CAT_SOUND:
-                return res.getStringArray(R.array.jbcat_sound);
+                return res.getStringArray(R.array.jbmr1_cat_sound);
             case CAT_SB_SIGNAL:
-                return res.getStringArray(R.array.jbcat_statusbar_signal);
+                return res.getStringArray(R.array.jbmr1_cat_statusbar_signal);
             default:
                 return null;
         }

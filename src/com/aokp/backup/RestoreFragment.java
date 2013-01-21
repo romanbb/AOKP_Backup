@@ -59,10 +59,13 @@ public class RestoreFragment extends Fragment {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
             cats = getActivity().getApplicationContext().getResources()
                     .getStringArray(R.array.categories);
-        else if (Build.VERSION.SDK_INT >= 16)
+        else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN)
             // jellybean
             cats = getActivity().getApplicationContext().getResources()
                     .getStringArray(R.array.jbcategories);
+        else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1)
+            cats = getActivity().getApplicationContext().getResources()
+                    .getStringArray(R.array.jbmr1_categories);
 
         checkBoxes = new CheckBox[cats.length];
 
@@ -365,9 +368,12 @@ public class RestoreFragment extends Fragment {
                 while (restore == null) {
                     // wait until user picks an option
                 }
+                int result = 3;
                 if (restore) {
                     Tools.mountRw();
-                    int result = r.restoreSettings(name, cats);
+                    synchronized (restore) {
+                        result = r.restoreSettings(name, cats);
+                    }
                     Tools.mountRo();
                     return result;
                 } else {

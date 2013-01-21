@@ -19,7 +19,6 @@ package com.aokp.backup.restore;
 import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
-import com.aokp.backup.categories.ICSCategories;
 import com.aokp.backup.util.SVal;
 import com.aokp.backup.util.Tools;
 import eu.chainfire.libsuperuser.Shell;
@@ -90,6 +89,8 @@ public abstract class Restore {
         return 0;
     }
 
+    public abstract String[] getSettingsCategory(Context c, int cat);
+
     public abstract boolean okayToRestore();
 
     protected int getBackedupGooVersion() {
@@ -102,7 +103,7 @@ public abstract class Restore {
         }
     }
 
-    protected boolean readRestore() {
+    protected synchronized boolean readRestore() {
         File f = new File(Tools.getBackupDirectory(mContext, name), "settings.cfg");
         if (!f.exists()) {
             Log.e(TAG, "settings.cfg doesn't exist!");
@@ -127,8 +128,8 @@ public abstract class Restore {
         }
     }
 
-    private void restoreSettings(int category) {
-        String[] settingsArray = new ICSCategories().getSettingsCategory(mContext, category);
+    private synchronized void restoreSettings(int category) {
+        String[] settingsArray = getSettingsCategory(mContext, category);
 
         if (settingsArray == null) {
             Log.w(TAG, "couldn't find array of settings for category: "

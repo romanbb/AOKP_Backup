@@ -29,6 +29,7 @@ import android.widget.*;
 import com.aokp.backup.backup.Backup;
 import com.aokp.backup.backup.ICSBackup;
 import com.aokp.backup.backup.JBBackup;
+import com.aokp.backup.backup.JBMR1Backup;
 
 import java.util.Date;
 
@@ -51,10 +52,13 @@ public class BackupFragment extends Fragment {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
             cats = getActivity().getApplicationContext().getResources()
                     .getStringArray(R.array.categories);
-        else if (Build.VERSION.SDK_INT >= 16) {
+        else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN) {
             // jellybean
             cats = getActivity().getApplicationContext().getResources()
                     .getStringArray(R.array.jbcategories);
+        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            cats = getActivity().getApplicationContext().getResources()
+                    .getStringArray(R.array.jbmr1_categories);
         }
 
         checkBoxes = new CheckBox[cats.length];
@@ -259,6 +263,9 @@ public class BackupFragment extends Fragment {
                     b = new ICSBackup(context, cats, name);
                 else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN)
                     b = new JBBackup(context, cats, name);
+                else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    b = new JBMR1Backup(context, cats, name);
+                }
 
             }
 

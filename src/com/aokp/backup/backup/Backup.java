@@ -198,13 +198,21 @@ public abstract class Backup {
         for (String setting : settings) {
             if (!shouldHandleSpecialCase(setting)) {
                 if (setting.startsWith("secure.")) {
-                    String val = Settings.Secure.getString(resolver, setting);
-                    if (val != null)
-                        currentSVals.add(new SVal(setting, val));
+                    try {
+                        String val = Settings.Secure.getString(resolver, setting);
+                        if (val != null)
+                            currentSVals.add(new SVal(setting, val));
+                    } catch (Exception e) {
+                        Log.e(TAG, "couldn't restore: " + setting);
+                    }
                 } else {
-                    String val = Settings.System.getString(resolver, setting);
-                    if (val != null)
-                        currentSVals.add(new SVal(setting, val));
+                    try {
+                        String val = Settings.System.getString(resolver, setting);
+                        if (val != null)
+                            currentSVals.add(new SVal(setting, val));
+                    } catch (Exception e) {
+                        Log.e(TAG, "couldn't restore: " + setting);
+                    }
                 }
             }
         }
