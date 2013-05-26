@@ -1,0 +1,27 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'commons-io:commons-io:2.4'
+        classpath 'com.android.tools.build:gradle:0.4.1'
+    }
+}
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion 17
+    buildToolsVersion "17.0"
+
+
+    defaultConfig {
+    }
+}
+
+dependencies {
+    compile project(':libsuperuser')
+}

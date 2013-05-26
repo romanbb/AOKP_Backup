@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <!-- Jellybean 4.1.x -->
+    <string-array name="jbcategories">
+        <item>General UI</item>
+        <item>Navigation Bar</item>
+        <item>Lockscreen Options</item>
+        <item>Weather</item>
+        <item>LED Options</item>
+        <item>Sound Options</item>
+        <item>Statusbar Toggles</item>
+        <item>Statusbar Clock</item>
+        <item>Statusbar Battery</item>
+        <item>Statusbar Signal</item>
+    </string-array>
+    <string-array name="jbcat_general_ui">
+        <item>recent_kill_all_button</item>
+        <item>custom_carrier_label</item>
+        <item>volume_link_notification</item>
+        <item>tablet_ui</item>
+        <item>status_bar_notif_count</item>
+        <item>nfc_polling_mode</item>
+        <item>status_bar_notif_count</item>
+        <item>quiet_hours_enabled</item>
+        <item>quiet_hours_start</item>
+        <item>quiet_hours_end</item>
+        <item>quiet_hours_notifications</item>
+        <item>quiet_hours_ringer</item>
+        <item>quiet_hours_still</item>
+        <item>quiet_hours_dim</item>
+        <item>notif_wallpaper_alpha</item>
+        <item>show_statusbar_ime_switcher</item>
+        <item>kill_app_longpress_back</item>
+        <item>activity_resolver_use_alt</item>
+        <item>power_dialog_show_navbar_hide</item>
+        <item>power_dialog_show_screenshot</item>
+        <item>power_dialog_show_airplane_toggle</item>
+        <item>nfc_polling_mode</item>
+        <item>notification_wallpaper</item>
+        <item>rc_prefs</item>
+        <item>force_dualpanel</item>
+        <item>ui_force_overflow_button</item>
+        <item>hide_extras_system_bar</item>
+        <item>ram_usage_bar</item>
+    </string-array>
+    <string-array name="jbcat_navigation_bar">
+        <item>navigation_bar_show</item>
+        <item>navigation_bar_width</item>
+        <item>navigation_bar_height</item>
+        <item>navigation_bar_height_landscape</item>
+        <item>navigation_bar_width</item>
+        <item>menu_location</item>
+        <item>menu_visibility</item>
+        <item>navigation_bar_buttons_qty</item>
+        <item>navigation_bar_tint</item>
+        <item>navigation_bar_glow_tint</item>
+        <item>navigation_bar_button_alpha</item>
+        <item>navigation_bar_glow_duration_off</item>
+        <item>navigation_bar_glow_duration_on</item>
+        <item>navigation_longpress_app_intent_0</item>
+        <item>navigation_longpress_app_intent_1</item>
+        <item>navigation_longpress_app_intent_2</item>
+        <item>navigation_longpress_app_intent_3</item>
+        <item>navigation_longpress_app_intent_4</item>
+        <item>navigation_longpress_app_intent_5</item>
+        <item>navigation_longpress_app_intent_6</item>
+        <item>navigation_custom_app_intent_0</item>
+        <item>navigation_custom_app_intent_1</item>
+        <item>navigation_custom_app_intent_2</item>
+        <item>navigation_custom_app_intent_3</item>
+        <item>navigation_custom_app_intent_4</item>
+        <item>navigation_custom_app_intent_5</item>
+        <item>navigation_custom_app_intent_6</item>
+        <item>navigation_bar_icons</item>
+        <item>systemui_navring_1</item>
+        <item>systemui_navring_2</item>
+        <item>systemui_navring_3</item>
+        <item>systemui_navring_4</item>
+        <item>systemui_navring_5</item>
+        <item>systemui_navring_amount</item>
+        <item>systemui_navring_override_home</item>
+        <item>navigation_bar_widgets</item>
+        <item>navigation_bar_width_port</item>
+        <item>navigation_bar_width_land</item>
+    </string-array>
+    <string-array name="jbcat_lockscreen">
+        <item>lockscreen_menu_unlock</item>
+        <item>lockscreen_stock_music_layout</item>
+        <item>lockscreen_custom_text_color</item>
+        <item>lockscreen_battery</item>
+        <item>lockscreen_weather</item>
+        <item>lockscreen_weather_type</item>
+        <item>volume_wake_screen</item>
+        <item>volume_music_controls</item>
+        <item>lockscreen_calendar</item>
+        <item>lockscreen_calendar_flip</item>
+        <item>lockscreen_calendar_hide_ongoing</item>
+        <item>lockscreen_calendar_use_colors</item>
+        <item>lockscreen_calendar_interval</item>
+        <item>lockscreen_calendar_range</item>
+        <item>lockscreen_hide_nav</item>
+        <item>lockscreen_hide_nav</item>
+        <item>lockscreen_text_color</item>
+        <item>lockscreen_targets</item>
+        <item>lockscreen_target_amount</item>
+        <item>lockscreen_quick_unlock_control</item>
+        <item>use_lockscreen_themes</item>
+    </string-array>
+    <string-array name="jbcat_weather">
+        <item>weather_statusbar_style</item>
+        <item>use_weather</item>
+        <item>weather_show_location</item>
+        <item>weather_panel_longclick</item>
+        <item>weather_panel_shortclick</item>
+        <item>statusbar_weather_hide</item>
+    </string-array>
+    <string-array name="jbcat_led">
+        <item>notification_light_off</item>
+        <item>notification_light_on</item>
+        <item>led_screen_on</item>
+        <item>notification_light_color</item>
+        <item>led_custom_values</item>
+        <item>led_brightness</item>
+    </string-array>
+    <string-array name="jbcat_sound">
+        <item>enable_volume_options</item>
+        <item>mute_annoying_notifications_threshold</item>
+    </string-array>
+    <string-array name="jbcat_statusbar_toggles">
+        <item>statusbar_layout</item>
+        <item>statusbar_toggles_brightness_loc</item>
+        <item>statusbar_toggles_style</item>
+        <item>statusbar_toggles_use_buttons</item>
+        <item>statusbar_toggles_number_per_row</item>
+        <item>statusbar_toggles</item>
+        <item>statusbar_toggles_enabled_color</item>
+        <item>statusbar_toggles_disabled_color</item>
+        <item>statusbar_toggles_text_color</item>
+        <item>statusbar_toggles_alpha</item>
+        <item>statusbar_toggles_background</item>
+        <item>vibrate_notif_expand</item>
+    </string-array>
+    <string-array name="jbcat_statusbar_clock">
+        <item>statusbar_clock_enabled</item>
+        <item>statusbar_clock_style</item>
+        <item>statusbar_clock_am_pm_style</item>
+        <item>statusbar_show_alarm</item>
+        <item>statusbar_clock_weekday</item>
+        <item>statusbar_clock_color</item>
+        <item>notification_date_longclick</item>
+        <item>notification_date_shortclick</item>
+        <item>notification_clock_longclick</item>
+        <item>notification_clock_shortclick</item>
+    </string-array>
+    <string-array name="jbcat_statusbar_battery">
+        <item>statusbar_battery_icon</item>
+        <item>notification_battery_display</item>
+        <item>statusbar_battery_bar</item>
+        <item>statusbar_battery_bar_style</item>
+        <item>statusbar_battery_bar_animate</item>
+        <item>statusbar_battery_bar_thickness</item>
+        <item>statusbar_battery_bar_color</item>
+    </string-array>
+    <string-array name="jbcat_statusbar_signal">
+        <item>statusbar_signal_text</item>
+        <item>statusbar_signal_text_color</item>
+        <item>statusbar_hide_signal_bars</item>
+        <item>statusbar_wifi_signal_text</item>
+        <item>statusbar_wifi_signal_text_color</item>
+        <item>statusbar_signal_cluster_alt</item>
+    </string-array>
+
+</resources>

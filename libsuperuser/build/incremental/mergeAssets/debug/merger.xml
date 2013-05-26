@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger>
+
+    <dataSet config="main" >
+        <source path="/Users/roman/Desktop/Android/src/AOKP_Backup/libsuperuser/src/main/assets" />
+    </dataSet>
+    <dataSet config="debug" >
+        <source path="/Users/roman/Desktop/Android/src/AOKP_Backup/libsuperuser/src/debug/assets" />
+    </dataSet>
+
+</merger>

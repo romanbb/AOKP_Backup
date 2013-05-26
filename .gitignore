@@ -1,8 +1,9 @@
 bin/
+build/
+app/build/
+libsupersu/build
 gen/
 out/
 .idea/
-assets/parse.application.id
-assets/parse.client.id
-
+.gradle/
 .DS_Store

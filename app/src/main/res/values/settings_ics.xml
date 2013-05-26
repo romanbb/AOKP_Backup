@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="cat_general_ui">
+        <item>disable_boot_animation</item>
+        <item>disable_boot_audio</item>
+        <item>disable_bug_mailer</item>
+        <item>accelerometer_rotation_angles</item>
+        <item>recent_app_switcher</item>
+        <item>lcd_density</item>
+        <item>crt_off_animation</item>
+        <item>ime_switcher</item>
+        <item>enable_volume_options</item>
+        <item>custom_carrier_label</item>
+        <item>kill_app_longpress_back</item>
+        <item>navigation_bar_home_longpress</item>
+        <item>accelerometer_rotation_settle_time</item>
+    </string-array>
+    <string-array name="cat_general_ui_strings">
+        <item>Disable boot animation</item>
+        <item>Disable boot audio</item>
+        <item>Disable bug mailer</item>
+        <item>Allow 180 degree rotation</item>
+        <item>Recents window style</item>
+        <item>LCD density</item>
+        <item>CRT Off animation</item>
+        <item>Show IME switcher</item>
+        <item>Enable volume options</item>
+        <item>Custom carrier label</item>
+        <item>Kill app on longpress back</item>
+        <item>Rotation delay</item>
+    </string-array>
+    <string-array name="cat_navigation_bar">
+        <item>menu_location</item>
+        <item>menu_visibility</item>
+        <item>navigation_bar_buttons_qty</item>
+        <item>navigation_bar_tint</item>
+        <item>navigation_bar_glow_tint</item>
+        <item>navigation_bar_button_alpha</item>
+        <item>navigation_bar_glow_duration_off</item>
+        <item>navigation_bar_glow_duration_on</item>
+        <item>navigation_bar_width</item>
+        <item>navigation_bar_height</item>
+        <item>navigation_longpress_app_intent_0</item>
+        <item>navigation_longpress_app_intent_1</item>
+        <item>navigation_longpress_app_intent_2</item>
+        <item>navigation_longpress_app_intent_3</item>
+        <item>navigation_longpress_app_intent_4</item>
+        <item>navigation_custom_app_intent_0</item>
+        <item>navigation_custom_app_intent_1</item>
+        <item>navigation_custom_app_intent_2</item>
+        <item>navigation_custom_app_intent_3</item>
+        <item>navigation_custom_app_intent_4</item>
+        <item>navigation_bar_icons</item>
+    </string-array>
+    <string-array name="cat_lockscreen">
+        <item>lockscreen_wallpaper</item>
+        <item>lockscreen_enable_menu_key</item>
+        <item>secure.lock_screen_lock_suer_override</item>
+        <item>lockscreen_layout</item>
+        <item>lockscreen_battery</item>
+        <item>lockscreen_weather</item>
+        <item>show_lock_before_unlock</item>
+        <item>volume_wake_screen</item>
+        <item>volume_music_controls</item>
+        <item>lockscreen_calendar</item>
+        <item>lockscreen_calendar_flip</item>
+        <item>lockscreen_calendar_hide_ongoing</item>
+        <item>lockscreen_calendar_use_colors</item>
+        <item>lockscreen_calendar_interval</item>
+        <item>lockscreen_calendar_range</item>
+        <item>lockscreen_hide_nav</item>
+        <item>lockscreen_hide_nav</item>
+        <item>lockscreen_text_color</item>
+        <item>lockscreen_custom_app_intent_0</item>
+        <item>lockscreen_custom_app_intent_1</item>
+        <item>lockscreen_custom_app_intent_2</item>
+        <item>lockscreen_custom_app_intent_3</item>
+        <item>lockscreen_custom_app_intent_4</item>
+        <item>lockscreen_custom_app_intent_5</item>
+        <item>lockscreen_custom_app_intent_6</item>
+        <item>lockscreen_custom_app_intent_7</item>
+        <item>lockscreen_icons</item>
+        <item>lockscreen_hide_nav</item>
+        <item>lockscreen_landscape</item>
+        <item>lockscreen_quick_unlock_control</item>
+        <item>enable_fast_torch</item>
+    </string-array>
+    <string-array name="cat_weather">
+        <item>weather_statusbar_style</item>
+        <item>use_weather</item>
+    </string-array>
+    <string-array name="cat_powermenu">
+        <item>power_dialog_show_power_saver</item>
+        <item>power_dialog_show_screenshot</item>
+        <item>power_dialog_show_torch_toggle</item>
+        <item>power_dialog_show_airplane_toggle</item>
+        <item>power_dialog_show_navbar_hide</item>
+    </string-array>
+    <string-array name="cat_powersaver">
+        <item>secure.power_saver_mode</item>
+        <item>secure.power_saver_data_mode</item>
+        <item>secure.power_saver_original_network_on</item>
+        <item>secure.power_saver_original_network_mode</item>
+        <item>secure.power_saver_sync_mode</item>
+        <item>secure.power_saver_sync_interval</item>
+        <item>secure.power_saver_data_delay</item>
+        <item>secure.power_saver_wifi_mode</item>
+        <item>secure.power_saver_sync_data_mode</item>
+        <item>secure.power_saver_sync_mobile_preference</item>
+    </string-array>
+    <string-array name="cat_led">
+        <item>notification_light_off</item>
+        <item>notification_light_on</item>
+        <item>led_screen_on</item>
+        <item>notification_light_color</item>
+    </string-array>
+    <string-array name="cat_statusbar_general">
+        <item>statusbar_settings_behavior</item>
+        <item>statusbar_quicktoggles_autohide</item>
+        <item>status_bar_brightness_toggle</item>
+        <item>status_bar_icon_transparency</item>
+        <item>secure.adb_icon</item>
+        <item>status_bar_transparency</item>
+        <item>status_bar_layout</item>
+        <item>statusbar_font_size</item>
+        <item>status_bar_notif_count</item>
+    </string-array>
+    <string-array name="cat_statusbar_toggles">
+        <item>statusbar_toggles_brightness_loc</item>
+        <item>statusbar_toggles_style</item>
+        <item>statusbar_toggles_use_buttons</item>
+        <item>statusbar_toggles</item>
+        <item>statusbar_toggles_number_per_row</item>
+    </string-array>
+    <string-array name="cat_statusbar_clock">
+        <item>statusbar_clock_enabled</item>
+        <item>statusbar_clock_am_pm_style</item>
+        <item>statusbar_show_alarm</item>
+        <item>statusbar_clock_weekday</item>
+        <item>statusbar_clock_color</item>
+    </string-array>
+    <string-array name="cat_statusbar_battery">
+        <item>statusbar_battery_icon</item>
+        <item>statusbar_battery_bar</item>
+        <item>statusbar_brightness_slider</item>
+        <item>statusbar_battery_bar_style</item>
+        <item>statusbar_battery_bar_animate</item>
+        <item>statusbar_battery_bar_thickness</item>
+        <item>statusbar_battery_bar_color</item>
+    </string-array>
+    <string-array name="cat_statusbar_signal">
+        <item>statusbar_signal_text</item>
+        <item>statusbar_battery_bar</item>
+        <item>statusbar_wifi_signal_text</item>
+        <item>statusbar_hide_signal_bars</item>
+        <item>statusbar_signal_text_color</item>
+        <item>statusbar_wifi_signal_text_color</item>
+    </string-array>
+    <string-array name="cat_custom_backlight">
+        <item>light_filter</item>
+        <item>light_filter_reset</item>
+        <item>light_filter_window</item>
+        <item>light_filter_interval</item>
+        <item>light_sensor_custom</item>
+        <item>light_screen_dim</item>
+        <item>light_decrease</item>
+        <item>light_hysteresis</item>
+        <item>light_sensor_levels</item>
+        <item>light_sensor_lcd_values</item>
+        <item>light_sensor_button_values</item>
+        <item>light_sensor_keyboard_values</item>
+    </string-array>
+
+</resources>
