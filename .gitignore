@@ -4,3 +4,4 @@ libsupersu/build
 .idea/
 .gradle/
 .DS_Store
+*.iml
