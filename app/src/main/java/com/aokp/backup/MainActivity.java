@@ -189,12 +189,6 @@ public class MainActivity extends Activity {
                 return RESULT_NO_ROOT;
             }
 
-            if (Prefs.getShowNotAokpWarning(getApplicationContext())) {
-                if (!application.isAndroidVersionSupported() || !application.isAOKPVersionSupported()) {
-                    return RESULT_NOT_AOKP;
-                }
-            }
-
             if (!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
                 return RESULT_SD_NA;
             } else {
@@ -204,6 +198,12 @@ public class MainActivity extends Activity {
                         new File(sdFolder, ".nomedia").createNewFile();
                     } catch (IOException e) {
                     }
+                }
+            }
+
+            if (Prefs.getShowNotAokpWarning(getApplicationContext())) {
+                if (!application.isAndroidVersionSupported() || !application.isAOKPVersionSupported()) {
+                    return RESULT_NOT_AOKP;
                 }
             }
 

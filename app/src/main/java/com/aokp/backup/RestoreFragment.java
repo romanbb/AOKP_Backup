@@ -331,7 +331,7 @@ public class RestoreFragment extends Fragment {
 
             @Override
             protected void onPreExecute() {
-                if (!r.okayToRestore() && !"aokp".equals(Tools.getInstance().getProp("ro.goo.rom"))) {
+                if (!r.okayToRestore()) {
                     new AlertDialog.Builder(context)
                             .setTitle("Restore failed!")
                             .setMessage("AOKP Not detected. Continue restoring?")

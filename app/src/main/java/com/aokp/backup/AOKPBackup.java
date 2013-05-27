@@ -18,7 +18,7 @@ public class AOKPBackup extends Application {
         if (Tools.getAOKPGooVersion() > 0) {
             return true;
         }
-        if (Tools.getROMVersion().startsWith("aokp_")) {
+        if (Tools.getROMVersion().contains("aokp")) {
             return true;
         } else {
             Log.e(TAG, "ROM version: " + Tools.getROMVersion());
