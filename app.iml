@@ -69,6 +69,7 @@
     <orderEntry type="jdk" jdkName="Android SDK" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="libsuperuser.aar" level="project" />
+    <orderEntry type="module" module-name="libsuperuser" />
   </component>
 </module>
 

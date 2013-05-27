@@ -31,6 +31,8 @@ import com.aokp.backup.backup.ICSBackup;
 import com.aokp.backup.backup.JBBackup;
 import com.aokp.backup.backup.JBMR1Backup;
 
+import com.aokp.backup.R;
+
 import java.util.Date;
 
 public class BackupFragment extends Fragment {

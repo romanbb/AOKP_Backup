@@ -51,7 +51,8 @@
         <item>ui_inverted_mode</item>
         <item>ui_mode_is_toggled</item>
         <item>hide_extras_system_bar</item>
-        <item></item>
+        <item>system_power_enable_crt_off</item>
+        <item>system_power_crt_mode</item>
     </string-array>
     <string-array name="jbmr1_cat_navigation_bar">
         <item>navigation_bar_show</item>
@@ -142,6 +143,28 @@
         <item>show_statusbar_ime_switcher</item>
         <item>fast_toggle</item>
         <item>choose_fasttoggle_side</item>
+        <item>custom_toggle_revert</item>
+        <item>custom_toggle_state</item>
+        <item>dclick_toggle_revert</item>
+        <item>match_action_icon</item>
+        <item>collapse_shade</item>
+        <item>custom_toggle_qty</item>
+        <item>toggle_custom_app_intent_0</item>
+        <item>toggle_custom_app_intent_1</item>
+        <item>toggle_custom_app_intent_2</item>
+        <item>toggle_custom_app_intent_3</item>
+        <item>toggle_custom_app_intent_4</item>
+        <item>toggle_custom_app_longintent_0</item>
+        <item>toggle_custom_app_longintent_1</item>
+        <item>toggle_custom_app_longintent_2</item>
+        <item>toggle_custom_app_longintent_3</item>
+        <item>toggle_custom_app_longintent_4</item>
+        <item>custom_toggle_icons_0</item>
+        <item>custom_toggle_icons_1</item>
+        <item>custom_toggle_icons_2</item>
+        <item>custom_toggle_icons_3</item>
+        <item>custom_toggle_icons_4</item>
+        <item>toggls_style</item>
     </string-array>
     <string-array name="jbmr1_cat_statusbar_clock">
         <item>statusbar_clock_enabled</item>
