@@ -29,25 +29,11 @@ public class JBMR1Restore extends Restore {
 
     public boolean okayToRestore() {
         boolean result = false;
-        int minimumGooVersion = getBackedupGooVersion();
-        if (minimumGooVersion == -1) {
-            return false;
-        }
-        final int maximumGooVersion = MIN_JBMR1_VERSION;
 
-        try {
-            int currentVersion = Tools.getAOKPGooVersion();
-            if (currentVersion == -1) {
-                result = false;
-            }
-            if ("aokp".startsWith(Tools.getInstance().getProp("ro.goo.rom"))) {
-                result = true;
-            }
-
-            if (currentVersion <= maximumGooVersion && currentVersion >= minimumGooVersion)
-                result = true;
-        } catch (Exception e) {
+        if (Tools.getROMVersion().contains("aokp")) {
+            result = true;
         }
+
         return result;
     }
 

@@ -1,27 +1,40 @@
+apply from: 'release.gradle'
+
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath 'commons-io:commons-io:2.4'
         classpath 'com.android.tools.build:gradle:0.4.1'
+        classpath 'commons-io:commons-io:2.4'
     }
 }
 apply plugin: 'android'
-
-repositories {
-    mavenCentral()
-}
 
 android {
     compileSdkVersion 17
     buildToolsVersion "17.0"
 
+    project.archivesBaseName = "AOKP_Backup"
 
     defaultConfig {
+        versionCode 38
+        versionName "1.8.1"
+        minSdkVersion 15
+        targetSdkVersion 17
     }
+
+    buildTypes {
+        debug {
+            debuggable true
+            packageNameSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
+        }
+    }
+
 }
 
 dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':libsuperuser')
 }

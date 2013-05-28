@@ -142,8 +142,10 @@ public abstract class Backup {
                         String val = Settings.System.getString(resolver, setting);
                         if (val != null)
                             currentSVals.add(new SVal(setting, val));
+                        else
+                            Log.e(TAG, "couldn't backup: " + setting);
                     } catch (Exception e) {
-                        Log.e(TAG, "couldn't restore: " + setting);
+                        Log.e(TAG, "couldn't backup: " + setting);
                     }
                 }
             }

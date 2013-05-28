@@ -16,8 +16,12 @@
 
 package com.aokp.backup;
 
-import android.app.*;
+import android.app.ActionBar;
 import android.app.ActionBar.Tab;
+import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -47,8 +51,8 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        application = (AOKPBackup) getApplicationContext();
 //        Log.i("B", Restore.getRomControlPid());
-        application = (AOKPBackup) getApplication();
         final ActionBar bar = getActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
@@ -170,7 +174,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    class CheckTask extends AsyncTask<Void, Void, Integer> {
+    public class CheckTask extends AsyncTask<Void, Void, Integer> {
 
         MainActivity activity;
 
@@ -260,6 +264,7 @@ public class MainActivity extends Activity {
             }
         }
 
+        @Override
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
             if (mFragment == null) {
                 mFragment = (Fragment) Fragment.instantiate(mActivity, mClass.getName(),

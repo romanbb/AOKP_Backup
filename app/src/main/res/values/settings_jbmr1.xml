@@ -53,6 +53,8 @@
         <item>hide_extras_system_bar</item>
         <item>system_power_enable_crt_off</item>
         <item>system_power_crt_mode</item>
+        <item>auto_brightness_lux</item>
+        <item>auto_brightness_backlight</item>
     </string-array>
     <string-array name="jbmr1_cat_navigation_bar">
         <item>navigation_bar_show</item>
@@ -115,6 +117,32 @@
         <item>lockscreen_minimize_lockscreen_challenge</item>
         <item>lockscreen_hide_initial_page_hints</item>
         <item>lockscreen_alpha_config</item>
+        <item>lockscreen_targets_longpress</item>
+        <item>lockscreen_targets_short_0</item>
+        <item>lockscreen_targets_short_1</item>
+        <item>lockscreen_targets_short_2</item>
+        <item>lockscreen_targets_short_3</item>
+        <item>lockscreen_targets_short_4</item>
+        <item>lockscreen_targets_short_5</item>
+        <item>lockscreen_targets_short_6</item>
+        <item>lockscreen_targets_short_7</item>
+        <item>lockscreen_targets_long_0</item>
+        <item>lockscreen_targets_long_1</item>
+        <item>lockscreen_targets_long_2</item>
+        <item>lockscreen_targets_long_3</item>
+        <item>lockscreen_targets_long_4</item>
+        <item>lockscreen_targets_long_5</item>
+        <item>lockscreen_targets_long_6</item>
+        <item>lockscreen_targets_long_7</item>
+        <item>lockscreen_targets_icon_0</item>
+        <item>lockscreen_targets_icon_1</item>
+        <item>lockscreen_targets_icon_2</item>
+        <item>lockscreen_targets_icon_3</item>
+        <item>lockscreen_targets_icon_4</item>
+        <item>lockscreen_targets_icon_5</item>
+        <item>lockscreen_targets_icon_6</item>
+        <item>lockscreen_targets_icon_7</item>
+        <item>lockscreen_quick_unlock_control</item>
     </string-array>
     <string-array name="jbmr1_cat_powermenu">
         <item>power_dialog_show_navbar_hide</item>

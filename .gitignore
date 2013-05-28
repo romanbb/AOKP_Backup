@@ -3,6 +3,7 @@ app/*.apk
 libsuperuser/build
 .idea/
 .gradle/
+app/release.gradle
 .DS_Store
 *.iml
 *.apk

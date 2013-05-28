@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.aokp.backup"
-          android:versionCode="37"
-          android:versionName="1.8.0">
-
+          package="com.aokp.backup">
 
     <uses-sdk
-            android:minSdkVersion="15"
-            android:targetSdkVersion="17"/>
+            android:targetSdkVersion="17"
+            android:minSdkVersion="15"/>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
