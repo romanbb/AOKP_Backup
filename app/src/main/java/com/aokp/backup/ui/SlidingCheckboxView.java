@@ -2,6 +2,7 @@ package com.aokp.backup.ui;
 
 import android.animation.AnimatorSet;
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import com.aokp.backup.R;
 import com.aokp.backup.R.dimen;
 import com.aokp.backup.R.id;
 
+import java.util.ArrayList;
+
 /**
  * Created by roman on 6/1/13.
  */
@@ -18,6 +21,7 @@ public class SlidingCheckboxView extends FrameLayout {
 
     String[] mChecks;
     private AnimatorSet mAnimatorSet;
+    private ViewGroup mAttachToMe;
 
     public SlidingCheckboxView(Context context) {
         super(context);
@@ -40,14 +44,35 @@ public class SlidingCheckboxView extends FrameLayout {
         int height = getContext().getResources().getDimensionPixelSize(dimen.checkbox_height);
 
 
-        ViewGroup attachToMe = (ViewGroup) findViewById(id.attach_checkbox_root);
+        mAttachToMe = (ViewGroup) findViewById(id.attach_checkbox_root);
         for (int i = 0; i < mChecks.length; i++) {
             CheckBox newbox = new CheckBox(getContext());
             newbox.setText(mChecks[i]);
             newbox.setTag(mChecks[i]);
             newbox.setChecked(true);
             newbox.setHeight(height);
-            attachToMe.addView(newbox);
+            mAttachToMe.addView(newbox);
+        }
+    }
+
+    public void addCategoryFilter(Intent backupIntent) {
+        ArrayList<Integer> categoryFilter = new ArrayList<Integer>();
+        boolean addFilter = false;
+
+        if (mChecks != null) {
+            for (int i = 0; i < mChecks.length; i++) {
+                CheckBox box = (CheckBox) mAttachToMe.findViewWithTag(mChecks[i]);
+                if (box != null) {
+                    if (!box.isChecked()) {
+                        addFilter = true;
+                    } else {
+                        categoryFilter.add(i);
+                    }
+                }
+            }
+            if (addFilter && backupIntent != null) {
+                backupIntent.putIntegerArrayListExtra("category_filter", categoryFilter);
+            }
         }
     }
 

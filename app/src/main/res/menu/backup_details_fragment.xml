@@ -3,6 +3,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+            android:id="@+id/restore_backup"
+            android:title="@string/restore"
+            android:showAsAction="always|withText"/>
+
+    <item
             android:title="@string/delete"
             android:id="@+id/delete_backup"/>
 </menu>

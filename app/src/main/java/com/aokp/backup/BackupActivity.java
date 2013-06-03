@@ -1,8 +1,8 @@
 package com.aokp.backup;
 
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.content.Context;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,20 +16,20 @@ import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import com.aokp.backup.backup.Backup;
 import com.aokp.backup.backup.BackupFactory;
 import com.aokp.backup.ui.BackupListFragment;
 import com.aokp.backup.ui.SlidingCheckboxView;
-import com.squareup.otto.Subscribe;
+import com.aokp.backup.util.Tools;
+import eu.chainfire.libsuperuser.Shell;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 public class BackupActivity extends Activity {
@@ -39,7 +39,7 @@ public class BackupActivity extends Activity {
     Animation mSlideInTopAnimation;
     Animation mSlideOutTopAnimation;
     private EditText mNewBackupNameEditText;
-    private ImageView mNewBacupSaveButton;
+    private ImageView mNewBackupSaveButton;
 
     MenuItem mPrefsMenuItem;
     MenuItem mBackupMenuItem;
@@ -54,7 +54,7 @@ public class BackupActivity extends Activity {
 
         mSlidingCats = (SlidingCheckboxView) findViewById(R.id.sliding_checkboxes);
         mSlidingCats.setVisibility(View.GONE);
-        mSlidingCats.init(R.array.jbmr1_categories); // TODO get proper array!
+        mSlidingCats.init(BackupFactory.getCategoryArrayResourceId());
         mSlidingCats.bringToFront();
 
         mSlideInTopAnimation = AnimationUtils.loadAnimation(BackupActivity.this, R.anim.slide_in_top);
@@ -66,6 +66,32 @@ public class BackupActivity extends Activity {
                 .beginTransaction()
                 .add(R.id.fragment, mBackupListFragment)
                 .commit();
+
+        if (getIntent() != null && getIntent().hasExtra("restore_completed")) {
+            showRestoreCompleteDialog();
+        }
+    }
+
+
+    private void showRestoreCompleteDialog() {
+        new Builder(this)
+                .setTitle("Restore complete!")
+                .setMessage("You should reboot!")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AsyncTask.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                Shell.SU.run("reboot");
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton("No", null)
+                .create()
+                .show();
+
     }
 
     @Override
@@ -85,8 +111,8 @@ public class BackupActivity extends Activity {
                 return false;
             }
         });
-        mNewBacupSaveButton = (ImageView) mBackupMenuItem.getActionView().findViewById(R.id.save);
-        mNewBacupSaveButton.setOnClickListener(new OnClickListener() {
+        mNewBackupSaveButton = (ImageView) mBackupMenuItem.getActionView().findViewById(R.id.save);
+        mNewBackupSaveButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 String text = mNewBackupNameEditText.getText().toString();
@@ -94,13 +120,18 @@ public class BackupActivity extends Activity {
                     text = mNewBackupNameEditText.getHint().toString();
                 }
 
-                final String backupName = text;
+                if (mBackupMenuItem != null) {
+                    mBackupMenuItem.collapseActionView();
+                }
 
-                // start backup
-                Intent dobackup = new Intent(BackupActivity.this, BackupService.class);
-                dobackup.setAction(BackupService.ACTION_NEW_BACKUP);
-                dobackup.putExtra("name", backupName);
-                startService(dobackup);
+                if (text != null && !text.isEmpty()) {
+                    final String backupName = text.trim();
+                    Intent dobackup = new Intent(BackupActivity.this, BackupService.class);
+                    dobackup.setAction(BackupService.ACTION_NEW_BACKUP);
+                    dobackup.putExtra("name", backupName);
+                    mSlidingCats.addCategoryFilter(dobackup);
+                    startService(dobackup);
+                }
             }
         });
 
@@ -108,18 +139,11 @@ public class BackupActivity extends Activity {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 // slide in categories
-                if (mSlidingCats != null) {
-                    mSlidingCats.startAnimation(mSlideInTopAnimation);
-                    mSlidingCats.setVisibility(View.VISIBLE);
-                }
+                slideInCategories();
 
 
                 if (mNewBackupNameEditText != null) {
-                    // suggest new backup name
-                    Date today = new Date(System.currentTimeMillis());
-                    SimpleDateFormat sdf = new SimpleDateFormat("EEE_MMM_d");
-
-                    mNewBackupNameEditText.setHint(sdf.format(today));
+                    mNewBackupNameEditText.setHint(getNewBackupNameHint());
                 }
                 invalidateOptionsMenu();
                 return true;
@@ -145,8 +169,7 @@ public class BackupActivity extends Activity {
 
                         }
                     });
-                    mSlideOutTopAnimation.setFillEnabled(true);
-                    mSlidingCats.startAnimation(mSlideOutTopAnimation);
+                    slideOutCategories();
 
                 }
                 invalidateOptionsMenu();
@@ -157,6 +180,44 @@ public class BackupActivity extends Activity {
         return super.onCreateOptionsMenu(menu);
 
 
+    }
+
+    private String getNewBackupNameHint() {
+        // suggest new backup name
+        Date today = new Date(System.currentTimeMillis());
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE_MMM_d");
+        String name = sdf.format(today);
+
+        int uniqueCounter = 1;
+
+        while (backupExists(name)) {
+            name = sdf.format(today) + "-" + uniqueCounter++;
+
+            if (uniqueCounter > 10) {
+                return "";
+            }
+        }
+
+        return name;
+    }
+
+    private boolean backupExists(String name) {
+        return new File(Tools.getBackupDirectory(this), name).exists()
+                || new File(Tools.getBackupDirectory(this), name + ".zip").exists();
+    }
+
+    private void slideOutCategories() {
+        if (mSlidingCats != null) {
+            mSlideOutTopAnimation.setFillEnabled(true);
+            mSlidingCats.startAnimation(mSlideOutTopAnimation);
+        }
+    }
+
+    private void slideInCategories() {
+        if (mSlidingCats != null) {
+            mSlidingCats.startAnimation(mSlideInTopAnimation);
+            mSlidingCats.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

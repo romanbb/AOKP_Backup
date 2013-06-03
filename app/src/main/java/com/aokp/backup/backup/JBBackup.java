@@ -45,9 +45,13 @@ public class JBBackup extends Backup {
         return NUM_CATS;
     }
 
+    @Override
+    public List<String> getSuCommands() {
+        return null;
+    }
 
     @Override
-    protected String[] getSettingsCategory(int categoryIndex) {
+    public String[] getSettingsCategory(int categoryIndex) {
         Resources res = mContext.getResources();
         switch (categoryIndex) {
             case CAT_GENERAL_UI:

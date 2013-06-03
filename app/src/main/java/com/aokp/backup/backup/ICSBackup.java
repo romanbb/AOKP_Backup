@@ -14,6 +14,7 @@ import eu.chainfire.libsuperuser.Shell;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class ICSBackup extends Backup {
 
@@ -41,6 +42,10 @@ public class ICSBackup extends Backup {
         super(c, name);
     }
 
+    @Override
+    public List<String> getSuCommands() {
+        return null;
+    }
 
     @Override
     public int getNumCats() {
@@ -48,7 +53,7 @@ public class ICSBackup extends Backup {
     }
 
     @Override
-    protected String[] getSettingsCategory(int categoryIndex) {
+    public String[] getSettingsCategory(int categoryIndex) {
         Resources res = mContext.getResources();
         switch (categoryIndex) {
             case CAT_GENERAL_UI:

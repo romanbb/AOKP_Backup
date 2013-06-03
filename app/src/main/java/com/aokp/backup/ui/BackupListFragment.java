@@ -70,6 +70,7 @@ public class BackupListFragment extends ListFragment {
     public void onResume() {
         super.onResume();
         AOKPBackup.getBus().register(this);
+        refresh();
     }
 
     private List<Backup> getBackups() {

@@ -23,6 +23,7 @@ import android.util.Log;
 import com.aokp.backup.ui.Prefs;
 import eu.chainfire.libsuperuser.Shell;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -42,6 +43,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -57,8 +59,11 @@ public class Tools {
     static final boolean DEBUG = true;
 
     private static Tools instance;
+    private static String sMyPid;
 
     HashMap<String, String> props;
+
+    static String mROMControlPid;
 
     public Tools() {
         readBuildProp();
@@ -127,6 +132,7 @@ public class Tools {
         return null;
     }
 
+    @Deprecated
     public static boolean mountRo() {
         final String mounts[] = getMounts("/system");
         if (mounts != null && mounts.length >= 3) {
@@ -143,6 +149,7 @@ public class Tools {
         return false;
     }
 
+    @Deprecated
     public static boolean mountRw() {
         final String mounts[] = getMounts("/system");
         if (mounts != null && mounts.length >= 3) {
@@ -186,7 +193,14 @@ public class Tools {
         return Build.VERSION.SDK_INT;
     }
 
+    public static void setROMControlPid(String pid) {
+        mROMControlPid = pid;
+    }
+
     public static String getRomControlPid() {
+        if (mROMControlPid != null) {
+            return mROMControlPid;
+        }
         List<String> result = Shell.SU.run("ls -ld /data/data/com.aokp.romcontrol/ | awk '{print $3}' | less");
         if (result != null && !result.isEmpty()) {
             return result.get(0);
@@ -283,11 +297,19 @@ public class Tools {
         }
     }
 
-    public static void chmodAndOwn(File f, String chmod, String chownUser) {
-        Shell.SU.run("chown " + chownUser + ":" + chownUser
+    public static List<String> getChmodAndOwnCommand(File f, String chmod, String chownUser) {
+        List<String> commands = new ArrayList<String>();
+        commands.add("chown " + chownUser + ":" + chownUser
                 + " " + f.getAbsolutePath());
-        Shell.SU.run("chmod " + chmod + " " + f.getAbsolutePath());
+        commands.add("chmod " + chmod + " " + f.getAbsolutePath());
+        return commands;
     }
+
+    @Deprecated
+    public static void chmodAndOwn(File f, String chmod, String chownUser) {
+        Shell.SU.run(getChmodAndOwnCommand(f, chmod, chownUser));
+    }
+
 
     public static void zip(File directory, File zipfile) throws IOException {
         URI base = directory.toURI();
@@ -351,23 +373,18 @@ public class Tools {
         return null;
     }
 
-    public static void unzip(File zipfile, File directory) throws IOException {
-        ZipFile zfile = new ZipFile(zipfile);
-        Enumeration<? extends ZipEntry> entries = zfile.entries();
+    public static void unzip(File file, File directory) throws IOException {
+        ZipFile zipFile = new ZipFile(file);
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            File file = new File(directory, entry.getName());
-            if (entry.isDirectory()) {
-                file.mkdirs();
-            } else {
-                file.getParentFile().mkdirs();
-                InputStream in = zfile.getInputStream(entry);
-                try {
-                    copy(in, file);
-                } finally {
-                    in.close();
-                }
-            }
+            File entryDestination = new File(directory,  entry.getName());
+            entryDestination.getParentFile().mkdirs();
+            InputStream in = zipFile.getInputStream(entry);
+            OutputStream out = new FileOutputStream(entryDestination);
+            IOUtils.copy(in, out);
+            IOUtils.closeQuietly(in);
+            IOUtils.closeQuietly(out);
         }
     }
 
@@ -398,5 +415,17 @@ public class Tools {
         } finally {
             out.close();
         }
+    }
+
+    public static String getMyPid(Context c) {
+        if (sMyPid != null) {
+            return sMyPid;
+        }
+        List<String> result = Shell.SU.run("ls -ld /data/data/" + c.getPackageName() + "/ | awk '{print $3}' | less");
+        if (result != null && !result.isEmpty()) {
+            return result.get(0);
+        }
+
+        return null;
     }
 }

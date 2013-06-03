@@ -18,10 +18,13 @@ package com.aokp.backup.backup;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.os.Build;
+import android.os.Build.VERSION;
 import android.provider.Settings;
 import android.util.Log;
 import com.aokp.backup.util.SVal;
 import com.aokp.backup.util.Tools;
+import eu.chainfire.libsuperuser.Shell;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -30,6 +33,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -48,20 +52,39 @@ import java.util.zip.ZipFile;
 public abstract class Backup {
 
     public static final String TAG = "Backup";
+
     private static final String SETTINGS_FILE = "settings.cfg";
     private static final String BACKUP_INFO_FILE = "aokp.backup";
+    private static final String SPECIAL_CASE_FILE = "special_cases.cfg";
+
     final Context mContext;
+
     @Deprecated
     ArrayList<ArrayList<SVal>> mBackupValuePairs;
+
     @Deprecated
     boolean[] mCategoriesToBackup;
+
     // meta
     String mName;
     long mBackupDate = -1;
+
+    String mDevice;
+    int mBackupSdkLevel;
+    String mRomVersion;
+
+
     List<Integer> mCategoryFilter;
     List<SVal> mBackupValues;
-    List<SVal> mSpecialCaseKeys;
+
     @Deprecated
+    List<SVal> mSpecialCaseKeys;
+
+
+    public File getBackupDir() {
+        return mBackupDir;
+    }
+
     File mBackupDir;
     File mZip;
 
@@ -69,17 +92,23 @@ public abstract class Backup {
     File rcFilesDir = null;
     File rcPrefsDir = null;
 
+
     public boolean isOldStyleBackup() {
         return mOldStyleBackup;
     }
+
+    public abstract List<String> getSuCommands();
 
     private boolean mOldStyleBackup;
 
     public Backup(Context c, String name) {
         mContext = c;
         mName = name;
+        if (new File(name).exists() || name.endsWith(".zip")) {
+            throw new RuntimeException("wrong constructor used for existing zip");
+        }
         init();
-        readFromSystem();
+        mZip = new File(Tools.getBackupDirectory(c), name + ".zip");
     }
 
     @Deprecated
@@ -104,21 +133,31 @@ public abstract class Backup {
 
     private void init() {
         mSpecialCaseKeys = new ArrayList<SVal>();
-        mBackupDir = Tools.getBackupDirectory(mContext, mName);
+        mBackupDir = Tools.getBackupDirectory(mContext);
         rcFilesDir = new File("/data/data/com.aokp.romcontrol/files/");
         rcPrefsDir = new File("/data/data/com.aokp.romcontrol/shared_prefs/");
 
         mBackupValues = new ArrayList<SVal>();
+        mCategoryFilter = new ArrayList<Integer>();
     }
 
-    public boolean handleBackup() {
-        if (mOldStyleBackup) {
-            // set the date to now
-            mBackupDate = System.currentTimeMillis();
-
-            // remove the old files after done writing below
+    public void setCategoryFilter(List<Integer> idxs) {
+        mCategoryFilter.clear();
+        for (Integer integer : idxs) {
+            mCategoryFilter.add(integer);
         }
+    }
 
+    /**
+     * Starts the backup process. Run the SU commands returned, then zip it.
+     *
+     * @return a list of SU commands to be run before we're ready to zip.
+     */
+    public List<String> initBackup() {
+        // set the date to now
+        mBackupDate = System.currentTimeMillis();
+
+        readFromSystem();
 
         // grab meta stuff
         List<String> metaLines = new LinkedList<String>();
@@ -130,19 +169,23 @@ public abstract class Backup {
             metaLines.add("backup_date=" + mBackupDate);
         }
 
-        if (mCategoryFilter != null && !mCategoryFilter.isEmpty()) {
+        if (hasCategoryFilter()) {
             StringBuilder builder = new StringBuilder();
             for (Integer category : mCategoryFilter) {
-                builder.append(String.valueOf(category) + "|");
+                builder.append(category);
+                builder.append("|");
             }
 
             // get rid of that |
-            if (String.valueOf(builder.charAt(builder.length() - 1)).equals("\\|")) {
+            if (String.valueOf(builder.charAt(builder.length() - 1)).equals("|")) {
                 builder.deleteCharAt(builder.length() - 1);
             }
 
-            metaLines.add(builder.toString());
+            metaLines.add("backup_categories=" + builder.toString());
         }
+        metaLines.add("device=" + Build.DEVICE);
+        metaLines.add("sdk_level=" + VERSION.SDK_INT);
+        metaLines.add("rom_version=" + Tools.getROMVersion());
 
         // grab actual settings
         List<String> settingsLines = new LinkedList<String>();
@@ -152,50 +195,80 @@ public abstract class Backup {
             }
         }
 
+        // write special case file
+        List<String> specialCaseLines = new LinkedList<String>();
+        if (mSpecialCaseKeys != null && !mSpecialCaseKeys.isEmpty()) {
+            for (SVal key : mSpecialCaseKeys) {
+                specialCaseLines.add(key.toString());
+            }
+        }
+
 //        File cacheDir = new File(mContext.getCacheDir(), ".zipping");
         File cacheDir = Tools.getTempBackupDirectory(mContext, true);
-        if (cacheDir.exists()) {
-            FileUtils.deleteQuietly(cacheDir);
+
+        // write files
+        try {
+            FileUtils.writeLines(new File(cacheDir, BACKUP_INFO_FILE), metaLines);
+            FileUtils.writeLines(new File(cacheDir, SPECIAL_CASE_FILE), specialCaseLines);
+            FileUtils.writeLines(new File(cacheDir, SETTINGS_FILE), settingsLines);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        if (!cacheDir.mkdir()) {
-            Log.e(TAG, "error creating temp zip dir!");
-            return false;
-        }
+        return getSuCommands();
+    }
+
+    /**
+     * At this point, everything should be ready to zip up in the temp dir. Any SU commands should have been run already
+     *
+     * @return Whether the zip operation was successful
+     */
+    public boolean doBackupZip() {
+
+        File cacheDir = Tools.getTempBackupDirectory(mContext, false);
+//
+//        Collection<File> backupFiles = FileUtils.listFiles(cacheDir, null, false);
+//        for (File ownMe : backupFiles) {
+//            ownMe.setReadable(true, false);
+//            ownMe.setWritable(true);
+//        }
 
         try {
-            // write files
-            FileUtils.writeLines(new File(cacheDir, BACKUP_INFO_FILE), metaLines);
-            FileUtils.writeLines(new File(cacheDir, SETTINGS_FILE), settingsLines);
-
             // zip!
             File zip = new File(Tools.getBackupDirectory(mContext), FilenameUtils.getName(mName) + ".zip");
             Tools.zip(cacheDir, zip);
             FileUtils.touch(zip);
-
-            // delete cache dir
-            FileUtils.deleteQuietly(cacheDir);
-
-            if (mOldStyleBackup) {
-                FileUtils.deleteQuietly(Tools.getBackupDirectory(mContext, mName));
-            }
-
-            return true;
         } catch (IOException e) {
             Log.e(TAG, "Backup failed!", e);
             return false;
         }
+        // delete cache dir
+        FileUtils.deleteQuietly(cacheDir);
+
+        // delete the folder that was zipped in place
+        File zippedFolder = new File(mBackupDir, mName);
+        if (zippedFolder.exists() && zippedFolder.isDirectory()) {
+            FileUtils.deleteQuietly(zippedFolder);
+        }
+
+        if (mOldStyleBackup) {
+            FileUtils.deleteQuietly(Tools.getBackupDirectory(mContext, mName));
+        }
+
+        return true;
+
     }
 
     public void readSettingsFromZip() throws IOException {
         mBackupValues.clear();
         mSpecialCaseKeys.clear();
 
+
         // zip?
         if (mZip != null && !mZip.isDirectory() && FilenameUtils.isExtension(mZip.getAbsolutePath(), "zip") && mZip.exists()) {
 
-            // new backup vals
 
+            // new backup vals
             ZipFile zip = new ZipFile(mZip);
             Enumeration<? extends ZipEntry> entries = zip.entries();
 
@@ -218,6 +291,12 @@ public abstract class Backup {
                             mBackupValues.add(new SVal(strLine));
                         }
 
+                    } else if (entry.getName().equalsIgnoreCase(SPECIAL_CASE_FILE)) {
+
+                        List<String> lines = IOUtils.readLines(zip.getInputStream(entry));
+                        for (String strLine : lines) {
+                            mSpecialCaseKeys.add(new SVal(strLine));
+                        }
 
                     } else if (entry.getName().equalsIgnoreCase(BACKUP_INFO_FILE)) {
 
@@ -233,24 +312,42 @@ public abstract class Backup {
                                 // look for stuff we might want
                                 SVal val = new SVal(line);
                                 if ("backup_date".equals(val.getKey())) {
+
                                     mBackupDate = Long.valueOf(val.getValue());
+
                                 } else if ("backup_categories".equals(val.getKey())) {
 
                                     // TODO make sure this doesn't fail
                                     String[] cats = val.getValue().split("\\|");
-                                    mCategoryFilter = new ArrayList<Integer>();
+                                    mCategoryFilter.clear();
                                     for (String cat : cats) {
                                         mCategoryFilter.add(Integer.parseInt(cat));
                                     }
                                 } else if ("backup_name".equals(val.getKey())) {
 
                                     mName = val.getValue();
+
+                                } else if ("device".equals(val.getKey())) {
+
+                                    mDevice = val.getValue();
+
+                                } else if ("sdk_level".equals(val.getKey())) {
+
+                                    mBackupSdkLevel = Integer.parseInt(val.getValue());
+
+                                } else if ("rom_version".equals(val.getKey())) {
+
+                                    mRomVersion = val.getValue();
+
                                 }
                             }
                         }
 
                     }
                 }
+            }
+            if (mBackupDate < 1) {
+                mBackupDate = mZip.lastModified();
             }
         } else if (mZip.isDirectory()) {
             /*
@@ -283,17 +380,23 @@ public abstract class Backup {
         return false;
     }
 
-    protected abstract String[] getSettingsCategory(int categoryIndex);
+    public abstract String[] getSettingsCategory(int categoryIndex);
 
     /**
      * Will fill this backup object with values from the current system,
-     * which settings are determined by the class that implements the abstract methods in this class
+     * which settings are determined by the class that implements the abstract methods in this class.
      */
     private void readFromSystem() {
         ContentResolver resolver = mContext.getContentResolver();
+
+        // iterate through categories
         for (int i = 0; i < getNumCats(); i++) {
             String[] settings = getSettingsCategory(i);
-            for (String setting : settings) {
+
+
+            // iterate through category settings to backup.
+            for (int j = 0; j < settings.length; j++) {
+                final String setting = settings[j];
                 if (!handleBackupSpecialCase(setting)) {
                     try {
                         String val = Settings.System.getString(resolver, setting);
@@ -307,7 +410,6 @@ public abstract class Backup {
                 }
             }
         }
-//        mBackupValuePairs.add(category, currentSVals);
     }
 
     public boolean deleteFromDisk() {
@@ -319,6 +421,7 @@ public abstract class Backup {
         } else {
             if (mZip != null && mZip.exists()) {
                 mZip.delete();
+                mZip = null;
                 return true;
             }
         }
@@ -339,7 +442,7 @@ public abstract class Backup {
             }
         }
 
-        File backup = new File(mBackupDir, "settings.cfg");
+        File backup = new File(Tools.getBackupDirectory(mContext, mName), "settings.cfg");
         Tools.writeFileToSD(output.toString(), backup);
 
 //        Tools.writeFileToSD(Tools.getAOKPGooVersion().toString(),
@@ -372,13 +475,35 @@ public abstract class Backup {
     public abstract boolean okayToRestore();
 
     /**
-     * Restore values to the current devices from this backup object
+     * Restore values to the current devices from this backup object.
+     *
+     * @return a list of SU commands to be run.
      */
-    public void handleRestore() {
+    public List<String> doRestore() {
+
+        // clear out temp directory
+        File temp = Tools.getTempRestoreDirectory(mContext, true);
+        File tempZip = new File(temp, FilenameUtils.getBaseName(mZip.getAbsolutePath()) + ".zip");
+        try {
+            FileUtils.copyFile(mZip, tempZip);
+            Tools.unzip(tempZip, temp);
+        } catch (IOException e) {
+            Log.e(TAG, "temp: " + temp.getAbsolutePath());
+            Log.e(TAG, "tempZip: " + tempZip.getAbsolutePath());
+            e.printStackTrace();
+            return null;
+        }
+
         if (mSpecialCaseKeys != null && !mSpecialCaseKeys.isEmpty()) {
+
             for (SVal specialSettingKey : mSpecialCaseKeys) {
                 handleRestoreSpecialCase(specialSettingKey);
             }
+
+//            List<String> sudo = getSuCommands();
+//            if (sudo != null && !sudo.isEmpty()) {
+//                Shell.SU.run(sudo);
+//            }
 
             for (SVal settingToRestore : mBackupValues) {
                 if (!restoreSetting(settingToRestore)) {
@@ -402,7 +527,7 @@ public abstract class Backup {
                 }
             }
         }
-
+        return getSuCommands();
     }
 
     /**
@@ -431,5 +556,21 @@ public abstract class Backup {
 
     public List<Integer> getCategoryFilter() {
         return mCategoryFilter;
+    }
+
+    public boolean hasCategoryFilter() {
+        return !(mCategoryFilter == null || mCategoryFilter.isEmpty());
+    }
+
+    public String getRomVersion() {
+        return mRomVersion;
+    }
+
+    public String getDevice() {
+        return mDevice;
+    }
+
+    public int getBackupSdkLevel() {
+        return mBackupSdkLevel;
     }
 }
