@@ -7,8 +7,10 @@
             android:id="@+id/menu_backup_go"
             android:icon="@drawable/ic_action_new_backup"
             android:showAsAction="collapseActionView|withText|always"/>
+
     <item
-            android:id="@+id/prefs"
-            android:title="@string/settings"
-            android:showAsAction="never"/>
+            android:id="@+id/use_external_storage"
+            android:title="@string/use_external_storage"
+            android:showAsAction="never"
+            android:checkable="true"/>
 </menu>

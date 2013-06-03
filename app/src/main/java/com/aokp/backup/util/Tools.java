@@ -24,12 +24,14 @@ import com.aokp.backup.ui.Prefs;
 import eu.chainfire.libsuperuser.Shell;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -78,10 +80,10 @@ public class Tools {
 
     public static File getBackupDirectory(Context c) {
         File f = null;
-        if (Prefs.getBackupPermanent(c)) {
-            f = new File(Environment.getExternalStorageDirectory(), "AOKP_Backup");
+        if (Prefs.getUseExternalStorage(c)) {
+            f = Tools.getExternalBackupHome();
         } else {
-            f = new File(c.getExternalFilesDir(null), "backups");
+            f = Tools.getInternalBackupHome(c);
         }
         f.mkdirs();
         return f;
@@ -112,6 +114,15 @@ public class Tools {
             d.mkdir();
         }
         return d;
+    }
+
+    public static File getInternalBackupHome(Context c) {
+        return new File(c.getCacheDir(), "backups");
+    }
+
+    public static File getExternalBackupHome() {
+
+        return new File(Environment.getExternalStorageDirectory(), "AOKP_Backup");
     }
 
     private static String[] getMounts(final String path) {
@@ -378,7 +389,7 @@ public class Tools {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
-            File entryDestination = new File(directory,  entry.getName());
+            File entryDestination = new File(directory, entry.getName());
             entryDestination.getParentFile().mkdirs();
             InputStream in = zipFile.getInputStream(entry);
             OutputStream out = new FileOutputStream(entryDestination);
@@ -427,5 +438,41 @@ public class Tools {
         }
 
         return null;
+    }
+
+    public static IOFileFilter getIOBackuPFileFilter() {
+        return new IOFileFilter() {
+            @Override
+            public boolean accept(File file) {
+                if (file.isDirectory()) {
+                    return true;
+                } else {
+                    if (file.getName().endsWith(".zip")) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean accept(File file, String s) {
+                return accept(file);
+            }
+        };
+    }
+
+    public static FileFilter getBackupFileFilter(final Context c) {
+        FileFilter fileFilter = new FileFilter() {
+            public boolean accept(File file) {
+                if (file.isDirectory()) {
+                    return true;
+                } else if (file.getName().endsWith(".zip")) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        return fileFilter;
     }
 }

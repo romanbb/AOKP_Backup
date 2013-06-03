@@ -20,13 +20,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import com.aokp.backup.BackupService.BackupFileSystemChange;
 import com.aokp.backup.backup.BackupFactory;
 import com.aokp.backup.ui.BackupListFragment;
+import com.aokp.backup.ui.Prefs;
 import com.aokp.backup.ui.SlidingCheckboxView;
 import com.aokp.backup.util.Tools;
+import com.squareup.otto.Subscribe;
 import eu.chainfire.libsuperuser.Shell;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -41,7 +42,7 @@ public class BackupActivity extends Activity {
     private EditText mNewBackupNameEditText;
     private ImageView mNewBackupSaveButton;
 
-    MenuItem mPrefsMenuItem;
+    MenuItem mUseExternalStorageMenuItem;
     MenuItem mBackupMenuItem;
 
     BackupListFragment mBackupListFragment;
@@ -72,6 +73,24 @@ public class BackupActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AOKPBackup.getBus().register(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        AOKPBackup.getBus().unregister(this);
+    }
+
+    @Subscribe
+    public void onBackupFileSystemChange(BackupFileSystemChange event) {
+        if (mUseExternalStorageMenuItem != null) {
+            mUseExternalStorageMenuItem.setChecked(Prefs.getUseExternalStorage(this));
+        }
+    }
 
     private void showRestoreCompleteDialog() {
         new Builder(this)
@@ -95,11 +114,26 @@ public class BackupActivity extends Activity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.use_external_storage:
+                mUseExternalStorageMenuItem.setChecked(!mUseExternalStorageMenuItem.isChecked());
+                Prefs.setUseExternalStorage(this, mUseExternalStorageMenuItem.isChecked());
+                AOKPBackup.getBus().post(new BackupFileSystemChange());
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.backup_activity, menu);
 
-        mPrefsMenuItem = menu.findItem(R.id.prefs);
+        mUseExternalStorageMenuItem = menu.findItem(R.id.use_external_storage);
+        mUseExternalStorageMenuItem.setChecked(Prefs.getUseExternalStorage(this));
+
         mBackupMenuItem = menu.findItem(R.id.menu_backup_go);
 
         mNewBackupNameEditText = (EditText) mBackupMenuItem.getActionView().findViewById(R.id.save_name);
@@ -222,7 +256,7 @@ public class BackupActivity extends Activity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        mPrefsMenuItem.setVisible(!mBackupMenuItem.isActionViewExpanded());
+        mUseExternalStorageMenuItem.setVisible(!mBackupMenuItem.isActionViewExpanded());
         mBackupMenuItem.setVisible(mBackupListFragment.isVisible());
         return super.onPrepareOptionsMenu(menu);
     }

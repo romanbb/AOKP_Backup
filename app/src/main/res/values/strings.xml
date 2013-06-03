@@ -45,5 +45,6 @@
     <string name="old_style_backup">Backup (old style)</string>
     <string name="desc_backup_named_save">Begin backup with given name</string>
     <string name="delete">Delete backup</string>
+    <string name="use_external_storage">Use external storage</string>
 
 </resources>

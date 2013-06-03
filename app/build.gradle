@@ -17,8 +17,8 @@ android {
     project.archivesBaseName = "AOKP_Backup"
 
     defaultConfig {
-        versionCode 39
-        versionName "2.0.0 alpha"
+        versionCode 40
+        versionName "2.0.0-b1"
         minSdkVersion 15
         targetSdkVersion 17
     }

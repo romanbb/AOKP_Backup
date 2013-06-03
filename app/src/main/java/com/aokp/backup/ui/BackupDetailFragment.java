@@ -29,6 +29,7 @@ import com.aokp.backup.R;
 import com.aokp.backup.R.drawable;
 import com.aokp.backup.backup.Backup;
 import com.aokp.backup.backup.BackupFactory;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,18 +77,23 @@ public class BackupDetailFragment extends Fragment {
     private List getListItems() {
         List items = new ArrayList();
         items.add(new SectionHeader("Backup details"));
-        items.add(new SectionRow<Pair>(new Pair("Backup type", mBackup.isOldStyleBackup() ? "Old" : "New")));
+
+        if (!mBackup.isOldStyleBackup())
+            items.add(new SectionRow<Pair>(new Pair("Size", FileUtils.byteCountToDisplaySize(mBackup.getZipFile().length()))));
 
         items.add(new SectionRow<Pair>(new Pair("Date", DateFormat.getDateFormat(getActivity()).format(mBackup.getBackupDate()))));
 
-        if (mBackup.getBackupSdkLevel() > 0)
+        if (mBackup.getBackupSdkLevel() > 0) {
             items.add(new SectionRow<Pair>(new Pair("SDK version", mBackup.getBackupSdkLevel())));
+        }
 
-        if (mBackup.getDevice() != null)
+        if (mBackup.getDevice() != null) {
             items.add(new SectionRow<Pair>(new Pair("Device", mBackup.getDevice())));
+        }
 
-        if (mBackup.getRomVersion() != null)
+        if (mBackup.getRomVersion() != null) {
             items.add(new SectionRow<Pair>(new Pair("ROM Version", mBackup.getRomVersion())));
+        }
 
         if (mBackup.hasCategoryFilter()) {
 
@@ -99,6 +105,7 @@ public class BackupDetailFragment extends Fragment {
             }
             items.add(new SectionRow<Pair>(new Pair("Categories", cats)));
         }
+        items.add(new SectionRow<Pair>(new Pair("Backup type", mBackup.isOldStyleBackup() ? "Old (restore disabled)" : "New")));
 
         return items;
     }
@@ -107,6 +114,9 @@ public class BackupDetailFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.backup_details_fragment, menu);
+        if (mBackup.isOldStyleBackup()) {
+            menu.findItem(R.id.restore_backup).setVisible(false);
+        }
     }
 
     @Override

@@ -15,11 +15,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.aokp.backup.AOKPBackup;
 import com.aokp.backup.BackupService.BackupFileSystemChange;
-import com.aokp.backup.R.drawable;
-import com.aokp.backup.R.menu;
-import com.aokp.backup.backup.Backup;
-
 import com.aokp.backup.R;
+import com.aokp.backup.R.drawable;
+import com.aokp.backup.backup.Backup;
 import com.squareup.otto.Subscribe;
 
 import java.text.DateFormat;

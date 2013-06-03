@@ -8,10 +8,8 @@ import com.aokp.backup.backup.Backup;
 import com.aokp.backup.backup.BackupFactory;
 import com.aokp.backup.util.Tools;
 import com.squareup.otto.Bus;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,14 +39,8 @@ public class AOKPBackup extends Application {
         File backupDir = Tools.getBackupDirectory(this);
 
         // This filter only returns directories
-        FileFilter fileFilter = new FileFilter() {
-            public boolean accept(File file) {
-                boolean accept = file.isDirectory() || FilenameUtils.getExtension(file.getAbsolutePath()).equals("zip");
 
-                return accept;
-            }
-        };
-        File[] files = backupDir.listFiles(fileFilter);
+        File[] files = backupDir.listFiles(Tools.getBackupFileFilter(this));
         if (files == null) {
             Log.d(TAG, "no backups found");
         } else {
