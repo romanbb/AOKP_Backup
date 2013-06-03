@@ -1,11 +1,12 @@
 
-package com.aokp.backup;
+package com.aokp.backup.ui;
 
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+import com.aokp.backup.R;
 import eu.chainfire.libsuperuser.Shell;
 
 public class Preferences extends PreferenceActivity {

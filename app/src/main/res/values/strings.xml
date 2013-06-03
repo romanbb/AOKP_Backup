@@ -42,5 +42,8 @@
     <string name="dialog_cancel">Cancel</string>
     <string name="dont_show_again">Don\'t show this warning message again</string>
     <string name="read_warning_text">I\'ve read the warning. I have a backup.</string>
+    <string name="old_style_backup">Backup (old style)</string>
+    <string name="desc_backup_named_save">Begin backup with given name</string>
+    <string name="delete">Delete backup</string>
 
 </resources>

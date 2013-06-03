@@ -1,63 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/layout_root"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+              android:id="@+id/layout_root"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal">
 
-    <RelativeLayout
-        android:id="@+id/RelativeLayout1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="10.0dip" >
-
-        <TextView
+    <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
+            android:layout_height="fill_parent"
             android:text="Name"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:gravity="center_vertical"/>
 
-        <EditText
+    <EditText
             android:id="@+id/save_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+
+            android:layout_height="fill_parent"
             android:layout_below="@+id/textView2"
-            android:inputType="textMultiLine"
-            android:isScrollContainer="false" >
+            android:isScrollContainer="false"
+            android:gravity="center_vertical"
+            android:inputType="text|textNoSuggestions">
 
-            <requestFocus />
+        <requestFocus/>
 
+    </EditText>
 
-        </EditText>
-    </RelativeLayout>
-
-    <LinearLayout
-        style="?android:attr/buttonBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="horizontal" >
-
-        <Button
-            android:id="@+id/cancel"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dip"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="Cancel" />
-
-        <Button
+    <ImageView
             android:id="@+id/save"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="0dip"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="Save" />
-    </LinearLayout>
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/desc_backup_named_save"
+            android:clickable="true"
+            android:src="@drawable/ic_backup"
+            android:background="?android:selectableItemBackground"/>
 
 </LinearLayout>

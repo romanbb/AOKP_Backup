@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.aokp.backup;
+package com.aokp.backup.ui;
 
 import android.content.Context;
 import android.content.SharedPreferences;

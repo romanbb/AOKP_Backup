@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp">
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Ribbons"
+            android:id="@+id/backup_name"
+            android:layout_gravity="left|center_vertical"
+            android:textSize="24dp"
+            android:layout_alignTop="@+id/imageView"
+            android:layout_toRightOf="@+id/imageView"
+            android:gravity="bottom"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="May 25, 2013"
+            android:id="@+id/backup_date"
+            android:textSize="10dp"
+            android:fontFamily="sans-serif-light"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:textColor="#8c8c8c"/>
+
+    <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:id="@+id/imageView"
+            android:src="@drawable/ic_backup"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:paddingRight="8dp"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Backup"
+            android:id="@+id/meta_text"
+            android:fontFamily="sans-serif-light"
+            android:textColor="#6a6a6a"
+            android:layout_below="@+id/backup_name"
+            android:layout_toRightOf="@+id/imageView"/>
+
+</RelativeLayout>

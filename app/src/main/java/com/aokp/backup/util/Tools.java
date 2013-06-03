@@ -20,14 +20,33 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
-import com.aokp.backup.Prefs;
+import com.aokp.backup.ui.Prefs;
 import eu.chainfire.libsuperuser.Shell;
+import org.apache.commons.io.FileUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.Closeable;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Deque;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -63,9 +82,28 @@ public class Tools {
         return f;
     }
 
+    @Deprecated
     public static File getBackupDirectory(Context c, String name) {
         File d = new File(getBackupDirectory(c), name);
         if (!d.exists()) {
+            d.mkdir();
+        }
+        return d;
+    }
+
+    public static File getTempBackupDirectory(Context c, boolean create) {
+        File d = new File(c.getCacheDir(), ".zipping");
+        if (create) {
+            FileUtils.deleteQuietly(d);
+            d.mkdir();
+        }
+        return d;
+    }
+
+    public static File getTempRestoreDirectory(Context c, boolean create) {
+        File d = new File(c.getCacheDir(), ".restoring");
+        if (create) {
+            FileUtils.deleteQuietly(d);
             d.mkdir();
         }
         return d;

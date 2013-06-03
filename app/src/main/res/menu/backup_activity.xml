@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:title="@string/backup"
+            android:actionLayout="@layout/backup_dialog"
+            android:id="@+id/menu_backup_go"
+            android:icon="@drawable/ic_action_new_backup"
+            android:showAsAction="collapseActionView|withText|always"/>
+    <item
+            android:id="@+id/prefs"
+            android:title="@string/settings"
+            android:showAsAction="never"/>
+</menu>

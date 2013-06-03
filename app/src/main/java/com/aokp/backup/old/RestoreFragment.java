@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.aokp.backup;
+package com.aokp.backup.old;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -30,10 +30,8 @@ import android.view.*;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import com.aokp.backup.restore.ICSRestore;
-import com.aokp.backup.restore.JBMR1Restore;
-import com.aokp.backup.restore.JBRestore;
-import com.aokp.backup.restore.Restore;
+import com.aokp.backup.R;
+import com.aokp.backup.ui.Preferences;
 import com.aokp.backup.util.Tools;
 import eu.chainfire.libsuperuser.Shell;
 
@@ -312,7 +310,6 @@ public class RestoreFragment extends Fragment {
 
             AlertDialog d;
             Context context;
-            Restore r;
             String name = null;
             boolean[] cats = null;
             Boolean restore;
@@ -321,17 +318,17 @@ public class RestoreFragment extends Fragment {
                 this.context = context;
                 this.name = name;
                 this.cats = cats;
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
-                    r = new ICSRestore(context);
-                else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN)
-                    r = new JBRestore(context);
-                else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1)
-                    r = new JBMR1Restore(context);
+//                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+//                    r = new ICSRestore(context);
+//                else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN)
+//                    r = new JBRestore(context);
+//                else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1)
+//                    r = new JBMR1Restore(context);
             }
 
             @Override
             protected void onPreExecute() {
-                if (!r.okayToRestore()) {
+//                if (!r.okayToRestore()) {
                     new AlertDialog.Builder(context)
                             .setTitle("Restore failed!")
                             .setMessage("AOKP Not detected. Continue restoring?")
@@ -353,13 +350,13 @@ public class RestoreFragment extends Fragment {
                                 }
                             })
                             .create().show();
-                } else {
-                    restore = true;
-                    d = new AlertDialog.Builder(context)
-                            .setMessage("Restore in progress")
-                            .create();
-                    d.show();
-                }
+//                } else {
+//                    restore = true;
+//                    d = new AlertDialog.Builder(context)
+//                            .setMessage("Restore in progress")
+//                            .create();
+//                    d.show();
+//                }
 
             }
 
@@ -370,9 +367,9 @@ public class RestoreFragment extends Fragment {
                 int result = 3;
                 if (restore) {
                     Tools.mountRw();
-                    synchronized (restore) {
-                        result = r.restoreSettings(name, cats);
-                    }
+//                    synchronized (restore) {
+//                        result = r.restoreSettings(name, cats);
+//                    }
                     Tools.mountRo();
                     return result;
                 } else {

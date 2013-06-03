@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.aokp.backup;
+package com.aokp.backup.old;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -24,14 +24,20 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.*;
-import android.widget.*;
-import com.aokp.backup.backup.Backup;
-import com.aokp.backup.backup.ICSBackup;
-import com.aokp.backup.backup.JBBackup;
-import com.aokp.backup.backup.JBMR1Backup;
-
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 import com.aokp.backup.R;
+import com.aokp.backup.backup.Backup;
+import com.aokp.backup.ui.Preferences;
 
 import java.util.Date;
 
@@ -261,13 +267,13 @@ public class BackupFragment extends Fragment {
                 this.context = context;
                 this.name = name;
 
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
-                    b = new ICSBackup(context, cats, name);
-                else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN)
-                    b = new JBBackup(context, cats, name);
-                else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                    b = new JBMR1Backup(context, cats, name);
-                }
+//                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+//                    b = new ICSBackup(context, cats, name);
+//                else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN)
+//                    b = new JBBackup(context, cats, name);
+//                else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//                    b = new JBMR1Backup(context, cats, name);
+//                }
 
             }
 

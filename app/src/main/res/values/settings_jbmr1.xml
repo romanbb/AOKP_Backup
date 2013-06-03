@@ -49,7 +49,6 @@
         <item>kill_app_longpress_back</item>
         <item>wakeup_when_plugged_unplugged</item>
         <item>ui_inverted_mode</item>
-        <item>ui_mode_is_toggled</item>
         <item>hide_extras_system_bar</item>
         <item>system_power_enable_crt_off</item>
         <item>system_power_crt_mode</item>

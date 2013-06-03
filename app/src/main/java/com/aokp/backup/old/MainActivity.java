@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.aokp.backup;
+package com.aokp.backup.old;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -33,6 +33,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TabHost;
 import android.widget.TextView;
+import com.aokp.backup.AOKPBackup;
+import com.aokp.backup.R;
+import com.aokp.backup.ui.Prefs;
 import eu.chainfire.libsuperuser.Shell;
 
 import java.io.File;
@@ -52,7 +55,6 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         application = (AOKPBackup) getApplicationContext();
-//        Log.i("B", Restore.getRomControlPid());
         final ActionBar bar = getActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
@@ -67,6 +69,8 @@ public class MainActivity extends Activity {
 
         if (savedInstanceState != null) {
             bar.setSelectedNavigationItem(savedInstanceState.getInt("tab", 0));
+        } else {
+            check();
         }
 
         if (savedInstanceState == null) {

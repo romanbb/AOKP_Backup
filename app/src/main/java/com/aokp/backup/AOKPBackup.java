@@ -2,17 +2,66 @@
 package com.aokp.backup;
 
 import android.app.Application;
-import android.content.res.AssetManager;
 import android.os.Build;
 import android.util.Log;
+import com.aokp.backup.backup.Backup;
+import com.aokp.backup.backup.BackupFactory;
 import com.aokp.backup.util.Tools;
+import com.squareup.otto.Bus;
+import org.apache.commons.io.FilenameUtils;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AOKPBackup extends Application {
 
     static final String TAG = "AOKP Backup";
+
+    List<Backup> mBackups;
+
+    static Bus sBus;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        sBus = new Bus();
+        mBackups = new ArrayList<Backup>();
+    }
+
+    public static Bus getBus() {
+        return sBus;
+    }
+
+    public List<Backup> findBackups() {
+        mBackups.clear();
+
+        File backupDir = Tools.getBackupDirectory(this);
+
+        // This filter only returns directories
+        FileFilter fileFilter = new FileFilter() {
+            public boolean accept(File file) {
+                boolean accept = file.isDirectory() || FilenameUtils.getExtension(file.getAbsolutePath()).equals("zip");
+
+                return accept;
+            }
+        };
+        File[] files = backupDir.listFiles(fileFilter);
+        if (files == null) {
+            Log.d(TAG, "no backups found");
+        } else {
+            for (int i = 0; i < files.length; i++) {
+                try {
+                    mBackups.add(BackupFactory.fromZipOrDirectory(this, files[i]));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return mBackups;
+    }
 
     public boolean isAOKPVersionSupported() {
         if (Tools.getAOKPGooVersion() > 0) {

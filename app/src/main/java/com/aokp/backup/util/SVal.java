@@ -19,34 +19,59 @@ package com.aokp.backup.util;
 public class SVal {
     String setting;
     String val;
-    
+
     private boolean secureSetting;
+
+    public SVal(String fromString) {
+        fromString = fromString.trim();
+        int split = fromString.indexOf("=");
+        setting = fromString.substring(0, split);
+        val = fromString.substring(split + 1, fromString.length());
+
+        if (setting.startsWith("secure.")) {
+            secureSetting = true;
+        }
+    }
 
     public SVal(String setting, String val) {
         this.setting = setting;
         this.val = val;
-        
-        if(setting.startsWith("secure.")) {
+
+        if (setting.startsWith("secure.")) {
             secureSetting = true;
         }
     }
-    
+
+    @Deprecated
     public boolean isSecure() {
         return secureSetting || setting.startsWith("secure.");
     }
-    
+
+    @Deprecated
     public String getRealSettingString() {
-        if(secureSetting)
+        if (isSecure())
             return setting.substring(7);
         else
             return setting;
     }
-    
-    public String getVal() {
+
+    public String getKey() {
+        return setting;
+    }
+
+    public String getValue() {
         return val;
     }
 
     public String toString() {
+        if (setting.startsWith("secure.")) {
+            return setting + "=" + val;
+        }
+
+        if (secureSetting) {
+            return "secure." + setting + "=" + val;
+        }
+
         return setting + "=" + val;
     }
 }
