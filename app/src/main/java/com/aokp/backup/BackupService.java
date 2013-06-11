@@ -1,5 +1,11 @@
 package com.aokp.backup;
 
+import com.aokp.backup.backup.Backup;
+import com.aokp.backup.backup.BackupFactory;
+import com.aokp.backup.util.Tools;
+
+import org.apache.commons.io.FileUtils;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -15,21 +21,12 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 import android.util.Log;
-import android.widget.Toast;
-import com.aokp.backup.R.drawable;
-import com.aokp.backup.backup.Backup;
-import com.aokp.backup.backup.BackupFactory;
-import com.aokp.backup.util.Tools;
-import eu.chainfire.libsuperuser.Shell;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+
+import eu.chainfire.libsuperuser.Shell;
 
 /**
  * Created by roman on 6/1/13.
@@ -43,11 +40,14 @@ public class BackupService extends Service {
     public static final int BACKUP_COMPLETED_NOTIFICATION_ID = 21387;
     public static final int RESTORE_COMPLETED_NOTIFICATION_ID = 21388;
 
-    public static final String ACTION_NEW_BACKUP = "com.aokp.backup.BackupService.ACTION_NEW_BACKUP";
-    public static final String ACTION_RESTORE_BACKUP = "com.aokp.backup.BackupService.ACTION_RESTORE_BACKUP";
+    public static final String ACTION_NEW_BACKUP
+            = "com.aokp.backup.BackupService.ACTION_NEW_BACKUP";
+    public static final String ACTION_RESTORE_BACKUP
+            = "com.aokp.backup.BackupService.ACTION_RESTORE_BACKUP";
 
     private static final String TAG = BackupService.class.getSimpleName();
-    private static final String ACTION_CLEAR_NOTIFICATION = "com.aokp.backup.BackupService.ACTION_CLEAR_NOTIFICATION";
+    private static final String ACTION_CLEAR_NOTIFICATION
+            = "com.aokp.backup.BackupService.ACTION_CLEAR_NOTIFICATION";
 
     private AsyncTask<String, Void, Boolean> mUpdateTask;
 
@@ -63,7 +63,8 @@ public class BackupService extends Service {
             if (intent.hasExtra("notification_id")) {
                 switch (intent.getIntExtra("notification_id", 0)) {
                     case BACKUP_COMPLETED_NOTIFICATION_ID:
-                        NotificationManager not = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                        NotificationManager not = (NotificationManager) context
+                                .getSystemService(Context.NOTIFICATION_SERVICE);
                         not.cancel(BACKUP_COMPLETED_NOTIFICATION_ID);
                         return;
                 }
@@ -106,8 +107,6 @@ public class BackupService extends Service {
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
 
-
-
         final String action = intent.getAction();
         if (ACTION_NEW_BACKUP.equals(action)) {
 
@@ -115,6 +114,9 @@ public class BackupService extends Service {
             if (mUpdateTask == null) {
 
                 mUpdateTask = new AsyncTask<String, Void, Boolean>() {
+
+                    Backup b;
+
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
@@ -126,10 +128,11 @@ public class BackupService extends Service {
                         boolean success;
                         Tools.setROMControlPid(Tools.getRomControlPid());
 
-                        Backup b = BackupFactory.getNewBackupObject(BackupService.this, params[0]);
+                        b = BackupFactory.getNewBackupObject(BackupService.this, params[0]);
 
                         if (intent.hasExtra("category_filter")) {
-                            ArrayList<Integer> filter = intent.getIntegerArrayListExtra("category_filter");
+                            ArrayList<Integer> filter = intent
+                                    .getIntegerArrayListExtra("category_filter");
                             b.setCategoryFilter(filter);
                         }
 
@@ -151,6 +154,9 @@ public class BackupService extends Service {
                     @Override
                     protected void onPostExecute(Boolean success) {
                         super.onPostExecute(success);
+                        if (b != null) {
+                            b.onBackupCompleted(success);
+                        }
                         AOKPBackup.getBus().post(new BackupFileSystemChange(success));
                         hideOngoingNotification();
                         notifyBackupDone(success);
@@ -160,7 +166,8 @@ public class BackupService extends Service {
             }
         } else if (ACTION_RESTORE_BACKUP.equals(action)) {
 
-            final NotificationManager not = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+            final NotificationManager not = (NotificationManager) this
+                    .getSystemService(Context.NOTIFICATION_SERVICE);
             not.cancel(BACKUP_COMPLETED_NOTIFICATION_ID);
 
             final String path = intent.getStringExtra("path");
@@ -184,7 +191,8 @@ public class BackupService extends Service {
 
                     boolean result;
                     try {
-                        Backup b = BackupFactory.fromZipOrDirectory(getApplicationContext(), new File(params[0]));
+                        Backup b = BackupFactory
+                                .fromZipOrDirectory(getApplicationContext(), new File(params[0]));
                         List<String> sudo = b.doRestore();
 
                         if (sudo != null && !sudo.isEmpty()) {
@@ -197,7 +205,8 @@ public class BackupService extends Service {
                         Log.d(TAG, "Restore failed!!!!!", e);
                         result = false;
                     } finally {
-                        FileUtils.deleteQuietly(Tools.getTempRestoreDirectory(BackupService.this, false));
+                        FileUtils.deleteQuietly(
+                                Tools.getTempRestoreDirectory(BackupService.this, false));
                     }
                     return result;
                 }
@@ -221,19 +230,18 @@ public class BackupService extends Service {
 
     /**
      * Restore is finished. Add notification until reboot.
-     *
-     * @param success
      */
     private void notifyRestoreDone(Boolean success) {
-
 
         Intent backupComplete = new Intent(this, BackupActivity.class);
         backupComplete.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         backupComplete.putExtra("restore_completed", true);
 
-        mPender = PendingIntent.getActivity(this, 0, backupComplete, PendingIntent.FLAG_CANCEL_CURRENT);
+        mPender = PendingIntent
+                .getActivity(this, 0, backupComplete, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), drawable.ic_noti_backup_complete_large);
+        Bitmap icon = BitmapFactory
+                .decodeResource(getResources(), R.drawable.ic_noti_backup_complete_large);
 
         String title = success ? "Restore completed" : "Restore failed!";
         Notification notification = new Builder(this)
@@ -245,7 +253,8 @@ public class BackupService extends Service {
                 .setSmallIcon(R.drawable.ic_noti_backup_complete)
                 .build();
 
-        NotificationManager not = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager not = (NotificationManager) getSystemService(
+                Context.NOTIFICATION_SERVICE);
         not.notify(RESTORE_COMPLETED_NOTIFICATION_ID, notification);
 
         stopSelf();
@@ -253,8 +262,6 @@ public class BackupService extends Service {
 
     /**
      * Backup is done.
-     *
-     * @param success
      */
     private void notifyBackupDone(boolean success) {
         Intent notify = new Intent(ACTION_CLEAR_NOTIFICATION);
@@ -262,7 +269,8 @@ public class BackupService extends Service {
 
         mPender = PendingIntent.getBroadcast(this, 0, notify, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), drawable.ic_noti_backup_complete_large);
+        Bitmap icon = BitmapFactory
+                .decodeResource(getResources(), R.drawable.ic_noti_backup_complete_large);
         String title = success ? "Backup completed" : "Backup failed!";
         Notification notification = new Builder(this)
                 .setContentTitle(title)
@@ -273,12 +281,14 @@ public class BackupService extends Service {
                 .setSmallIcon(R.drawable.ic_noti_backup_complete)
                 .build();
 
-        NotificationManager not = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager not = (NotificationManager) getSystemService(
+                Context.NOTIFICATION_SERVICE);
         not.notify(BACKUP_COMPLETED_NOTIFICATION_ID, notification);
     }
 
     private void hideOngoingNotification() {
-        NotificationManager not = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager not = (NotificationManager) getSystemService(
+                Context.NOTIFICATION_SERVICE);
         not.cancel(BACKUP_NOTIFICATION_ID);
         mNotification = null;
     }
@@ -291,12 +301,14 @@ public class BackupService extends Service {
                 .setSmallIcon(R.drawable.ic_noti_backup_complete)
                 .build();
 
-        NotificationManager not = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager not = (NotificationManager) getSystemService(
+                Context.NOTIFICATION_SERVICE);
         not.notify(BACKUP_NOTIFICATION_ID, mNotification);
     }
 
 
     public static class BackupFileSystemChange {
+
         public boolean success;
         public boolean restored;
 

@@ -16,24 +16,24 @@
 
 package com.aokp.backup.backup;
 
+import com.aokp.backup.util.SVal;
+import com.aokp.backup.util.Tools;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+
 import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Build;
 import android.os.Build.VERSION;
 import android.provider.Settings;
 import android.util.Log;
-import com.aokp.backup.util.SVal;
-import com.aokp.backup.util.Tools;
-import eu.chainfire.libsuperuser.Shell;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -42,12 +42,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * Old backup structure:
- * $backup_root/$name/
- * <p/>
- * <p/>
- * New backup structure
- * $backup_root/$name.zip
+ * Old backup structure: $backup_root/$name/ <p/> <p/> New backup structure $backup_root/$name.zip
  */
 public abstract class Backup {
 
@@ -219,14 +214,15 @@ public abstract class Backup {
     }
 
     /**
-     * At this point, everything should be ready to zip up in the temp dir. Any SU commands should have been run already
+     * At this point, everything should be ready to zip up in the temp dir. Any SU commands should
+     * have been run already
      *
      * @return Whether the zip operation was successful
      */
     public boolean doBackupZip() {
 
         File cacheDir = Tools.getTempBackupDirectory(mContext, false);
-//
+
 //        Collection<File> backupFiles = FileUtils.listFiles(cacheDir, null, false);
 //        for (File ownMe : backupFiles) {
 //            ownMe.setReadable(true, false);
@@ -235,16 +231,27 @@ public abstract class Backup {
 
         try {
             // zip!
-            File zip = new File(Tools.getBackupDirectory(mContext), FilenameUtils.getName(mName) + ".zip");
-            Tools.zip(cacheDir, zip);
-            FileUtils.touch(zip);
+            mZip = new File(Tools.getBackupDirectory(mContext),
+                    FilenameUtils.getName(mName) + ".zip");
+            Tools.zip(cacheDir, mZip);
         } catch (IOException e) {
             Log.e(TAG, "Backup failed!", e);
             return false;
         }
-        // delete cache dir
-        FileUtils.deleteQuietly(cacheDir);
 
+        return true;
+    }
+
+    public void onBackupCompleted(boolean success) {
+        if (success) {
+            try {
+                FileUtils.touch(mZip);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // delete cache dir
+            FileUtils.deleteQuietly(Tools.getTempBackupDirectory(mContext, false));
+        }
         // delete the folder that was zipped in place
         File zippedFolder = new File(mBackupDir, mName);
         if (zippedFolder.exists() && zippedFolder.isDirectory()) {
@@ -255,18 +262,15 @@ public abstract class Backup {
             FileUtils.deleteQuietly(Tools.getBackupDirectory(mContext, mName));
         }
 
-        return true;
-
     }
 
     public void readSettingsFromZip() throws IOException {
         mBackupValues.clear();
         mSpecialCaseKeys.clear();
 
-
         // zip?
-        if (mZip != null && !mZip.isDirectory() && FilenameUtils.isExtension(mZip.getAbsolutePath(), "zip") && mZip.exists()) {
-
+        if (mZip != null && !mZip.isDirectory() && FilenameUtils
+                .isExtension(mZip.getAbsolutePath(), "zip") && mZip.exists()) {
 
             // new backup vals
             ZipFile zip = new ZipFile(mZip);
@@ -383,8 +387,8 @@ public abstract class Backup {
     public abstract String[] getSettingsCategory(int categoryIndex);
 
     /**
-     * Will fill this backup object with values from the current system,
-     * which settings are determined by the class that implements the abstract methods in this class.
+     * Will fill this backup object with values from the current system, which settings are
+     * determined by the class that implements the abstract methods in this class.
      */
     private void readFromSystem() {
         ContentResolver resolver = mContext.getContentResolver();
@@ -392,7 +396,6 @@ public abstract class Backup {
         // iterate through categories
         for (int i = 0; i < getNumCats(); i++) {
             String[] settings = getSettingsCategory(i);
-
 
             // iterate through category settings to backup.
             for (int j = 0; j < settings.length; j++) {
@@ -402,8 +405,9 @@ public abstract class Backup {
                         String val = Settings.System.getString(resolver, setting);
                         if (val != null) {
                             mBackupValues.add(new SVal(setting, val));
-                        } else
+                        } else {
                             Log.e(TAG, "couldn't backup: " + setting);
+                        }
                     } catch (Exception e) {
                         Log.e(TAG, "couldn't backup: " + setting, e);
                     }
@@ -430,8 +434,6 @@ public abstract class Backup {
 
     /**
      * Old style of writing the backup. Writes separate backup files to a folder.
-     *
-     * @return
      */
     @Deprecated
     public boolean writeBackupSetings() {
@@ -449,17 +451,16 @@ public abstract class Backup {
 //                new File(Tools.getBackupDirectory(mContext, mName),
 //                        "aokp.version"));
 
-
         return true;
     }
 
     /**
-     * Run this to ask the implementing backup class to handle the special KEY.
-     * <p/>
-     * Should set setting's value to 1 if succeeded. 0 if failed (and it handled the event)
+     * Run this to ask the implementing backup class to handle the special KEY. <p/> Should set
+     * setting's value to 1 if succeeded. 0 if failed (and it handled the event)
      *
      * @param setting the KEY from the backup
-     * @return If this method returns false, we can assume it's a key/value pair to be written to Settings.System
+     * @return If this method returns false, we can assume it's a key/value pair to be written to
+     *         Settings.System
      */
     abstract boolean handleBackupSpecialCase(String setting);
 
@@ -468,7 +469,8 @@ public abstract class Backup {
     /**
      * Get the number of categories to query the super class
      *
-     * @return the number of categories (they start with 0, the count would give you the count just like an array)
+     * @return the number of categories (they start with 0, the count would give you the count just
+     *         like an array)
      */
     public abstract int getNumCats();
 
@@ -523,7 +525,8 @@ public abstract class Backup {
                         Log.e(TAG, "failed restoring setting: " + settingToRestore.getKey());
                     }
                 } else {
-                    Log.d(TAG, "handled special case while restoring with key: " + settingToRestore);
+                    Log.d(TAG,
+                            "handled special case while restoring with key: " + settingToRestore);
                 }
             }
         }
@@ -538,7 +541,8 @@ public abstract class Backup {
      */
     private boolean restoreSetting(SVal settingToRestore) {
         if (settingToRestore.isSecure()) {
-            Log.e(TAG, "Not restoring (it's secure!)! Tried to restore secure setting: " + settingToRestore.getKey());
+            Log.e(TAG, "Not restoring (it's secure!)! Tried to restore secure setting: "
+                    + settingToRestore.getKey());
             return false;
         }
 
