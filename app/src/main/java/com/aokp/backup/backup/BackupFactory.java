@@ -3,7 +3,6 @@ package com.aokp.backup.backup;
 import android.content.Context;
 import android.os.Build;
 import com.aokp.backup.R;
-import com.aokp.backup.R.array;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,10 +18,10 @@ public class BackupFactory {
             return R.array.categories;
 
         else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN)
-            return array.jbcategories;
+            return R.array.jbcategories;
 
         else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1)
-            return array.jbmr1_categories;
+            return R.array.jbmr1_categories;
 
 
         return 0;
