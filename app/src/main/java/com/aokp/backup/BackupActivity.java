@@ -13,19 +13,19 @@ import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 import com.aokp.backup.BackupService.BackupFileSystemChange;
+import com.aokp.backup.R.id;
 import com.aokp.backup.backup.BackupFactory;
 import com.aokp.backup.ui.BackupListFragment;
 import com.aokp.backup.ui.Prefs;
 import com.aokp.backup.ui.SlidingCheckboxView;
 import com.aokp.backup.util.Tools;
+import com.dropbox.sync.android.DbxAccountManager;
 import com.squareup.otto.Subscribe;
 import eu.chainfire.libsuperuser.Shell;
 
@@ -36,17 +36,20 @@ import java.util.Date;
 public class BackupActivity extends Activity {
 
     private static final String TAG = BackupActivity.class.getSimpleName();
+    private static final int REQUEST_LINK_TO_DBX = 5;
+
     SlidingCheckboxView mSlidingCats;
-    Animation mSlideInTopAnimation;
-    Animation mSlideOutTopAnimation;
+
     private EditText mNewBackupNameEditText;
     private ImageView mNewBackupSaveButton;
 
+    MenuItem mSyncWithDropboxMenuItem;
     MenuItem mUseExternalStorageMenuItem;
     MenuItem mBackupMenuItem;
 
     BackupListFragment mBackupListFragment;
 
+    private DbxAccountManager mDbxAcctMgr;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,9 +61,6 @@ public class BackupActivity extends Activity {
         mSlidingCats.init(BackupFactory.getCategoryArrayResourceId());
         mSlidingCats.bringToFront();
 
-        mSlideInTopAnimation = AnimationUtils.loadAnimation(BackupActivity.this, R.anim.slide_in_top);
-        mSlideOutTopAnimation = AnimationUtils.loadAnimation(BackupActivity.this, R.anim.slide_out_top);
-
 
         mBackupListFragment = new BackupListFragment();
         getFragmentManager()
@@ -70,6 +70,13 @@ public class BackupActivity extends Activity {
 
         if (getIntent() != null && getIntent().hasExtra("restore_completed")) {
             showRestoreCompleteDialog();
+        }
+
+        if (BuildConfig.DROPBOX_ENABLED) {
+            mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(),
+                    getString(R.string.dropbox_app_key),
+                    getString(R.string.dropbox_app_secret));
+            startService(new Intent(BackupActivity.this, DropboxSyncService.class));
         }
     }
 
@@ -83,6 +90,24 @@ public class BackupActivity extends Activity {
     protected void onPause() {
         super.onPause();
         AOKPBackup.getBus().unregister(this);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_LINK_TO_DBX) {
+            if (resultCode == Activity.RESULT_OK) {
+                // ... Start using Dropbox files.
+                mSyncWithDropboxMenuItem.setChecked(true);
+                startService(new Intent(BackupActivity.this, DropboxSyncService.class));
+            } else {
+                // ... Link failed or was cancelled by the user.
+                mSyncWithDropboxMenuItem.setChecked(false);
+                Toast.makeText(BackupActivity.this, "Link with Dropbox cancelled or failed", Toast.LENGTH_SHORT).show();
+                startService(new Intent(DropboxSyncService.ACTION_UNLINK));
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Subscribe
@@ -121,6 +146,19 @@ public class BackupActivity extends Activity {
                 Prefs.setUseExternalStorage(this, mUseExternalStorageMenuItem.isChecked());
                 AOKPBackup.getBus().post(new BackupFileSystemChange());
                 return true;
+
+            case R.id.sync_with_dropbox:
+                if (mSyncWithDropboxMenuItem.isChecked()) {
+
+                    // unlink
+                    startService(new Intent(DropboxSyncService.ACTION_UNLINK));
+                    mSyncWithDropboxMenuItem.setChecked(false);
+                } else {
+                    // link account
+                    mDbxAcctMgr.startLink((Activity) BackupActivity.this, REQUEST_LINK_TO_DBX);
+                }
+
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -130,6 +168,14 @@ public class BackupActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.backup_activity, menu);
+
+        mSyncWithDropboxMenuItem = menu.findItem(id.sync_with_dropbox);
+        if (BuildConfig.DROPBOX_ENABLED) {
+            mSyncWithDropboxMenuItem.setChecked(mDbxAcctMgr.hasLinkedAccount());
+            mSyncWithDropboxMenuItem.setVisible(true);
+        } else {
+            mSyncWithDropboxMenuItem.setVisible(false);
+        }
 
         mUseExternalStorageMenuItem = menu.findItem(R.id.use_external_storage);
         mUseExternalStorageMenuItem.setChecked(Prefs.getUseExternalStorage(this));
@@ -186,23 +232,6 @@ public class BackupActivity extends Activity {
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 if (mSlidingCats != null) {
-                    mSlideOutTopAnimation.setAnimationListener(new AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            mSlidingCats.setVisibility(View.INVISIBLE);
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
                     slideOutCategories();
 
                 }
@@ -240,17 +269,15 @@ public class BackupActivity extends Activity {
                 || new File(Tools.getBackupDirectory(this), name + ".zip").exists();
     }
 
-    private void slideOutCategories() {
+    public void slideOutCategories() {
         if (mSlidingCats != null) {
-            mSlideOutTopAnimation.setFillEnabled(true);
-            mSlidingCats.startAnimation(mSlideOutTopAnimation);
+            mSlidingCats.slideOutCategories();
         }
     }
 
-    private void slideInCategories() {
+    public void slideInCategories() {
         if (mSlidingCats != null) {
-            mSlidingCats.startAnimation(mSlideInTopAnimation);
-            mSlidingCats.setVisibility(View.VISIBLE);
+            mSlidingCats.slideInCategories();
         }
     }
 

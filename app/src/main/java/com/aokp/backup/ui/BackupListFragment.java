@@ -15,9 +15,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.aokp.backup.AOKPBackup;
 import com.aokp.backup.BackupService.BackupFileSystemChange;
+import com.aokp.backup.BuildConfig;
 import com.aokp.backup.R;
 import com.aokp.backup.R.drawable;
+import com.aokp.backup.R.id;
 import com.aokp.backup.backup.Backup;
+import com.aokp.backup.util.DropboxUtils;
+import com.dropbox.sync.android.DbxAccountManager;
+import com.dropbox.sync.android.DbxException;
 import com.squareup.otto.Subscribe;
 
 import java.text.DateFormat;
@@ -28,7 +33,10 @@ import java.util.List;
  */
 public class BackupListFragment extends ListFragment {
 
+    private DbxAccountManager mDbxAcctMgr;
+
     ArrayAdapter<Backup> mAdapter;
+
     LayoutInflater mInflater;
 
     Handler mHandler;
@@ -50,6 +58,13 @@ public class BackupListFragment extends ListFragment {
         mInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mAdapter = new BackupListArrayAdapter(getActivity(), R.id.backup_name, getBackups());
         setHasOptionsMenu(true);
+
+        if (BuildConfig.DROPBOX_ENABLED) {
+            mDbxAcctMgr = DbxAccountManager.getInstance(getActivity().getApplicationContext(),
+                    getString(R.string.dropbox_app_key),
+                    getString(R.string.dropbox_app_secret));
+
+        }
     }
 
     @Override
@@ -121,6 +136,7 @@ public class BackupListFragment extends ListFragment {
             TextView date = (TextView) convertView.findViewById(R.id.backup_date);
             TextView meta = (TextView) convertView.findViewById(R.id.meta_text);
             ImageView icon = (ImageView) convertView.findViewById(R.id.imageView);
+            ImageView dropboxIcon = (ImageView) convertView.findViewById(id.dropbox_icon);
 
             name.setText(b.getName());
             date.setText(DateFormat.getDateInstance().format(b.getBackupDate()));
@@ -133,8 +149,22 @@ public class BackupListFragment extends ListFragment {
                 icon.setImageResource(drawable.ic_backup);
             }
 
+            if (BuildConfig.DROPBOX_ENABLED) {
+                try {
+                    dropboxIcon.setVisibility(
+                            DropboxUtils.isBackupSyncedToDropbox(mDbxAcctMgr, b)
+                                    ? View.VISIBLE
+                                    : View.GONE);
+                } catch (DbxException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                dropboxIcon.setVisibility(View.GONE);
+            }
+
             return convertView;
         }
     }
+
 
 }

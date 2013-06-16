@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import com.aokp.backup.R;
@@ -23,6 +26,9 @@ public class SlidingCheckboxView extends FrameLayout {
     private AnimatorSet mAnimatorSet;
     private ViewGroup mAttachToMe;
 
+    Animation mSlideInTopAnimation;
+    Animation mSlideOutTopAnimation;
+
     public SlidingCheckboxView(Context context) {
         super(context);
     }
@@ -36,6 +42,29 @@ public class SlidingCheckboxView extends FrameLayout {
     }
 
     public void init(int checkBoxResourceArray) {
+
+        mSlideInTopAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_top);
+        mSlideOutTopAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_top);
+
+        mSlideOutTopAnimation.setAnimationListener(new AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                SlidingCheckboxView.this.setVisibility(View.INVISIBLE);
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+
         View.inflate(getContext(), R.layout.sliding_checkbox_layout, this);
 
         mChecks = getResources().getStringArray(checkBoxResourceArray);
@@ -74,6 +103,16 @@ public class SlidingCheckboxView extends FrameLayout {
                 backupIntent.putIntegerArrayListExtra("category_filter", categoryFilter);
             }
         }
+    }
+
+    public void slideOutCategories() {
+        mSlideOutTopAnimation.setFillEnabled(true);
+        startAnimation(mSlideOutTopAnimation);
+    }
+
+    public void slideInCategories() {
+        startAnimation(mSlideInTopAnimation);
+        setVisibility(View.VISIBLE);
     }
 
 }

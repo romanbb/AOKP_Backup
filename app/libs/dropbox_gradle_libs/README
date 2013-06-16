@@ -1,0 +1,11 @@
+Hack to compile .so libs with gradle
+====================================
+
+
+
+See: https://groups.google.com/forum/?fromgroups#!searchin/adt-dev/so/adt-dev/nQobKd2Gl_8/Z5yWAvCh4h4J
+
+Basic rundown:
+- compress the 'lib' dir (so that the lib is the root in the new zip)
+- rename new zip to "whatever.jar"
+- move to app libs with other jars to get included with the build

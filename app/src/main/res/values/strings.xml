@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">AOKP Backup</string>
+    <string name="app_name">AOKP Backup DEBUG</string>
     <string name="actionbar_title">AOKP Backup Manager</string>
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
@@ -47,4 +47,7 @@
     <string name="delete">Delete backup</string>
     <string name="use_external_storage">Use external storage</string>
 
+    <string name="dropbox_app_key">APP_KEY</string>
+    <string name="dropbox_app_secret">APP_SECRET</string>
+    <string name="sync_with_dropbox">Sync with Dropbox</string>
 </resources>

@@ -462,6 +462,20 @@ public class Tools {
         };
     }
 
+    public static FileFilter getBackupFileFilter(final Context c, final boolean acceptOldBackups) {
+        final FileFilter fileFilter = new FileFilter() {
+            public boolean accept(File file) {
+                if (file.isDirectory()) {
+                    return acceptOldBackups;
+                } else if (file.getName().endsWith(".zip")) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        return fileFilter;
+    }
+
     public static FileFilter getBackupFileFilter(final Context c) {
         FileFilter fileFilter = new FileFilter() {
             public boolean accept(File file) {

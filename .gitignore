@@ -7,3 +7,4 @@ app/release.gradle
 .DS_Store
 *.iml
 *.apk
+app/src/release

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="8dp">
+                android:padding="8dp"
+                tools:context=".BackupActivity">
 
     <TextView
             android:layout_width="wrap_content"
@@ -47,5 +49,14 @@
             android:textColor="#6a6a6a"
             android:layout_below="@+id/backup_name"
             android:layout_toRightOf="@+id/imageView"/>
+
+    <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:id="@+id/dropbox_icon"
+            android:src="@drawable/dropbox"
+            android:layout_alignBottom="@+id/imageView"
+            android:layout_alignRight="@+id/backup_date"
+            android:visibility="gone"/>
 
 </RelativeLayout>

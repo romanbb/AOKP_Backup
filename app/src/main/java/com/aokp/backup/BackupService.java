@@ -1,11 +1,5 @@
 package com.aokp.backup;
 
-import com.aokp.backup.backup.Backup;
-import com.aokp.backup.backup.BackupFactory;
-import com.aokp.backup.util.Tools;
-
-import org.apache.commons.io.FileUtils;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -21,12 +15,15 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 import android.util.Log;
+import com.aokp.backup.backup.Backup;
+import com.aokp.backup.backup.BackupFactory;
+import com.aokp.backup.util.Tools;
+import eu.chainfire.libsuperuser.Shell;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import eu.chainfire.libsuperuser.Shell;
 
 /**
  * Created by roman on 6/1/13.
@@ -156,6 +153,9 @@ public class BackupService extends Service {
                         super.onPostExecute(success);
                         if (b != null) {
                             b.onBackupCompleted(success);
+
+                            Intent dbxDelete = new Intent(BackupService.this, DropboxSyncService.class);
+                            BackupService.this.startService(dbxDelete);
                         }
                         AOKPBackup.getBus().post(new BackupFileSystemChange(success));
                         hideOngoingNotification();

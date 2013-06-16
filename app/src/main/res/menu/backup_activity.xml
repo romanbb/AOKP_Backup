@@ -6,11 +6,18 @@
             android:actionLayout="@layout/backup_dialog"
             android:id="@+id/menu_backup_go"
             android:icon="@drawable/ic_action_new_backup"
-            android:showAsAction="collapseActionView|withText|always"/>
+            android:showAsAction="always|collapseActionView"/>
 
     <item
             android:id="@+id/use_external_storage"
             android:title="@string/use_external_storage"
             android:showAsAction="never"
             android:checkable="true"/>
+
+    <item
+            android:id="@+id/sync_with_dropbox"
+            android:title="@string/sync_with_dropbox"
+            android:showAsAction="never"
+            android:checkable="true"
+            android:checked="false"/>
 </menu>

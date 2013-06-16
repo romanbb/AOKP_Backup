@@ -1,14 +1,12 @@
 package com.aokp.backup.ui;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Pair;
@@ -22,20 +20,16 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.aokp.backup.AOKPBackup;
 import com.aokp.backup.BackupService;
-import com.aokp.backup.BackupService.BackupFileSystemChange;
+import com.aokp.backup.DropboxSyncService;
 import com.aokp.backup.R;
-import com.aokp.backup.R.drawable;
 import com.aokp.backup.backup.Backup;
 import com.aokp.backup.backup.BackupFactory;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -54,6 +48,11 @@ public class BackupDetailFragment extends Fragment {
         f.setArguments(b);
 
         return f;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -174,9 +173,9 @@ public class BackupDetailFragment extends Fragment {
                 .setPositiveButton("Yes", new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new AsyncTask<String, Void, Boolean>() {
+                        new AsyncTask<String, Void, String>() {
                             @Override
-                            protected Boolean doInBackground(String... params) {
+                            protected String doInBackground(String... params) {
 //                                try {
 //                                    deleteMe = BackupFactory.fromZipOrDirectory(getActivity(), mBackup.getZipFile());
 //                                } catch (IOException e) {
@@ -184,14 +183,27 @@ public class BackupDetailFragment extends Fragment {
 //                                    return false;
 //                                }
 
-                                return mBackup.deleteFromDisk();
+                                File backup = mBackup.getZipFile();
+                                boolean success = mBackup.deleteFromDisk();
+
+                                return success ? backup.getName() : null;
                             }
 
                             @Override
-                            protected void onPostExecute(Boolean success) {
-                                super.onPostExecute(success);
-                                Toast.makeText(getActivity(), "Backup deleted", Toast.LENGTH_SHORT).show();
-                                getFragmentManager().popBackStack();
+                            protected void onPostExecute(String backup) {
+                                if (backup != null) {
+                                    Intent dbxDelete = new Intent(getActivity(), DropboxSyncService.class);
+                                    dbxDelete.setAction(DropboxSyncService.ACTION_DELETE_BACKUP);
+                                    dbxDelete.putExtra("backup", backup);
+                                    getActivity().startService(dbxDelete);
+
+
+                                    Toast.makeText(getActivity(), "Backup deleted", Toast.LENGTH_SHORT).show();
+                                    if (!BackupDetailFragment.this.isDetached()) {
+                                        getFragmentManager().popBackStack();
+                                    }
+                                }
+
                             }
                         }.execute();
                     }
