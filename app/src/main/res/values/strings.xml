@@ -29,6 +29,7 @@
         <item>Statusbar Battery</item>
         <item>Statusbar Signal</item>
         <item>Custom backlight Settings</item>
+        <item>Profiles</item>
     </string-array>
 
 

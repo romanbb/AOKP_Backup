@@ -114,6 +114,11 @@ public class JBMR1Backup extends Backup {
                 }
             }
             return true;
+        } else if (setting.equals("profile_xml")) {
+            Shell.SU.run(
+                    "cp /data/system/profiles.xml "
+                            + outDir);
+            return true;
         }
 
         return false;

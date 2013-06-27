@@ -142,7 +142,18 @@ public class JBMR1Restore extends Restore {
                 Log.e(TAG, "Error getting RC user");
             }
             return true;
+        } else if (setting.equals("profile_xml")) {
+            String outDir = Tools.getBackupDirectory(mContext, name).getAbsolutePath();
+            File source = new File(outDir, "profiles.xml");
+            File target = new File(dsFileDir, "profiles.xml");
+            Shell.SU.run("rm " + target.getAbsolutePath());
+            Shell.SU.run("cp " + source.getAbsolutePath() + " "
+                    + target.getAbsolutePath());
+            Tools.chmodAndOwn(target, "0660", rcUser);
+
+            return true;
         }
+
 
         return false;
     }
