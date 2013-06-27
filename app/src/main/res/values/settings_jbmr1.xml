@@ -14,6 +14,7 @@
         <item>Statusbar Signal</item>
         <item>Ribbons</item>
         <item>Quiet hours</item>
+        <item>Profiles</item>
     </string-array>
     <string-array name="jbmr1_cat_general_ui">
         <item>recent_kill_all_button</item>
@@ -349,5 +350,10 @@
         <item>quiet_hours_ringer</item>
         <item>quiet_hours_still</item>
         <item>quiet_hours_dim</item>
+    </string-array>
+
+    <string-array name="jbmr1_cat_profiles">
+        <item>profile_enabled</item>
+        <item>profile_xml</item>
     </string-array>
 </resources>

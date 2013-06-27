@@ -18,7 +18,8 @@ public class JBMR1Categories extends Categories {
     public static final int CAT_SB_SIGNAL = 9;
     public static final int CAT_RIBBONS = 10;
     public static final int CAT_QUIET_HOURS = 11;
-    public static final int NUM_CATS = 12;
+    public static final int CAT_PROFILE = 12;
+    public static final int NUM_CATS = 13;
 
     @Override
     public String[] getSettingsCategory(Context c, int cat) {
@@ -48,6 +49,8 @@ public class JBMR1Categories extends Categories {
                 return res.getStringArray(R.array.jbmr1_cat_ribbons);
             case CAT_QUIET_HOURS:
                 return res.getStringArray(R.array.jbmr1_cat_quiet_hours);
+            case CAT_PROFILE:
+                return res.getStringArray(R.array.jbmr1_cat_profiles);
             default:
                 return null;
         }

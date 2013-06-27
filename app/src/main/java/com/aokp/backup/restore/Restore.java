@@ -46,7 +46,7 @@ public abstract class Restore {
     String rcUser = null;
     File rcFilesDir;
     File rcPrefsDir;
-
+    File dsFileDir;
     int restoreResult = 0;
 
     public Restore(Context c) {
@@ -71,6 +71,11 @@ public abstract class Restore {
         if (!rcFilesDir.exists()) {
             Shell.SU.run("mkdir " + rcFilesDir.getAbsolutePath());
             Tools.chmodAndOwn(rcFilesDir, "0660", rcUser);
+        }
+        dsFileDir = new File("/data/system/");
+        if (!dsFileDir.exists()) {
+            Shell.SU.run("mkdir " + dsFileDir.getAbsolutePath());
+            Tools.chmodAndOwn(dsFileDir, "0660", rcUser);
         }
         Log.e(TAG, "setup files");
         rcPrefsDir = new File("/data/data/com.aokp.romcontrol/shared_prefs/");
