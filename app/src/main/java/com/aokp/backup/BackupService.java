@@ -195,8 +195,10 @@ public class BackupService extends Service {
                                 .fromZipOrDirectory(getApplicationContext(), new File(params[0]));
                         List<String> sudo = b.doRestore();
 
-                        if (sudo != null && !sudo.isEmpty()) {
+                        if (sudo != null) {
                             Shell.SU.run(sudo);
+                            result = true;
+                        } else if (sudo != null && sudo.isEmpty()) {
                             result = true;
                         } else {
                             result = false;

@@ -4,13 +4,11 @@ package com.aokp.backup.backup;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.provider.Settings;
 import android.util.Log;
 import com.aokp.backup.R;
 import com.aokp.backup.util.SVal;
 import com.aokp.backup.util.Tools;
-import eu.chainfire.libsuperuser.Shell;
 
 import java.io.File;
 import java.io.IOException;
@@ -208,7 +206,7 @@ public class JBMR1Backup extends Backup {
 
     public boolean handleRestoreSpecialCase(SVal sval) {
         if (rcUser == null) {
-            Tools.getRomControlPid();
+            rcUser = Tools.getRomControlPid();
         }
 
         String setting = sval.getKey();
