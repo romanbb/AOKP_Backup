@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import com.aokp.backup.BackupService;
 import com.aokp.backup.DropboxSyncService;
 import com.aokp.backup.R;
+import com.aokp.backup.UnsupportedSDKVersionException;
 import com.aokp.backup.backup.Backup;
 import com.aokp.backup.backup.BackupFactory;
 import org.apache.commons.io.FileUtils;
@@ -36,6 +38,8 @@ import java.util.List;
  * Created by roman on 6/3/13.
  */
 public class BackupDetailFragment extends Fragment {
+
+    private static final String TAG = BackupDetailFragment.class.getSimpleName();
 
     Backup mBackup;
     ListView mListView;
@@ -96,7 +100,13 @@ public class BackupDetailFragment extends Fragment {
 
         if (mBackup.hasCategoryFilter()) {
 
-            String[] categories = getResources().getStringArray(BackupFactory.getCategoryArrayResourceId());
+            String[] categories;
+            try {
+                categories = getResources().getStringArray(BackupFactory.getCategoryArrayResourceId());
+            } catch (UnsupportedSDKVersionException e) {
+                Log.e(TAG, "Unsupported SDK version. No settings found to restore.");
+                return new ArrayList();
+            }
 
             String cats = new String();
             for (Integer categoryToBackup : mBackup.getCategoryFilter()) {

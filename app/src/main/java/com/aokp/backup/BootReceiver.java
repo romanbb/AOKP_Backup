@@ -9,6 +9,7 @@ import android.content.Intent;
  * Created by roman on 6/3/13.
  */
 public class BootReceiver extends BroadcastReceiver {
+
     public void onReceive(Context context, Intent intent) {
 
         // clear it either way

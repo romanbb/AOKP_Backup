@@ -38,6 +38,8 @@ public class BackupActivity extends Activity {
     private static final String TAG = BackupActivity.class.getSimpleName();
     private static final int REQUEST_LINK_TO_DBX = 5;
 
+    private static final String PREF_DO_NOT_WARN = "do_not_warn_unsupported_version";
+
     SlidingCheckboxView mSlidingCats;
 
     private EditText mNewBackupNameEditText;
@@ -51,33 +53,56 @@ public class BackupActivity extends Activity {
 
     private DbxAccountManager mDbxAcctMgr;
 
+    private boolean mDisableStuff;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.content_frame);
 
-        mSlidingCats = (SlidingCheckboxView) findViewById(R.id.sliding_checkboxes);
+        mSlidingCats = (SlidingCheckboxView) findViewById(id.sliding_checkboxes);
         mSlidingCats.setVisibility(View.GONE);
-        mSlidingCats.init(BackupFactory.getCategoryArrayResourceId());
-        mSlidingCats.bringToFront();
 
+        // keep going if it's AOKP.
+        try {
+            mSlidingCats.init(BackupFactory.getCategoryArrayResourceId());
+            mSlidingCats.bringToFront();
 
-        mBackupListFragment = new BackupListFragment();
-        getFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragment, mBackupListFragment)
-                .commit();
+            mBackupListFragment = new BackupListFragment();
+            getFragmentManager()
+                    .beginTransaction()
+                    .add(id.fragment, mBackupListFragment)
+                    .commit();
 
-        if (getIntent() != null && getIntent().hasExtra("restore_completed")) {
-            showRestoreCompleteDialog();
+            if (getIntent() != null && getIntent().hasExtra("restore_completed")) {
+                showRestoreCompleteDialog();
+            }
+
+            if (BuildConfig.DROPBOX_ENABLED) {
+                mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(),
+                        getString(R.string.dropbox_app_key),
+                        getString(R.string.dropbox_app_secret));
+                startService(new Intent(BackupActivity.this, DropboxSyncService.class));
+            }
+
+        } catch (UnsupportedSDKVersionException e) {
+            mDisableStuff = true;
+            // show error dialog
+            new Builder(BackupActivity.this)
+                    .setCancelable(false)
+                    .setTitle("Danger!")
+                    .setMessage("Your SDK version is unsupported. It is dangerous to use this app on an unsupported SDK version.")
+                    .setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .create()
+                    .show();
+
         }
 
-        if (BuildConfig.DROPBOX_ENABLED) {
-            mDbxAcctMgr = DbxAccountManager.getInstance(getApplicationContext(),
-                    getString(R.string.dropbox_app_key),
-                    getString(R.string.dropbox_app_secret));
-            startService(new Intent(BackupActivity.this, DropboxSyncService.class));
-        }
     }
 
     @Override
@@ -166,83 +191,82 @@ public class BackupActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.backup_activity, menu);
+        if (!mDisableStuff) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.backup_activity, menu);
 
-        mSyncWithDropboxMenuItem = menu.findItem(id.sync_with_dropbox);
-        if (BuildConfig.DROPBOX_ENABLED) {
-            mSyncWithDropboxMenuItem.setChecked(mDbxAcctMgr.hasLinkedAccount());
-            mSyncWithDropboxMenuItem.setVisible(true);
-        } else {
-            mSyncWithDropboxMenuItem.setVisible(false);
+            mSyncWithDropboxMenuItem = menu.findItem(id.sync_with_dropbox);
+            if (BuildConfig.DROPBOX_ENABLED) {
+                mSyncWithDropboxMenuItem.setChecked(mDbxAcctMgr.hasLinkedAccount());
+                mSyncWithDropboxMenuItem.setVisible(true);
+            } else {
+                mSyncWithDropboxMenuItem.setVisible(false);
+            }
+
+            mUseExternalStorageMenuItem = menu.findItem(R.id.use_external_storage);
+            mUseExternalStorageMenuItem.setChecked(Prefs.getUseExternalStorage(this));
+
+            mBackupMenuItem = menu.findItem(R.id.menu_backup_go);
+
+            mNewBackupNameEditText = (EditText) mBackupMenuItem.getActionView().findViewById(R.id.save_name);
+            mNewBackupNameEditText.setOnEditorActionListener(new OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+
+                    return false;
+                }
+            });
+            mNewBackupSaveButton = (ImageView) mBackupMenuItem.getActionView().findViewById(R.id.save);
+            mNewBackupSaveButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String text = mNewBackupNameEditText.getText().toString();
+                    if (text == null || text.isEmpty()) {
+                        text = mNewBackupNameEditText.getHint().toString();
+                    }
+
+                    if (mBackupMenuItem != null) {
+                        mBackupMenuItem.collapseActionView();
+                    }
+
+                    if (text != null && !text.isEmpty()) {
+                        final String backupName = text.trim();
+                        Intent dobackup = new Intent(BackupActivity.this, BackupService.class);
+                        dobackup.setAction(BackupService.ACTION_NEW_BACKUP);
+                        dobackup.putExtra("name", backupName);
+                        mSlidingCats.addCategoryFilter(dobackup);
+                        startService(dobackup);
+                    }
+                }
+            });
+
+            mBackupMenuItem.setOnActionExpandListener(new OnActionExpandListener() {
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    // slide in categories
+                    slideInCategories();
+
+
+                    if (mNewBackupNameEditText != null) {
+                        mNewBackupNameEditText.setHint(getNewBackupNameHint());
+                    }
+                    invalidateOptionsMenu();
+                    return true;
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    if (mSlidingCats != null) {
+                        slideOutCategories();
+
+                    }
+                    invalidateOptionsMenu();
+                    return true;
+                }
+            });
         }
-
-        mUseExternalStorageMenuItem = menu.findItem(R.id.use_external_storage);
-        mUseExternalStorageMenuItem.setChecked(Prefs.getUseExternalStorage(this));
-
-        mBackupMenuItem = menu.findItem(R.id.menu_backup_go);
-
-        mNewBackupNameEditText = (EditText) mBackupMenuItem.getActionView().findViewById(R.id.save_name);
-        mNewBackupNameEditText.setOnEditorActionListener(new OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-
-
-                return false;
-            }
-        });
-        mNewBackupSaveButton = (ImageView) mBackupMenuItem.getActionView().findViewById(R.id.save);
-        mNewBackupSaveButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String text = mNewBackupNameEditText.getText().toString();
-                if (text == null || text.isEmpty()) {
-                    text = mNewBackupNameEditText.getHint().toString();
-                }
-
-                if (mBackupMenuItem != null) {
-                    mBackupMenuItem.collapseActionView();
-                }
-
-                if (text != null && !text.isEmpty()) {
-                    final String backupName = text.trim();
-                    Intent dobackup = new Intent(BackupActivity.this, BackupService.class);
-                    dobackup.setAction(BackupService.ACTION_NEW_BACKUP);
-                    dobackup.putExtra("name", backupName);
-                    mSlidingCats.addCategoryFilter(dobackup);
-                    startService(dobackup);
-                }
-            }
-        });
-
-        mBackupMenuItem.setOnActionExpandListener(new OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                // slide in categories
-                slideInCategories();
-
-
-                if (mNewBackupNameEditText != null) {
-                    mNewBackupNameEditText.setHint(getNewBackupNameHint());
-                }
-                invalidateOptionsMenu();
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                if (mSlidingCats != null) {
-                    slideOutCategories();
-
-                }
-                invalidateOptionsMenu();
-                return true;
-            }
-        });
-
         return super.onCreateOptionsMenu(menu);
-
-
     }
 
     private String getNewBackupNameHint() {
@@ -283,8 +307,10 @@ public class BackupActivity extends Activity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        mUseExternalStorageMenuItem.setVisible(!mBackupMenuItem.isActionViewExpanded());
-        mBackupMenuItem.setVisible(mBackupListFragment.isVisible());
+        if (!mDisableStuff) {
+            mUseExternalStorageMenuItem.setVisible(!mBackupMenuItem.isActionViewExpanded());
+            mBackupMenuItem.setVisible(mBackupListFragment.isVisible());
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 }

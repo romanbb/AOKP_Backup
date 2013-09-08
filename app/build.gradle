@@ -1,26 +1,18 @@
 apply from: 'release.gradle'
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:0.4.2'
-    }
-}
 apply plugin: 'android'
 
 android {
-    compileSdkVersion 17
-    buildToolsVersion "17.0"
+    compileSdkVersion 18
+    buildToolsVersion "18.0.1"
 
     project.archivesBaseName = "AOKP_Backup"
 
     defaultConfig {
-        versionCode 43
-        versionName "2.0.1-43"
+        versionCode 44
+        versionName "2.1"
         minSdkVersion 15
-        targetSdkVersion 17
+        targetSdkVersion 18
     }
 
     buildTypes {
@@ -35,11 +27,13 @@ android {
 }
 
 dependencies {
+    compile 'com.android.support:support-v4:18.0.0'
+
     compile fileTree(dir: 'libs', include: '*.jar')
 
     compile 'commons-io:commons-io:2.4'
 
-    compile 'com.squareup:otto:1.3.3'
+    compile 'com.squareup:otto:1.3.4'
 
     compile project(':libsuperuser')
 }
