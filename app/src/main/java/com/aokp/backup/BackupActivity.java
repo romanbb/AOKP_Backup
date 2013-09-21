@@ -28,7 +28,6 @@ import com.aokp.backup.ui.SlidingCheckboxView;
 import com.aokp.backup.util.Tools;
 import com.dropbox.sync.android.DbxAccountManager;
 import com.squareup.otto.Subscribe;
-import eu.chainfire.libsuperuser.BuildConfig;
 import eu.chainfire.libsuperuser.Shell;
 
 import java.io.File;
