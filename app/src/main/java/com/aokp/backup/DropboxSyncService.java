@@ -1,5 +1,6 @@
 package com.aokp.backup;
 
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
@@ -22,6 +23,7 @@ import java.util.List;
 /**
  * Created by roman on 6/15/13.
  */
+@SuppressLint("NewApi")
 public class DropboxSyncService extends IntentService {
 
     private static final String TAG = DropboxSyncService.class.getSimpleName();
@@ -32,6 +34,7 @@ public class DropboxSyncService extends IntentService {
 
     private DbxFileSystem mDbxFs;
 
+    @SuppressLint("NewApi")
     public DropboxSyncService() {
         super(DropboxSyncService.class.getSimpleName());
     }
@@ -52,6 +55,7 @@ public class DropboxSyncService extends IntentService {
 
      */
 
+    @SuppressLint("NewApi")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -110,33 +114,30 @@ public class DropboxSyncService extends IntentService {
                     // first sync for this device; just upload current backups!
                     dbxFs().createFolder(DropboxUtils.PATH_DEVICE);
 
-                } else {
+                }
 
-                    // next make sure all local files are up to date.
-                    List<DbxFileInfo> dbxFileInfos = dbxFs().listFolder(DropboxUtils.PATH_DEVICE);
-                    for (DbxFileInfo dbxFileInfo : dbxFileInfos) {
-                        // copy to backup dir if it's newer.
-                        File backupZip = new File(backupDir, dbxFileInfo.path.getName());
+                dbxFs().syncNowAndWait();
 
-                        // check if dbfile is newer
-                        if (!DropboxUtils.isBackupSyncedToDropbox(mDbxAcctMgr, backupZip)) {
-                            if (FileUtils.isFileOlder(backupZip, dbxFileInfo.modifiedTime)) {
-                                // db has newer version of backup!
-                                DbxFile dbxFile = dbxFs().open(dbxFileInfo.path);
+                // next make sure all local files are up to date.
+                List<DbxFileInfo> dbxFileInfos = dbxFs().listFolder(DropboxUtils.PATH_DEVICE);
+                for (DbxFileInfo dbxFileInfo : dbxFileInfos) {
+                    // copy to backup dir if it's newer.
+                    File backupZip = new File(backupDir, dbxFileInfo.path.getName());
 
-                                FileUtils.copyInputStreamToFile(new BufferedInputStream(dbxFile.getReadStream()), backupZip);
-                                dbxFile.close();
+                    // always sync if it's old or not.
+                    if (!DropboxUtils.isBackupSyncedToDropbox(mDbxAcctMgr, backupZip)) {
+                        // db has newer version of backup!
+                        DbxFile dbxFile = dbxFs().open(dbxFileInfo.path);
 
-                                Log.d(TAG, "copied dropbox/" + dbxFile.getPath().getName() + " to local storage");
+                        FileUtils.copyInputStreamToFile(new BufferedInputStream(dbxFile.getReadStream()), backupZip);
+                        dbxFile.close();
 
-                                refresh();
-                                //copied to local file
-                            } else {
-                                Log.d(TAG, "local file: " + backupZip.getName() + " is newer than dropbox version, not downloading it");
-                            }
-                        } else {
-                            Log.d(TAG, "no need to download " + backupZip.getName() + " // already on device");
-                        }
+                        Log.d(TAG, "copied dropbox/" + dbxFile.getPath().getName() + " to local storage");
+
+                        refresh();
+                        //copied to local file
+                    } else {
+                        Log.d(TAG, "local file: " + backupZip.getName() + " is newer than dropbox version, not downloading it");
                     }
                 }
 
