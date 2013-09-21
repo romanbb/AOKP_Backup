@@ -1,5 +1,6 @@
 package com.aokp.backup;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
@@ -27,6 +28,7 @@ import com.aokp.backup.ui.SlidingCheckboxView;
 import com.aokp.backup.util.Tools;
 import com.dropbox.sync.android.DbxAccountManager;
 import com.squareup.otto.Subscribe;
+import eu.chainfire.libsuperuser.BuildConfig;
 import eu.chainfire.libsuperuser.Shell;
 
 import java.io.File;
@@ -55,23 +57,33 @@ public class BackupActivity extends Activity {
 
     private boolean mDisableStuff;
 
+    private Object mBusEventHandler = new Object() {
+        @Subscribe
+        public void onBackupFileSystemChange(BackupFileSystemChange event) {
+            if (mUseExternalStorageMenuItem != null) {
+                mUseExternalStorageMenuItem.setChecked(Prefs.getUseExternalStorage(BackupActivity.this));
+            }
+        }
+    };
+
+    @SuppressLint("NewApi")
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.content_frame);
-
-        mSlidingCats = (SlidingCheckboxView) findViewById(id.sliding_checkboxes);
-        mSlidingCats.setVisibility(View.GONE);
-
-        // keep going if it's AOKP.
         try {
-            mSlidingCats.init(BackupFactory.getCategoryArrayResourceId());
+            int categoryBranchResourceId = BackupFactory.getCategoryArrayResourceId();
+            setContentView(R.layout.content_frame);
+            mSlidingCats = (SlidingCheckboxView) findViewById(id.sliding_checkboxes);
+            mSlidingCats.setVisibility(View.GONE);
+
+            // keep going if it's AOKP.
+            mSlidingCats.init(categoryBranchResourceId);
             mSlidingCats.bringToFront();
 
             mBackupListFragment = new BackupListFragment();
             getFragmentManager()
                     .beginTransaction()
-                    .add(id.fragment, mBackupListFragment)
+                    .add(R.id.fragment, mBackupListFragment)
                     .commit();
 
             if (getIntent() != null && getIntent().hasExtra("restore_completed")) {
@@ -108,13 +120,13 @@ public class BackupActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        AOKPBackup.getBus().register(this);
+        AOKPBackup.getBus().register(mBusEventHandler);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        AOKPBackup.getBus().unregister(this);
+        AOKPBackup.getBus().unregister(mBusEventHandler);
     }
 
     @Override
@@ -135,12 +147,6 @@ public class BackupActivity extends Activity {
         }
     }
 
-    @Subscribe
-    public void onBackupFileSystemChange(BackupFileSystemChange event) {
-        if (mUseExternalStorageMenuItem != null) {
-            mUseExternalStorageMenuItem.setChecked(Prefs.getUseExternalStorage(this));
-        }
-    }
 
     private void showRestoreCompleteDialog() {
         new Builder(this)
@@ -189,6 +195,7 @@ public class BackupActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressLint("NewApi")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!mDisableStuff) {
