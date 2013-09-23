@@ -8,6 +8,9 @@
 
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER"/>
 
+    <uses-sdk android:minSdkVersion="15"
+              android:targetSdkVersion="18" />
+
     <application
             android:name=".AOKPBackup"
             android:theme="@android:style/Theme.Holo.Light"
@@ -25,7 +28,17 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".BackupService"/>
+        <service android:name=".BackupService">
+            <intent-filter>
+                <action android:name="com.aokp.backup.BackupService.ACTION_NEW_BACKUP"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.aokp.backup.BackupService.ACTION_RESTORE_BACKUP"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.aokp.backup.BackupService.ACTION_CLEAR_NOTIFICATION"/>
+            </intent-filter>
+        </service>
         <service android:name=".DropboxSyncService">
             <intent-filter>
                 <action android:name="com.aokp.backup.DropboxSyncService.ACTION_UNLINK"/>
