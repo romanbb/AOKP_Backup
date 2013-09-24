@@ -16,19 +16,17 @@
 
 package com.aokp.backup.backup;
 
-import com.aokp.backup.util.SVal;
-import com.aokp.backup.util.Tools;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-
 import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Build;
 import android.os.Build.VERSION;
 import android.provider.Settings;
 import android.util.Log;
+import com.aokp.backup.util.SVal;
+import com.aokp.backup.util.Tools;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,6 +85,7 @@ public abstract class Backup {
     File rcFilesDir = null;
     File rcPrefsDir = null;
 
+    List<String> mSuCommands;
 
     public boolean isOldStyleBackup() {
         return mOldStyleBackup;
@@ -97,7 +96,7 @@ public abstract class Backup {
     private boolean mOldStyleBackup;
 
     public Backup(Context c, String name) {
-        mContext = c;
+        mContext = c.getApplicationContext();
         mName = name;
         if (new File(name).exists() || name.endsWith(".zip")) {
             throw new RuntimeException("wrong constructor used for existing zip");
@@ -460,7 +459,7 @@ public abstract class Backup {
      *
      * @param setting the KEY from the backup
      * @return If this method returns false, we can assume it's a key/value pair to be written to
-     *         Settings.System
+     * Settings.System
      */
     abstract boolean handleBackupSpecialCase(String setting);
 
@@ -470,7 +469,7 @@ public abstract class Backup {
      * Get the number of categories to query the super class
      *
      * @return the number of categories (they start with 0, the count would give you the count just
-     *         like an array)
+     * like an array)
      */
     public abstract int getNumCats();
 
@@ -490,7 +489,7 @@ public abstract class Backup {
             FileUtils.copyFile(mZip, tempZip);
             Tools.unzip(tempZip, temp);
         } catch (IOException e) {
-            Log.e(TAG, "temp: " + temp.getAbsolutePath());
+            Log.e(TAG, "temp: " + temp.getAbsolutePath(), e);
             Log.e(TAG, "tempZip: " + tempZip.getAbsolutePath());
             e.printStackTrace();
             return null;
@@ -540,14 +539,36 @@ public abstract class Backup {
      * @return whether it was written.
      */
     private boolean restoreSetting(SVal settingToRestore) {
-        if (settingToRestore.isSecure()) {
-            Log.e(TAG, "Not restoring (it's secure!)! Tried to restore secure setting: "
-                    + settingToRestore.getKey());
-            return false;
-        }
+//        if (settingToRestore.isSecure()) {
+//            Log.e(TAG, "Not restoring (it's secure!)! Tried to restore secure setting: "
+//                    + settingToRestore.getKey());
+//            return false;
+//        }
 
-        return Settings.System.putString(mContext.getContentResolver(),
-                settingToRestore.getValue(), settingToRestore.getKey());
+        String cmd = "sqlite3 /data/data/com.android.providers.settings/databases/settings.db"
+                + " \"INSERT into system (name, value) VALUES ('" + settingToRestore.getKey() + "','"
+                + settingToRestore.getValue() + "');\"";
+
+        mSuCommands.add(getSqlRestoreCommand(
+                settingToRestore.isSecure() ? "secure" : "system",
+                settingToRestore.getKey(),
+                settingToRestore.getValue()));
+
+//        Log.e(TAG, "restoring: " + settingToRestore.getKey() + " with val: " + settingToRestore.getValue());
+//        if(Build.VERSION.SDK_INT < 17) {
+        return true;
+//        } else if(Build.VERSION.SDK_INT >= 17) {
+//            return Settings.System.putString(mContext.getContentResolver(),
+//                    settingToRestore.getValue(), settingToRestore.getKey());
+//        }
+
+    }
+
+    private static String getSqlRestoreCommand(String table, String key, String value) {
+        String cmd = "sqlite3 /data/data/com.android.providers.settings/databases/settings.db"
+                + " \"INSERT into " + table + " (name, value) VALUES('" + key + "','" + value + "');\"";
+
+        return cmd;
     }
 
     public String getName() {

@@ -34,7 +34,6 @@ public class JBMR1Backup extends Backup {
 
     static String rcUser;
 
-    List<String> mSuCommands;
 
 
     public JBMR1Backup(Context c, String name) {
