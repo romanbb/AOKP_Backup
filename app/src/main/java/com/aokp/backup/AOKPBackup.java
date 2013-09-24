@@ -8,6 +8,7 @@ import com.aokp.backup.backup.Backup;
 import com.aokp.backup.backup.BackupFactory;
 import com.aokp.backup.util.Tools;
 import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class AOKPBackup extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        sBus = new Bus();
+        sBus = new Bus(ThreadEnforcer.ANY);
         mBackups = new ArrayList<Backup>();
     }
 

@@ -99,7 +99,7 @@ public class Tools {
     }
 
     public static File getTempBackupDirectory(Context c, boolean create) {
-        File d = new File(c.getCacheDir(), ".zipping");
+        File d = new File(c.getFilesDir(), ".zipping");
         if (create) {
             FileUtils.deleteQuietly(d);
             d.mkdir();
@@ -108,7 +108,7 @@ public class Tools {
     }
 
     public static File getTempRestoreDirectory(Context c, boolean create) {
-        File d = new File(c.getCacheDir(), ".restoring");
+        File d = new File(c.getFilesDir(), ".restoring");
         if (create) {
             FileUtils.deleteQuietly(d);
             d.mkdir();
@@ -117,7 +117,7 @@ public class Tools {
     }
 
     public static File getInternalBackupHome(Context c) {
-        return new File(c.getCacheDir(), "backups");
+        return new File(c.getFilesDir(), "backups");
     }
 
     public static File getExternalBackupHome() {
