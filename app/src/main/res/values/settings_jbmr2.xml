@@ -189,7 +189,7 @@
         <item>custom_toggle_icons_2</item>
         <item>custom_toggle_icons_3</item>
         <item>custom_toggle_icons_4</item>
-        <item>toggls_style</item>
+        <item>toggles_style</item>
     </string-array>
     <string-array name="jbmr2_cat_statusbar_clock">
         <item>statusbar_clock_enabled</item>
