@@ -86,7 +86,11 @@ public class BackupActivity extends Activity {
                     .commit();
 
             if (getIntent() != null && getIntent().hasExtra("restore_completed")) {
-                showRestoreCompleteDialog();
+                if (getIntent().getBooleanExtra("restore_completed", false)) {
+                    showRestoreCompleteDialog();
+                } else {
+                    showRestoreFailedDialog();
+                }
             }
 
             if (BuildConfig.DROPBOX_ENABLED) {
@@ -146,12 +150,11 @@ public class BackupActivity extends Activity {
         }
     }
 
-
-    private void showRestoreCompleteDialog() {
+    private void showRestoreFailedDialog() {
         new Builder(this)
-                .setTitle("Restore complete!")
-                .setMessage("You should reboot!")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setTitle("Restore failed!!")
+                .setMessage("You should reboot and try again!")
+                .setPositiveButton("Reboot!", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         AsyncTask.execute(new Runnable() {
@@ -162,10 +165,23 @@ public class BackupActivity extends Activity {
                         });
                     }
                 })
-                .setNegativeButton("No", null)
+                .setNegativeButton("Got it", null)
                 .create()
                 .show();
+    }
 
+    private void showRestoreCompleteDialog() {
+        new Builder(this)
+                .setTitle("Restore complete!")
+                .setMessage("That's it!")
+                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        BackupActivity.this.finish();
+                    }
+                })
+                .create()
+                .show();
     }
 
     @Override

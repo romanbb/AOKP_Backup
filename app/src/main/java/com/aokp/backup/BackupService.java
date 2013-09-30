@@ -101,8 +101,6 @@ public class BackupService extends IntentService {
             AOKPBackup.getBus().post(new BackupFileSystemChange(success));
             hideOngoingNotification();
             notifyBackupDone(success);
-
-
         } else if (ACTION_RESTORE_BACKUP.equals(action)) {
 
             final NotificationManager not = (NotificationManager) this
@@ -156,6 +154,9 @@ public class BackupService extends IntentService {
 
             notifyRestoreDone(result);
 
+            if(result) {
+                Shell.SU.run("pkill zygote");
+            }
         }
     }
 
@@ -180,7 +181,7 @@ public class BackupService extends IntentService {
 
         Intent backupComplete = new Intent(this, BackupActivity.class);
         backupComplete.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        backupComplete.putExtra("restore_completed", true);
+        backupComplete.putExtra("restore_completed", success);
 
         mPender = PendingIntent
                 .getActivity(this, 0, backupComplete, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -191,8 +192,9 @@ public class BackupService extends IntentService {
         String title = success ? "Restore completed" : "Restore failed!";
         Notification notification = new Builder(this)
                 .setContentTitle(title)
-                .setContentText("Tap to reboot now!")
-                .setOngoing(success)
+                .setContentText("Tap me!")
+                .setOngoing(true)
+                .setAutoCancel(false)
                 .setContentIntent(mPender)
                 .setLargeIcon(icon)
                 .setSmallIcon(R.drawable.ic_noti_backup_complete)

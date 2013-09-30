@@ -160,7 +160,7 @@ public class BackupDetailFragment extends Fragment {
     private void confirmRestore() {
         new Builder(getActivity())
                 .setTitle("Restore backup?")
-                .setMessage("Want to restore '" + mBackup.getName() + "'?")
+                .setMessage("Want to restore '" + mBackup.getName() + "'?\n\nYour device your will perform a soft reset to complete the process after the backup has been restored.")
                 .setPositiveButton("Yes", new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
