@@ -93,10 +93,10 @@ public class BackupService extends IntentService {
                 success = false;
             }
 
+            b.onBackupCompleted(success);
             if (success) {
-                b.onBackupCompleted(success);
-                Intent dbxDelete = new Intent(BackupService.this, DropboxSyncService.class);
-                BackupService.this.startService(dbxDelete);
+                Intent syncDbx = new Intent(BackupService.this, DropboxSyncService.class);
+                BackupService.this.startService(syncDbx);
             }
             AOKPBackup.getBus().post(new BackupFileSystemChange(success));
             hideOngoingNotification();

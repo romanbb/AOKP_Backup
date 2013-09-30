@@ -250,6 +250,8 @@ public abstract class Backup {
             }
             // delete cache dir
             FileUtils.deleteQuietly(Tools.getTempBackupDirectory(mContext, false));
+        } else {
+            FileUtils.deleteQuietly(mZip);
         }
         // delete the folder that was zipped in place
         File zippedFolder = new File(mBackupDir, mName);
