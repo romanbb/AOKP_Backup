@@ -8,3 +8,5 @@ app/release.gradle
 *.iml
 *.apk
 app/src/release
+local.properties
+Icon
